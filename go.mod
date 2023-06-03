@@ -3,9 +3,9 @@ module go-boilerplate
 go 1.20
 
 require (
+	github.com/goava/di v1.11.2
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.10.2
-	go.uber.org/dig v1.17.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.1
 )
