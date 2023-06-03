@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go-boilerplate/internal/helpers"
+	"go-boilerplate/pkg/databases"
 	"log"
 	"os"
 
@@ -19,6 +20,7 @@ func ProvideDIContainer() (container *dig.Container, err error) {
 
 	container = dig.New()
 	err = helpers.MultiProvideDI(container, []any{
+		databases.NewPostgresDB,
 		echo.New,
 	})
 
