@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: postgres:15
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: hello123
+      POSTGRES_DB: todolist
+    network_mode: host
