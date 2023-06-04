@@ -6,6 +6,7 @@ require (
 	github.com/goava/di v1.11.2
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.10.2
+	github.com/ztrue/tracerr v0.4.0
 	golang.org/x/crypto v0.9.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.1
