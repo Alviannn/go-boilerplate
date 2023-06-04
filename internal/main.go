@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go-boilerplate/internal/domains/users"
 	"go-boilerplate/pkg/databases"
 	"log"
 	"os"
@@ -21,6 +22,12 @@ func ProvideDIContainer() (container *di.Container, err error) {
 	container, err = di.New(
 		di.Provide(databases.NewPostgresDB),
 		di.Provide(echo.New),
+
+		// Include domains module
+		users.Module,
+
+		// Register all routes
+		di.Invoke(users.SetupRouter),
 	)
 	return
 }
