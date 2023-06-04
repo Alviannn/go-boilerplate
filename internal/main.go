@@ -9,6 +9,7 @@ import (
 	"github.com/goava/di"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 func ProvideDIContainer() (container *di.Container, err error) {
@@ -30,6 +31,12 @@ func main() {
 	container, err := ProvideDIContainer()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	// Force DB to load and test the connection.
+	var gorm *gorm.DB
+	if err := container.Resolve(&gorm); err != nil {
+		return
 	}
 
 	container.Invoke(func(e *echo.Echo) {

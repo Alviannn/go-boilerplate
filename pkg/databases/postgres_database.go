@@ -19,9 +19,7 @@ func NewPostgresDB() (db *gorm.DB, err error) {
 		os.Getenv("DB_TIMEZONE"),
 	)
 
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+	return gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Error),
 	})
-
-	return
 }
