@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go-boilerplate/internal/pkg/databases"
+	"go-boilerplate/pkg/databases"
 	"log"
 	"os"
 
