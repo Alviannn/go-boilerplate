@@ -34,7 +34,7 @@ func (b *ResponseBuilder) WithError(err error) *ResponseBuilder {
 
 func (b *ResponseBuilder) Send(c echo.Context) error {
 	if b.Error != nil {
-		return b.Error
+		return sendErrorResponse(c, FromPrimitiveError(b.Error))
 	}
 
 	dataReflect := reflect.ValueOf(b.Data)
