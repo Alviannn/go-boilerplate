@@ -1,4 +1,4 @@
-APP_NAME = go-boilerplate
+APP_NAME := go-boilerplate
 
 .PHONY: build
 build:
