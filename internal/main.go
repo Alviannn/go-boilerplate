@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go-boilerplate/internal/domains/users"
+	"go-boilerplate/internal/middlewares"
 	"go-boilerplate/pkg/databases"
 	"log"
 	"os"
@@ -47,6 +48,8 @@ func main() {
 	}
 
 	container.Invoke(func(e *echo.Echo) {
+		e.HTTPErrorHandler = middlewares.ErrorHandler()
+
 		e.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
 	})
 }
