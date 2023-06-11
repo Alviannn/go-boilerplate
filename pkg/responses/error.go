@@ -36,7 +36,7 @@ func (e *CustomError) WithError(err error) *CustomError {
 }
 
 func (e *CustomError) Sanitize() *CustomError {
-	if e.Code != 0 {
+	if e.Code == 0 {
 		e.WithCode(http.StatusInternalServerError)
 	}
 	if e.Message == "" {
