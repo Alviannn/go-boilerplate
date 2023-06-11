@@ -35,9 +35,14 @@ func sendErrorResponse(c echo.Context, err *CustomError) error {
 	rawStackTrace := tracerr.StackTrace(err.Err)
 	stackTrace := parseStackTrace(rawStackTrace)
 
+	var errorMessage string
+	if err.Err != nil {
+		errorMessage = err.Err.Error()
+	}
+
 	response := ErrorResponse{
 		Message:      err.Message,
-		ErrorMessage: err.Error(),
+		ErrorMessage: errorMessage,
 		Stack:        stackTrace,
 	}
 
@@ -45,7 +50,7 @@ func sendErrorResponse(c echo.Context, err *CustomError) error {
 }
 
 func parseStackTrace(rawStackList []tracerr.Frame) []string {
-	var stackList []string
+	stackList := make([]string, 0)
 
 	for _, rawStack := range rawStackList {
 		stackList = append(stackList, rawStack.String())

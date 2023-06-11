@@ -1,9 +1,7 @@
 package responses
 
 import (
-	"errors"
 	"net/http"
-	"strings"
 
 	"github.com/ztrue/tracerr"
 )
@@ -38,21 +36,16 @@ func (e *CustomError) WithError(err error) *CustomError {
 }
 
 func (e *CustomError) Sanitize() *CustomError {
-	defaultErrorMessage := "Unhandled server error"
-
 	if e.Code != 0 {
 		e.WithCode(http.StatusInternalServerError)
 	}
 	if e.Message == "" {
-		e.WithMessage(defaultErrorMessage)
-	}
-	if e.Err == nil {
-		e.WithError(errors.New(strings.ToLower(defaultErrorMessage)))
+		e.WithMessage("Unhandled server error")
 	}
 
 	return e
 }
 
 func (e CustomError) Error() string {
-	return e.Err.Error()
+	return e.Message
 }
