@@ -45,14 +45,17 @@ func (b *ResponseBuilder) Send(c echo.Context) error {
 	}
 
 	var sanitizedData any = b.Data
+	emptySlice := make([]string, 0)
+	emptyMap := make(map[string]string)
+
 	if (dataKind == reflect.Struct || dataKind == reflect.Slice) && dataReflect.IsZero() {
 		if dataKind == reflect.Struct {
-			sanitizedData = make(map[any]any, 0)
+			sanitizedData = emptyMap
 		} else {
-			sanitizedData = make([]any, 0)
+			sanitizedData = emptySlice
 		}
 	} else if b.Data == nil {
-		sanitizedData = make(map[any]any, 0)
+		sanitizedData = emptyMap
 	}
 
 	return c.JSON(b.SuccessCode, sanitizedData)
