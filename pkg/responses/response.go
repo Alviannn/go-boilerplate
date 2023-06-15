@@ -36,18 +36,17 @@ func (b *ResponseBuilder) Send(c echo.Context) error {
 	if b.Error != nil {
 		return sendErrorResponse(c, FromPrimitiveError(b.Error))
 	}
-
-	dataReflect := reflect.ValueOf(b.Data)
-	dataKind := dataReflect.Kind()
-
 	if b.SuccessCode == 0 {
 		b.WithSuccessCode(http.StatusOK)
 	}
 
-	var sanitizedData any = b.Data
+	dataReflect := reflect.ValueOf(b.Data)
+	dataKind := dataReflect.Kind()
+
 	emptySlice := make([]string, 0)
 	emptyMap := make(map[string]string)
 
+	var sanitizedData any = b.Data
 	if (dataKind == reflect.Struct || dataKind == reflect.Slice) && dataReflect.IsZero() {
 		if dataKind == reflect.Struct {
 			sanitizedData = emptyMap
