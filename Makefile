@@ -8,6 +8,10 @@ build:
 start:
 	./build/${APP_NAME}
 
+.PHONY: start-dev
+start-dev:
+	air -c ./.air.toml
+
 .PHONY: create-feature
 create-feature:
 	go run ./cmd/create-feature/main.go -name ${name} -domain ${domain}
