@@ -24,7 +24,7 @@ func (s *serviceImpl) GetUser(params dtos.GetUserReq) (user models.User, err err
 
 	if err != nil {
 		newErr := responses.NewError().
-			WithError(err).
+			WithSourceError(err).
 			WithCode(http.StatusInternalServerError).
 			WithMessage(fmt.Sprintf("Cannot fetch user with ID %s", params.UserID))
 

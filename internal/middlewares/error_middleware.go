@@ -14,7 +14,7 @@ func ErrorHandler() echo.HTTPErrorHandler {
 		if echoError, ok := err.(*echo.HTTPError); ok {
 			newError := responses.NewError().
 				WithCode(echoError.Code).
-				WithError(echoError).
+				WithSourceError(echoError).
 				WithMessage(fmt.Sprint(echoError.Message))
 
 			resp.WithError(newError)

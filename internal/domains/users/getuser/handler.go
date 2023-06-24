@@ -22,7 +22,7 @@ func (h Handler) Handle(c echo.Context) (err error) {
 	if err = c.Bind(&params); err != nil {
 		err = responses.NewError().
 			WithCode(http.StatusBadRequest).
-			WithError(err).
+			WithSourceError(err).
 			WithMessage("Failed to bind parameters")
 
 		return
