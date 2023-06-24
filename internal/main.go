@@ -20,22 +20,24 @@ func ProvideDIContainer() (container *di.Container, err error) {
 		return
 	}
 
+	di.SetTracer(&di.StdTracer{})
+
 	container, err = di.New(
 		di.Provide(databases.NewPostgresDB),
 		di.Provide(echo.New),
 
 		// Include domains module
 		users.Module,
-
-		// Register all routes
-		di.Invoke(users.SetupRouter),
 	)
 	return
 }
 
-func main() {
-	di.SetTracer(&di.StdTracer{})
+// Insert all `SetupRouter` functions here.
+var SetupRouterList = []di.Invocation{
+	users.SetupRouter,
+}
 
+func main() {
 	container, err := ProvideDIContainer()
 	if err != nil {
 		log.Fatal(err)
@@ -49,6 +51,11 @@ func main() {
 
 	container.Invoke(func(e *echo.Echo) {
 		e.HTTPErrorHandler = middlewares.ErrorHandler()
+
+		// Register all routes
+		for _, setupRouterFunc := range SetupRouterList {
+			di.Invoke(setupRouterFunc)
+		}
 
 		e.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
 	})
