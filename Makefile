@@ -7,3 +7,7 @@ build:
 .PHONY: start
 start:
 	./build/${APP_NAME}
+
+.PHONY: create-feature
+create-feature:
+	go run ./cmd/create-feature/main.go -name ${name} -domain ${domain}

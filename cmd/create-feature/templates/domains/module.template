@@ -1,0 +1,12 @@
+package {domain_package_name}
+
+import (
+	"{module_name}/internal/domains/{domain_package_name}/{package_name}"
+
+	"github.com/goava/di"
+)
+
+var Module = di.Options(
+	// Add features module here
+	{package_name}.Module,
+)

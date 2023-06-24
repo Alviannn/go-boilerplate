@@ -1,0 +1,13 @@
+package {package_name}
+
+type serviceImpl struct {
+	Repository Repository
+}
+
+func NewService(repo Repository) Service {
+	return &serviceImpl{Repository: repo}
+}
+
+func (s *serviceImpl) {pascal_name}() (err error) {
+	return s.Repository.{pascal_name}()
+}

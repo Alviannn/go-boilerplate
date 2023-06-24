@@ -8,6 +8,7 @@ require (
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/ztrue/tracerr v0.4.0
 	golang.org/x/crypto v0.9.0
+	golang.org/x/mod v0.8.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.1
 )
