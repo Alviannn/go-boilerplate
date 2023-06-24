@@ -32,6 +32,38 @@ func (b *ResponseBuilder) WithError(err error) *ResponseBuilder {
 	return b
 }
 
+// sanitizeData will sanitize the `Data` for JSON response.
+//
+// By sanitizing, it means to make the value of `Data` not `nil`.
+// If it's an empty slice, it will change to `[]`.
+// If it's an empty object/struct instance, it will change to `{}`.
+//
+// Anything that's not a slice or struct or `nil` value
+// will become the default zero value of the type,
+// ex: empty string stays as "".
+func (b *ResponseBuilder) sanitizeData() any {
+	dataReflect := reflect.ValueOf(b.Data)
+	dataKind := dataReflect.Kind()
+
+	emptySlice := make([]string, 0)
+	emptyMap := make(map[string]string)
+
+	var newData any = b.Data
+	isDataStructOrSlice := (dataKind == reflect.Struct || dataKind == reflect.Slice)
+
+	if newData == nil {
+		newData = emptyMap
+	} else if isDataStructOrSlice && dataReflect.IsZero() {
+		if dataKind == reflect.Struct {
+			newData = emptyMap
+		} else {
+			newData = emptySlice
+		}
+	}
+
+	return newData
+}
+
 func (b *ResponseBuilder) Send(c echo.Context) error {
 	if b.Error != nil {
 		return sendErrorResponse(c, FromPrimitiveError(b.Error))
@@ -40,22 +72,5 @@ func (b *ResponseBuilder) Send(c echo.Context) error {
 		b.WithSuccessCode(http.StatusOK)
 	}
 
-	dataReflect := reflect.ValueOf(b.Data)
-	dataKind := dataReflect.Kind()
-
-	emptySlice := make([]string, 0)
-	emptyMap := make(map[string]string)
-
-	var sanitizedData any = b.Data
-	if (dataKind == reflect.Struct || dataKind == reflect.Slice) && dataReflect.IsZero() {
-		if dataKind == reflect.Struct {
-			sanitizedData = emptyMap
-		} else {
-			sanitizedData = emptySlice
-		}
-	} else if b.Data == nil {
-		sanitizedData = emptyMap
-	}
-
-	return c.JSON(b.SuccessCode, sanitizedData)
+	return c.JSON(b.SuccessCode, b.sanitizeData())
 }
