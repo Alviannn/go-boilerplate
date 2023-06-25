@@ -14,7 +14,9 @@ type ResponseBuilder struct {
 }
 
 func New() *ResponseBuilder {
-	return &ResponseBuilder{}
+	return &ResponseBuilder{
+		SuccessCode: http.StatusOK,
+	}
 }
 
 func (b *ResponseBuilder) WithData(data any) *ResponseBuilder {
@@ -23,11 +25,17 @@ func (b *ResponseBuilder) WithData(data any) *ResponseBuilder {
 }
 
 func (b *ResponseBuilder) WithSuccessCode(statusCode int) *ResponseBuilder {
+	if statusCode == 0 {
+		statusCode = http.StatusOK
+	}
 	b.SuccessCode = statusCode
 	return b
 }
 
 func (b *ResponseBuilder) WithError(err error) *ResponseBuilder {
+	if err != nil {
+		err = ParseAsCustomError(err)
+	}
 	b.Error = err
 	return b
 }
@@ -66,10 +74,10 @@ func (b *ResponseBuilder) sanitizeData() any {
 
 func (b *ResponseBuilder) Send(c echo.Context) error {
 	if b.Error != nil {
-		return sendErrorResponse(c, FromPrimitiveError(b.Error))
-	}
-	if b.SuccessCode == 0 {
-		b.WithSuccessCode(http.StatusOK)
+		customErr := ParseAsCustomError(b.Error)
+		errResp := BuildErrorResponse(customErr)
+
+		return c.JSON(customErr.Code, errResp)
 	}
 
 	return c.JSON(b.SuccessCode, b.sanitizeData())
