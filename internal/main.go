@@ -54,7 +54,7 @@ func main() {
 
 		// Register all routes
 		for _, setupRouterFunc := range SetupRouterList {
-			di.Invoke(setupRouterFunc)
+			container.Invoke(setupRouterFunc)
 		}
 
 		e.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
