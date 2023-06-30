@@ -43,13 +43,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Force DB to load and test the connection.
-	var gorm *gorm.DB
-	if err := container.Resolve(&gorm); err != nil {
-		return
-	}
+	err = container.Invoke(func(e *echo.Echo) (err error) {
+		// Force DB to load and test the connection.
+		var gorm *gorm.DB
+		if err = container.Resolve(&gorm); err != nil {
+			return
+		}
 
-	container.Invoke(func(e *echo.Echo) {
+		// Override error handler middleware
 		e.HTTPErrorHandler = middlewares.ErrorHandler()
 
 		// Register all routes
@@ -57,6 +58,10 @@ func main() {
 			container.Invoke(setupRouterFunc)
 		}
 
-		e.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
+		err = e.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
+		return
 	})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
