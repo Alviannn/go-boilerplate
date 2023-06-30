@@ -57,7 +57,9 @@ func main() {
 
 		// Register all routes
 		for _, setupRouterFunc := range SetupRouterList {
-			container.Invoke(setupRouterFunc)
+			if err = container.Invoke(setupRouterFunc); err != nil {
+				return
+			}
 		}
 
 		err = e.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
