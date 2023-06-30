@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-boilerplate/internal/domains/users"
 	"go-boilerplate/internal/middlewares"
+	"go-boilerplate/pkg/customvalidator"
 	"go-boilerplate/pkg/databases"
 	"log"
 	"os"
@@ -23,6 +24,7 @@ func ProvideDIContainer() (container *di.Container, err error) {
 	di.SetTracer(&di.StdTracer{})
 
 	container, err = di.New(
+		di.Provide(customvalidator.NewValidator),
 		di.Provide(databases.NewPostgresDB),
 		di.Provide(echo.New),
 
