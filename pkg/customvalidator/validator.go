@@ -35,6 +35,13 @@ func (v *Validator) Validate(ptrValue any) (err error) {
 		return
 	}
 
+	// Incase the validation is invalid, we're stopping
+	// the process here.
+	_, isOk := err.(*validator.InvalidValidationError)
+	if !isOk {
+		return
+	}
+
 	validationErrors := err.(validator.ValidationErrors)
 	firstFieldError := validationErrors[0]
 
