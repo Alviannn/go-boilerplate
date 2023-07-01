@@ -10,7 +10,6 @@ require (
 	github.com/rs/zerolog v1.29.1
 	github.com/ztrue/tracerr v0.4.0
 	golang.org/x/crypto v0.10.0
-	golang.org/x/mod v0.8.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.1
 )

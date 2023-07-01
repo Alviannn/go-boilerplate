@@ -20,7 +20,7 @@ start-dev:
 
 .PHONY: create-feature
 create-feature:
-	go run ./cmd/create-feature/main.go -name ${name} -domain ${domain}
+	go run ./cmd/create-feature/internal/main.go -name $(name) -domain $(domain)
 
 .PHONY: migration-new
 migration-new:

@@ -1,10 +1,10 @@
 package main
 
 import (
+	"cmd/create-feature/internal/constants"
+	"cmd/create-feature/internal/helpers"
 	"flag"
 	"fmt"
-	"go-boilerplate/cmd/create-feature/constants"
-	"go-boilerplate/cmd/create-feature/helpers"
 	"log"
 	"os"
 	"path"
