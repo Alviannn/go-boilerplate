@@ -6,12 +6,13 @@ import (
 	"go-boilerplate/internal/middlewares"
 	"go-boilerplate/pkg/customvalidator"
 	"go-boilerplate/pkg/databases"
-	"log"
+	"go-boilerplate/pkg/logger"
 	"os"
 
 	"github.com/goava/di"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -21,7 +22,7 @@ func ProvideDIContainer() (container *di.Container, err error) {
 		return
 	}
 
-	di.SetTracer(&di.StdTracer{})
+	di.SetTracer(&logger.DITracer{})
 
 	container, err = di.New(
 		di.Provide(customvalidator.NewValidator),
@@ -40,9 +41,13 @@ var SetupRouterList = []di.Invocation{
 }
 
 func main() {
+	if err := logger.SetupLogger(); err != nil {
+		log.Fatal().Err(err).Msg("Failed to setup logger configuration.")
+	}
+
 	container, err := ProvideDIContainer()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Send()
 	}
 
 	err = container.Invoke(func(e *echo.Echo) (err error) {
@@ -66,6 +71,6 @@ func main() {
 		return
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Send()
 	}
 }
