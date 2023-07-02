@@ -1,27 +1,19 @@
-package getuser
+package users_service
 
 import (
 	"errors"
 	"fmt"
+	"net/http"
+
 	"go-boilerplate/internal/dtos"
 	"go-boilerplate/internal/models"
 	"go-boilerplate/pkg/responses"
-	"net/http"
 
 	"gorm.io/gorm"
 )
 
-type serviceImpl struct {
-	Repository Repository
-}
-
-func NewService(repo Repository) Service {
-	return &serviceImpl{Repository: repo}
-}
-
-func (s *serviceImpl) GetUser(params dtos.GetUserReq) (user models.User, err error) {
+func (s *ServiceImpl) GetUser(params dtos.GetUserReq) (user models.User, err error) {
 	user, err = s.Repository.GetUser(params.UserID)
-
 	if err != nil {
 		newErr := responses.NewError().
 			WithSourceError(err).
@@ -36,6 +28,5 @@ func (s *serviceImpl) GetUser(params dtos.GetUserReq) (user models.User, err err
 
 		err = newErr
 	}
-
 	return
 }

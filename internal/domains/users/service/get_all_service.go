@@ -1,4 +1,4 @@
-package getallusers
+package users_service
 
 import (
 	"go-boilerplate/internal/dtos"
@@ -7,15 +7,7 @@ import (
 	"net/http"
 )
 
-type serviceImpl struct {
-	Repository Repository
-}
-
-func NewService(repo Repository) Service {
-	return &serviceImpl{Repository: repo}
-}
-
-func (s *serviceImpl) GetAllUsers(params dtos.GetAllUsersReq) (userList []models.User, err error) {
+func (s *ServiceImpl) GetAllUsers(params dtos.GetAllUsersReq) (userList []models.User, err error) {
 	userList, err = s.Repository.GetAllUsers(params)
 	if err != nil {
 		err = responses.NewError().

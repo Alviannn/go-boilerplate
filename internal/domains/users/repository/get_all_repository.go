@@ -1,22 +1,12 @@
-package getallusers
+package users_repository
 
 import (
 	"go-boilerplate/internal/dtos"
 	"go-boilerplate/internal/models"
-
-	"gorm.io/gorm"
 )
 
-type repositoryImpl struct {
-	gorm *gorm.DB
-}
-
-func NewRepository(gorm *gorm.DB) Repository {
-	return &repositoryImpl{gorm: gorm}
-}
-
-func (r *repositoryImpl) GetAllUsers(params dtos.GetAllUsersReq) (userList []models.User, err error) {
-	query := r.gorm
+func (r *RepositoryImpl) GetAllUsers(params dtos.GetAllUsersReq) (userList []models.User, err error) {
+	query := r.DB
 
 	if params.Email != "" {
 		query = query.Where("email = ?", params.Email)

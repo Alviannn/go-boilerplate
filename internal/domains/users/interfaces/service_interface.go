@@ -1,4 +1,4 @@
-package getuser
+package users_interfaces
 
 import (
 	"go-boilerplate/internal/dtos"
@@ -7,8 +7,6 @@ import (
 
 type Service interface {
 	GetUser(params dtos.GetUserReq) (user models.User, err error)
-}
-
-type Repository interface {
-	GetUser(userID string) (user models.User, err error)
+	GetAllUsers(params dtos.GetAllUsersReq) (userList []models.User, err error)
+	RegisterUser(params dtos.RegisterUserReq) (err error)
 }

@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"go-boilerplate/internal/domains/users"
+	domains_interfaces "go-boilerplate/internal/domains/interfaces"
 	"go-boilerplate/internal/middlewares"
-	"go-boilerplate/pkg/customvalidator"
-	"go-boilerplate/pkg/databases"
+	"go-boilerplate/pkg/dependencies"
 	"go-boilerplate/pkg/logger"
 	"os"
 
@@ -16,41 +15,35 @@ import (
 	"gorm.io/gorm"
 )
 
-func ProvideDIContainer() (container *di.Container, err error) {
-	err = godotenv.Load()
-	if err != nil {
+func RegisterRouters(echo *echo.Echo, container *di.Container) (err error) {
+	var restDeliveries []domains_interfaces.BaseRestDelivery
+	if err = container.Resolve(&restDeliveries); err != nil {
 		return
 	}
 
-	di.SetTracer(&logger.DITracer{})
-
-	container, err = di.New(
-		di.Provide(customvalidator.NewValidator),
-		di.Provide(databases.NewPostgresDB),
-		di.Provide(echo.New),
-
-		// Include domains module
-		users.Module,
-	)
+	for _, rest := range restDeliveries {
+		rest.SetupRouter(echo)
+	}
 	return
 }
 
-// Insert all `SetupRouter` functions here.
-var SetupRouterList = []di.Invocation{
-	users.SetupRouter,
-}
-
 func main() {
+	if err := godotenv.Load(); err != nil {
+		return
+	}
 	if err := logger.SetupLogger(); err != nil {
 		log.Fatal().Err(err).Msg("Failed to setup logger configuration.")
 	}
 
-	container, err := ProvideDIContainer()
+	// Set logging for dependency registery and resolving.
+	di.SetTracer(&logger.DITracer{})
+
+	container, err := dependencies.New()
 	if err != nil {
 		log.Fatal().Err(err).Send()
 	}
 
-	err = container.Invoke(func(e *echo.Echo) (err error) {
+	err = container.Invoke(func(echo *echo.Echo) (err error) {
 		// Force DB to load and test the connection.
 		var gorm *gorm.DB
 		if err = container.Resolve(&gorm); err != nil {
@@ -58,16 +51,12 @@ func main() {
 		}
 
 		// Override error handler middleware
-		e.HTTPErrorHandler = middlewares.ErrorHandler()
-
-		// Register all routes
-		for _, setupRouterFunc := range SetupRouterList {
-			if err = container.Invoke(setupRouterFunc); err != nil {
-				return
-			}
+		if err = RegisterRouters(echo, container); err != nil {
+			return
 		}
 
-		err = e.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
+		echo.HTTPErrorHandler = middlewares.ErrorHandler()
+		err = echo.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
 		return
 	})
 	if err != nil {

@@ -1,4 +1,4 @@
-package registeruser
+package users_service
 
 import (
 	"go-boilerplate/internal/constants"
@@ -9,15 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type serviceImpl struct {
-	Repository Repository
-}
-
-func NewService(repo Repository) Service {
-	return &serviceImpl{Repository: repo}
-}
-
-func (s *serviceImpl) RegisterUser(params dtos.RegisterUserReq) (err error) {
+func (s *ServiceImpl) RegisterUser(params dtos.RegisterUserReq) (err error) {
 	if s.Repository.IsUserExistByEmail(params.Email) {
 		err = responses.NewError().
 			WithCode(http.StatusBadRequest).

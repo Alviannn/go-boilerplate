@@ -1,4 +1,4 @@
-package getallusers
+package users_delivery_rest
 
 import (
 	"go-boilerplate/internal/dtos"
@@ -8,17 +8,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Handler struct {
-	Service Service
-}
-
-func NewHandler(service Service) Handler {
-	return Handler{Service: service}
-}
-
-func (h Handler) Handle(c echo.Context) (err error) {
+func (d *RestDeliveryImpl) GetAllUsers(c echo.Context) (err error) {
 	var params dtos.GetAllUsersReq
-
 	if err = c.Bind(&params); err != nil {
 		err = responses.NewError().
 			WithCode(http.StatusBadRequest).
@@ -27,7 +18,7 @@ func (h Handler) Handle(c echo.Context) (err error) {
 		return
 	}
 
-	data, err := h.Service.GetAllUsers(params)
+	data, err := d.Service.GetAllUsers(params)
 	return responses.New().
 		WithData(data).
 		WithError(err).
