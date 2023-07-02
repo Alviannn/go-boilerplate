@@ -22,3 +22,12 @@ func SnakeToPascalCase(snake string) string {
 func SnakeToPackageName(snake string) string {
 	return strings.ReplaceAll(snake, "_", "")
 }
+
+func SnakeToCamelCase(snake string) string {
+	pascalCase := SnakeToPascalCase(snake)
+
+	firstChar := strings.ToLower(pascalCase[:1])
+	restOfChars := pascalCase[1:]
+
+	return fmt.Sprintf("%s%s", firstChar, restOfChars)
+}

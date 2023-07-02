@@ -1,0 +1,7 @@
+package {domain_snake_name}_interfaces
+
+import "{module_name}/internal/models"
+
+type Repository interface {
+	Get{domain_pascal_name}(id int64) ({domain_camel_name} models.{domain_pascal_name}, err error)
+}

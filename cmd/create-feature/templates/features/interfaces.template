@@ -1,9 +1,0 @@
-package {package_name}
-
-type Service interface {
-	{pascal_name}() (err error)
-}
-
-type Repository interface {
-	{pascal_name}() (err error)
-}

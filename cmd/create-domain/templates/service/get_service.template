@@ -1,0 +1,20 @@
+package {domain_snake_name}_service
+
+import (
+	"net/http"
+
+	"{module_name}/internal/dtos"
+	"{module_name}/internal/models"
+	"{module_name}/pkg/responses"
+)
+
+func (s *ServiceImpl) Get{domain_pascal_name}(params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} models.{domain_pascal_name}, err error) {
+	{domain_camel_name}, err = s.Repository.Get{domain_pascal_name}(params.ID)
+	if err != nil {
+		err = responses.NewError().
+			WithSourceError(err).
+			WithCode(http.StatusBadRequest).
+			WithMessage("Failed to get {domain_camel_name} by ID.")
+	}
+	return
+}

@@ -1,0 +1,28 @@
+package {domain_snake_name}_delivery_rest
+
+import (
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+	"{module_name}/internal/dtos"
+	"{module_name}/pkg/responses"
+)
+
+func (d *RestDeliveryImpl) Get{domain_pascal_name}(c echo.Context) (err error) {
+	var params dtos.Get{domain_pascal_name}Req
+	if err = c.Bind(&params); err != nil {
+		err = responses.NewError().
+			WithCode(http.StatusBadRequest).
+			WithSourceError(err).
+			WithMessage("Failed to bind parameters")
+
+		return
+	}
+
+	{domain_camel_name}, err := d.Service.Get{domain_pascal_name}(params)
+	return responses.New().
+		WithData({domain_camel_name}).
+		WithSuccessCode(http.StatusOK).
+		WithError(err).
+		Send(c)
+}

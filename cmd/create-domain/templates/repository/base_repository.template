@@ -1,0 +1,17 @@
+package {domain_snake_name}_repository
+
+import (
+	"github.com/goava/di"
+	"gorm.io/gorm"
+	{domain_snake_name}_interfaces "{module_name}/internal/domains/{domain_snake_name}/interfaces"
+)
+
+type RepositoryImpl struct {
+	di.Inject
+
+	DB *gorm.DB
+}
+
+func NewRepository(p RepositoryImpl) {domain_snake_name}_interfaces.Repository {
+	return &p
+}

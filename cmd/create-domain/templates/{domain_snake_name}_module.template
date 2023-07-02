@@ -1,0 +1,15 @@
+package {domain_snake_name}
+
+import (
+	"github.com/goava/di"
+	{domain_snake_name}_delivery_rest "{module_name}/internal/domains/{domain_snake_name}/delivery_rest"
+	{domain_snake_name}_repository "{module_name}/internal/domains/{domain_snake_name}/repository"
+	{domain_snake_name}_service "{module_name}/internal/domains/{domain_snake_name}/service"
+	domains_interfaces "{module_name}/internal/domains/interfaces"
+)
+
+var Module = di.Options(
+	di.Provide({domain_snake_name}_repository.NewRepository),
+	di.Provide({domain_snake_name}_service.NewService),
+	di.Provide({domain_snake_name}_delivery_rest.NewRestDelivery, di.As(new(domains_interfaces.BaseRestDelivery))),
+)
