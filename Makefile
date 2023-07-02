@@ -1,6 +1,10 @@
 include .env
 
 APP_NAME := go-boilerplate
+SOURCE_PATH := ./internal/
+
+CREATE_DOMAIN_CMD := go run ./cmd/create-domain/internal/main.go
+MIGRATION_CMD := go run ./cmd/migrations/internal/main.go
 
 DBMATE_URL := postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable
 DBMATE_CMD_PREFIX := dbmate --migrations-dir './migrations' --no-dump-schema
@@ -25,7 +29,7 @@ clean: ## Cleans the build directory by removing all binary files.
 
 .PHONY: build
 build: ## Builds the app based on your operating system.
-	go build -v -o ./build/$(APP_NAME) ./internal/main.go
+	go build -v -o ./build/$(APP_NAME) $(SOURCE_PATH)
 
 .PHONY: start
 start: ## Starts the app from 'build' directory.
@@ -35,9 +39,9 @@ start: ## Starts the app from 'build' directory.
 start-dev: ## Starts the app with 'air' to allow live/hot reloading as you edit the code.
 	air -c ./.air.toml
 
-.PHONY: create-feature
-create-feature: ## Creates a feature for the app according to boilerplate (ex, make create-feature name=find_todo domain=todos).
-	go run ./cmd/create-feature/internal/main.go -name $(name) -domain $(domain)
+.PHONY: create-domain
+create-domain: ## Creates a domain for the app according to boilerplate (ex, make create-domain domain=finance_reports).
+	$(CREATE_DOMAIN_CMD) -domain $(domain)
 
 .PHONY: migration-new
 migration-new: ## Create a new migration file (ex, migration-new name=create_accounts_table).
@@ -53,4 +57,4 @@ migration-up: ## Execute all migration files.
 
 .PHONY: migration-down
 migration-down: ## Rollback 1 migration.
-	${DBMATE_CMD_WITH_URL_PREFIX} down 
+	${DBMATE_CMD_WITH_URL_PREFIX} down
