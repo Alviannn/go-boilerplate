@@ -11,6 +11,7 @@ import (
 	"github.com/goava/di"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	echo_middlewares "github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
@@ -49,6 +50,8 @@ func StartServer() (err error) {
 		if err = container.Resolve(&gorm); err != nil {
 			return
 		}
+
+		echo.Use(echo_middlewares.RequestID())
 
 		// Override error handler middleware
 		if err = RegisterRouters(echo, container); err != nil {
