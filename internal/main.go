@@ -44,22 +44,22 @@ func StartServer() (err error) {
 		return
 	}
 
-	err = container.Invoke(func(echo *echo.Echo) (err error) {
+	err = container.Invoke(func(app *echo.Echo) (err error) {
 		// Force DB to load and test the connection.
 		var gorm *gorm.DB
 		if err = container.Resolve(&gorm); err != nil {
 			return
 		}
 
-		echo.Use(echo_middlewares.RequestID())
+		app.Use(echo_middlewares.RequestID())
 
 		// Override error handler middleware
-		if err = RegisterRouters(echo, container); err != nil {
+		if err = RegisterRouters(app, container); err != nil {
 			return
 		}
 
-		echo.HTTPErrorHandler = middlewares.ErrorHandler()
-		err = echo.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
+		app.HTTPErrorHandler = middlewares.ErrorHandler()
+		err = app.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
 		return
 	})
 	return
