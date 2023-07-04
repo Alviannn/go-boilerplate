@@ -19,7 +19,7 @@ func NewRotateFileWriter(filenameWithFormat string) (writer *RotateFileWriter, e
 	}
 
 	err = writer.rotateFile()
-	return writer, err
+	return
 }
 
 func (w *RotateFileWriter) getExpectedFilePath() string {
@@ -27,20 +27,20 @@ func (w *RotateFileWriter) getExpectedFilePath() string {
 	return strings.ReplaceAll(w.filenameWithFormat, "{date}", currentDate)
 }
 
-func (w *RotateFileWriter) rotateFile() error {
+func (w *RotateFileWriter) rotateFile() (err error) {
 	// Close the old (or previous) file writer if there were any.
-	if err := w.Close(); err != nil {
-		return err
+	if err = w.Close(); err != nil {
+		return
 	}
 
 	expectedFilePath := w.getExpectedFilePath()
 	fileWriter, err := os.OpenFile(expectedFilePath, os.O_WRONLY|os.O_APPEND|os.O_CREATE, os.ModePerm)
 	if err != nil {
-		return err
+		return
 	}
 
 	w.fileWriter = fileWriter
-	return nil
+	return
 }
 
 func (w *RotateFileWriter) Write(p []byte) (n int, err error) {
@@ -53,13 +53,12 @@ func (w *RotateFileWriter) Write(p []byte) (n int, err error) {
 	return w.fileWriter.Write(p)
 }
 
-func (w *RotateFileWriter) Close() error {
+func (w *RotateFileWriter) Close() (err error) {
 	if w.fileWriter == nil {
-		return nil
+		return
 	}
 
-	err := w.fileWriter.Close()
-	if err != nil {
+	if err = w.fileWriter.Close(); err != nil {
 		w.fileWriter = nil
 	}
 
