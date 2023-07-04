@@ -18,5 +18,5 @@ func NewRestDelivery(p RestDeliveryImpl) health_interfaces.RestDelivery {
 func (d *RestDeliveryImpl) SetupRouter(app *echo.Echo) {
 	group := app.Group("/health")
 
-	group.GET("/", d.GetHealth)
+	group.GET("", d.GetHealth)
 }
