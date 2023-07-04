@@ -27,12 +27,12 @@ func RegisterRouters(echo *echo.Echo, container *di.Container) (err error) {
 	return
 }
 
-func main() {
-	if err := godotenv.Load(); err != nil {
+func StartServer() (err error) {
+	if err = godotenv.Load(); err != nil {
 		return
 	}
-	if err := logger.SetupLogger(); err != nil {
-		log.Fatal().Err(err).Msg("Failed to setup logger configuration.")
+	if err = logger.SetupLogger(); err != nil {
+		return
 	}
 
 	// Set logging for dependency registery and resolving.
@@ -40,7 +40,7 @@ func main() {
 
 	container, err := dependencies.New()
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		return
 	}
 
 	err = container.Invoke(func(echo *echo.Echo) (err error) {
@@ -59,7 +59,11 @@ func main() {
 		err = echo.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
 		return
 	})
-	if err != nil {
+	return
+}
+
+func main() {
+	if err := StartServer(); err != nil {
 		log.Fatal().Err(err).Send()
 	}
 }
