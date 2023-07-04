@@ -10,11 +10,10 @@ import (
 // New creates a new DI (dependency injection) container
 // with the modules we provided in `modules.go`.
 func New() (container *di.Container, err error) {
-	container, err = di.New(
+	return di.New(
 		appModules,
 		domains.Modules,
 	)
-	return
 }
 
 // NewForTransaction creates a new DI container just like `New`
@@ -55,9 +54,8 @@ func New() (container *di.Container, err error) {
 //		return err
 //	}
 func NewForTransaction(db *gorm.DB) (txContainer *di.Container, err error) {
-	txContainer, err = di.New(
+	return di.New(
 		di.ProvideValue(db),
 		domains.Modules,
 	)
-	return
 }
