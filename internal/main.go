@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"go-boilerplate/internal/constants"
 	domains_interfaces "go-boilerplate/internal/domains/interfaces"
 	"go-boilerplate/internal/middlewares"
 	"go-boilerplate/pkg/dependencies"
@@ -51,7 +53,16 @@ func StartServer() (err error) {
 			return
 		}
 
-		app.Use(echo_middlewares.RequestID())
+		app.Use(echo_middlewares.RemoveTrailingSlash())
+		app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
+			RequestIDHandler: func(c echo.Context, rid string) {
+				req := c.Request()
+				ctx := req.Context()
+
+				ctx = context.WithValue(ctx, constants.RequestIDKey, rid)
+				c.SetRequest(req.WithContext(ctx))
+			},
+		}))
 
 		// Override error handler middleware
 		if err = RegisterRouters(app, container); err != nil {
