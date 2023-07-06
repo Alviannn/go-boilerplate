@@ -31,6 +31,16 @@ clean: ## Cleans the build directory by removing all binary files.
 build: ## Builds the app based on your operating system.
 	go build -v -o ./build/$(APP_NAME) $(SOURCE_PATH)
 
+.PHONY: docs-fmt
+docs-fmt: ## Format the swagger annotations within the codebase.
+	swag fmt -d $(SOURCE_PATH)
+
+.PHONY: docs-gen
+docs-gen: docs-fmt ## Generate swagger API documentation for this app.
+	mkdir -p ./docs
+	swag init -d $(SOURCE_PATH),./pkg/responses
+
+
 .PHONY: start
 start: ## Starts the app from 'build' directory.
 	./build/$(APP_NAME)
