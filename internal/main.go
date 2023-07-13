@@ -76,7 +76,7 @@ func StartServer() (err error) {
 			return
 		}
 
-		app.HTTPErrorHandler = middlewares.ErrorHandler()
+		app.HTTPErrorHandler = middlewares.CustomErrorHandler()
 		err = app.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
 		return
 	})

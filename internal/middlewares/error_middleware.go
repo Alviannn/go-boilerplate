@@ -1,27 +1,18 @@
 package middlewares
 
 import (
-	"fmt"
 	"go-boilerplate/pkg/responses"
 
 	"github.com/labstack/echo/v4"
 )
 
-func ErrorHandler() echo.HTTPErrorHandler {
+func CustomErrorHandler() echo.HTTPErrorHandler {
 	return func(err error, c echo.Context) {
-		resp := responses.New()
+		customErr := responses.NewError().
+			WithSourceError(err)
 
-		if echoError, ok := err.(*echo.HTTPError); ok {
-			newError := responses.NewError().
-				WithCode(echoError.Code).
-				WithSourceError(echoError).
-				WithMessage(fmt.Sprint(echoError.Message))
-
-			resp.WithError(newError)
-		} else {
-			resp.WithError(err)
-		}
-
-		resp.Send(c)
+		responses.New().
+			WithError(customErr).
+			Send(c)
 	}
 }
