@@ -33,10 +33,7 @@ func (b *ResponseBuilder) WithSuccessCode(statusCode int) *ResponseBuilder {
 }
 
 func (b *ResponseBuilder) WithError(err error) *ResponseBuilder {
-	if err != nil {
-		err = ParseAsCustomError(err)
-	}
-	b.Error = err
+	b.Error = parseAsCustomErrorOrNil(err)
 	return b
 }
 
@@ -73,12 +70,8 @@ func (b *ResponseBuilder) sanitizeData() any {
 }
 
 func (b *ResponseBuilder) Send(c echo.Context) error {
-	if b.Error != nil {
-		customErr := ParseAsCustomError(b.Error)
-		errResp := BuildErrorResponse(customErr)
-
-		return c.JSON(customErr.Code, errResp)
+	if customErr := parseAsCustomErrorOrNil(b.Error); customErr != nil {
+		return c.JSON(customErr.Code, customErr.BuildResponse())
 	}
-
 	return c.JSON(b.SuccessCode, b.sanitizeData())
 }

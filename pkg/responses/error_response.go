@@ -19,23 +19,18 @@ func NewError() *CustomError {
 		Message: "Unhandled error",
 		Code:    http.StatusInternalServerError,
 	}
-	customError.ThisError = tracerr.Wrap(customError)
+	customError.thisError = tracerr.Wrap(customError)
 
 	return customError
 }
 
-func ParseAsCustomError(err error) *CustomError {
+func parseAsCustomErrorOrNil(err error) *CustomError {
+	if err == nil {
+		return nil
+	}
 	if customError, ok := err.(*CustomError); ok {
 		return customError
 	}
 
 	return NewError().WithSourceError(err)
-}
-
-func BuildErrorResponse(err *CustomError) ErrorResponse {
-	return ErrorResponse{
-		Message:            err.Message,
-		SourceErrorMessage: err.GetWorkingError().Error(),
-		Stack:              err.GetStackTrace(),
-	}
 }

@@ -24,13 +24,13 @@ type CustomError struct {
 	// `nil`, read `ThisError` on why.
 	SourceError error
 
-	// ThisError is the current `CustomError` instance but in a form
+	// thisError is the current `CustomError` instance but in a form
 	// of a traceable error (basically with stack trace).
 	//
 	// It is responsible for replacing `SourceError` when it's `nil`.
 	// This will never be (and should never be) `nil`. The field setup
 	// exists in the struct creation function.
-	ThisError error
+	thisError error
 
 	// Message is human-readable or human-friendly error that is made
 	// specifically for someone else to read with ease.
@@ -85,7 +85,7 @@ func (e *CustomError) WithSourceError(err error) *CustomError {
 func (e *CustomError) GetWorkingError() (err error) {
 	err = e.SourceError
 	if err == nil {
-		err = e.ThisError
+		err = e.thisError
 	}
 
 	return err
@@ -101,6 +101,14 @@ func (e *CustomError) GetStackTrace() []string {
 	}
 
 	return stackList
+}
+
+func (e *CustomError) BuildResponse() ErrorResponse {
+	return ErrorResponse{
+		Message:            e.Message,
+		SourceErrorMessage: e.GetWorkingError().Error(),
+		Stack:              e.GetStackTrace(),
+	}
 }
 
 func (e CustomError) Error() string {
