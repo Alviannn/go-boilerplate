@@ -24,5 +24,5 @@ func (r *RepositoryImpl) IsUserExistByEmail(email string) bool {
 		Limit(1).
 		Find(&user)
 
-	return query.Error == nil && user.ID != ""
+	return query.Error == nil && user.ID != 0
 }

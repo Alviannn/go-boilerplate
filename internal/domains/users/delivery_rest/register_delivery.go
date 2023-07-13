@@ -31,5 +31,8 @@ func (d *RestDeliveryImpl) RegisterUser(c echo.Context) (err error) {
 		return responses.New().WithError(err).Send(c)
 	}
 
-	return d.Service.RegisterUser(params)
+	err = d.Service.RegisterUser(params)
+	return responses.New().
+		WithError(err).
+		Send(c)
 }
