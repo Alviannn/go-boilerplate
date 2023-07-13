@@ -28,7 +28,7 @@ func (d *RestDeliveryImpl) RegisterUser(c echo.Context) (err error) {
 			WithSourceError(err).
 			WithMessage("Failed to bind parameters")
 
-		return
+		return responses.New().WithError(err).Send(c)
 	}
 
 	return d.Service.RegisterUser(params)

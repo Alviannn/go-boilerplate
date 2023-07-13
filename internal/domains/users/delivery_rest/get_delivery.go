@@ -29,7 +29,7 @@ func (d *RestDeliveryImpl) GetUser(c echo.Context) (err error) {
 			WithSourceError(err).
 			WithMessage("Failed to bind parameters")
 
-		return
+		return responses.New().WithError(err).Send(c)
 	}
 
 	user, err := d.Service.GetUser(params)

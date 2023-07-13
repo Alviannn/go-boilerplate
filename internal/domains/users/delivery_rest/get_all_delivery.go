@@ -31,7 +31,8 @@ func (d *RestDeliveryImpl) GetAllUsers(c echo.Context) (err error) {
 			WithCode(http.StatusBadRequest).
 			WithSourceError(err).
 			WithMessage("Failed to bind parameters")
-		return
+
+		return responses.New().WithError(err).Send(c)
 	}
 
 	data, err := d.Service.GetAllUsers(params)
