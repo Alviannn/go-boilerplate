@@ -6,7 +6,7 @@ import (
 )
 
 type Repository interface {
-	GetUser(userID string) (user models.User, err error)
+	GetUser(userID int64) (user models.User, err error)
 	GetAllUsers(params dtos.GetAllUsersReq) (userList []models.User, err error)
 	RegisterUser(params dtos.RegisterUserReq) error
 	IsUserExistByEmail(email string) bool

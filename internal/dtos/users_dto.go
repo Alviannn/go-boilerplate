@@ -8,7 +8,7 @@ type RegisterUserReq struct {
 }
 
 type GetUserReq struct {
-	UserID string `param:"id"`
+	ID int64 `param:"id"`
 }
 
 type GetAllUsersReq struct {

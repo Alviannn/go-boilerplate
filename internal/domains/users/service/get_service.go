@@ -13,17 +13,17 @@ import (
 )
 
 func (s *ServiceImpl) GetUser(params dtos.GetUserReq) (user models.User, err error) {
-	user, err = s.Repository.GetUser(params.UserID)
+	user, err = s.Repository.GetUser(params.ID)
 	if err != nil {
 		newErr := responses.NewError().
 			WithSourceError(err).
 			WithCode(http.StatusInternalServerError).
-			WithMessage(fmt.Sprintf("Cannot fetch user with ID %s", params.UserID))
+			WithMessage(fmt.Sprintf("Cannot fetch user with ID %d", params.ID))
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			newErr.
 				WithCode(http.StatusNotFound).
-				WithMessage(fmt.Sprintf("Cannot find user with ID %s", params.UserID))
+				WithMessage(fmt.Sprintf("Cannot find user with ID %d", params.ID))
 		}
 
 		err = newErr

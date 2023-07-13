@@ -1,6 +1,6 @@
 -- migrate:up
 CREATE TABLE users (
-    id UUID NOT NULL DEFAULT uuid_generate_v4(),
+    id BIGSERIAL,
 
     username VARCHAR(64) NOT NULL,
     full_name VARCHAR(256) NOT NULL,
@@ -11,7 +11,9 @@ CREATE TABLE users (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
 
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    UNIQUE (username),
+    UNIQUE (email)
 );
 
 CREATE INDEX ON users (deleted_at);
