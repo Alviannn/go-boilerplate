@@ -1,5 +1,5 @@
 package constants
 
 const (
-	RequestIDKey string = "requestid"
+	RequestIDKey = string("requestid")
 )
