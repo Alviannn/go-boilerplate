@@ -7,7 +7,6 @@ import (
 	domains_interfaces "go-boilerplate/internal/domains/interfaces"
 	"go-boilerplate/internal/middlewares"
 	"go-boilerplate/pkg/dependencies"
-	"go-boilerplate/pkg/logger"
 	"os"
 
 	"github.com/goava/di"
@@ -34,14 +33,8 @@ func StartServer() (err error) {
 	if err = godotenv.Load(); err != nil {
 		return
 	}
-	if err = logger.SetupLogger(); err != nil {
-		return
-	}
 
-	// Set logging for dependency registery and resolving.
-	di.SetTracer(&logger.DITracer{})
-
-	container, err := dependencies.New()
+	container, err := dependencies.NewForStartup()
 	if err != nil {
 		return
 	}
