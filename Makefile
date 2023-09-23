@@ -29,7 +29,25 @@ clean: ## Cleans the build directory by removing all binary files.
 
 .PHONY: build
 build: ## Builds the app based on your operating system.
+	go mod tidy -v
 	go build -v -o ./build/$(APP_NAME) $(SOURCE_PATH)
+
+.PHONY: build-prod
+build-prod: ## Builds the app for production purpose.
+	go mod tidy -v
+	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -gcflags "all=-trimpath=$(pwd)" -o ./build/$(APP_NAME)_linux_amd64 -v $(SOURCE_PATH)
+
+.PHONY: start
+start: ## Starts the app from 'build' directory.
+	ENVIRONMENT=production ./build/$(APP_NAME)
+
+.PHONY: start-prod
+start-prod: ## Starts the app from 'build' directory for production.
+	ENVIRONMENT=production ./build/$(APP_NAME)_linux_amd64
+
+.PHONY: start-dev
+start-dev: ## Starts the app with 'air' to allow live/hot reloading as you edit the code.
+	ENVIRONMENT=development air -c ./.air.toml
 
 .PHONY: docs-fmt
 docs-fmt: ## Format the swagger annotations within the codebase.
@@ -39,15 +57,6 @@ docs-fmt: ## Format the swagger annotations within the codebase.
 docs-gen: docs-fmt ## Generate swagger API documentation for this app.
 	mkdir -p ./docs
 	swag init -d $(SOURCE_PATH),./pkg/responses
-
-
-.PHONY: start
-start: ## Starts the app from 'build' directory.
-	./build/$(APP_NAME)
-
-.PHONY: start-dev
-start-dev: ## Starts the app with 'air' to allow live/hot reloading as you edit the code.
-	air -c ./.air.toml
 
 .PHONY: create-domain
 create-domain: ## Creates a domain for the app according to boilerplate (ex, make create-domain domain=finance_reports).
