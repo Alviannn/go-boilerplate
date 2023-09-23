@@ -10,6 +10,14 @@ DBMATE_URL := postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?
 DBMATE_CMD_PREFIX := dbmate --migrations-dir './migrations' --no-dump-schema
 DBMATE_CMD_WITH_URL_PREFIX := ${DBMATE_CMD_PREFIX} --url ${DBMATE_URL}
 
+GOOS_VAR := linux
+BIN_EXT :=
+
+ifeq ($(OS), Windows_NT)
+	GOOS_VAR := windows
+	BIN_EXT := .exe
+endif
+
 # Some more documentation on this command for learning purpose:
 # The `grep -E '^[a-zA-Z0-9_-]+:' Makefile`, this part finds any lines that matches as commands and its comments.
 # For example: "help: ## Shows help command".
@@ -30,7 +38,7 @@ clean: ## Cleans the build directory by removing all binary files.
 .PHONY: build
 build: ## Builds the app based on your operating system.
 	go mod tidy -v
-	go build -v -o ./build/$(APP_NAME) $(SOURCE_PATH)
+	GOOS=$(GOOS_VAR) go build -v -o ./build/$(APP_NAME) $(SOURCE_PATH)
 
 .PHONY: build-prod
 build-prod: ## Builds the app for production purpose.
