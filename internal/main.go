@@ -46,11 +46,6 @@ func StartServer() (err error) {
 			return
 		}
 
-		logMiddleware, err := middlewares.NewLogHandler()
-		if err != nil {
-			return
-		}
-
 		app.Use(echo_middlewares.RemoveTrailingSlash())
 		app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
 			RequestIDHandler: func(c echo.Context, rid string) {
@@ -62,7 +57,7 @@ func StartServer() (err error) {
 				c.SetRequest(req.WithContext(ctx))
 			},
 		}))
-		app.Use(logMiddleware.Handler)
+		app.Use(middlewares.LogMiddleware)
 
 		// Override error handler middleware
 		if err = RegisterRouters(app, container); err != nil {
