@@ -6,6 +6,7 @@ import (
 	"go-boilerplate/internal/constants"
 	domains_interfaces "go-boilerplate/internal/domains/interfaces"
 	"go-boilerplate/internal/middlewares"
+	"go-boilerplate/pkg/databases"
 	"go-boilerplate/pkg/dependencies"
 	"os"
 
@@ -45,6 +46,9 @@ func StartServer() (err error) {
 		if err = container.Resolve(&gorm); err != nil {
 			return
 		}
+		if err = databases.MigratePosgres(); err != nil {
+			return
+		}
 
 		app.Use(echo_middlewares.RemoveTrailingSlash())
 		app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
@@ -71,10 +75,10 @@ func StartServer() (err error) {
 	return
 }
 
-//	@title		API documentation
-//	@version	1.0
-//	@schemes	http https
-//	@host		localhost:5000
+// @title		API documentation
+// @version	1.0
+// @schemes	http https
+// @host		localhost:5000
 func main() {
 	if err := StartServer(); err != nil {
 		log.Fatal().Err(err).Send()
