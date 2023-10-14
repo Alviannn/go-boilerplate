@@ -1,12 +1,13 @@
 package users_repository
 
 import (
+	"context"
 	"go-boilerplate/internal/dtos"
 	"go-boilerplate/internal/models"
 )
 
-func (r *RepositoryImpl) GetAllUsers(params dtos.GetAllUsersReq) (userList []models.User, err error) {
-	query := r.DB
+func (r *RepositoryImpl) GetAllUsers(ctx context.Context, params dtos.GetAllUsersReq) (userList []models.User, err error) {
+	query := r.DB.WithContext(ctx)
 
 	if params.Email != "" {
 		query = query.Where("email = ?", params.Email)

@@ -1,12 +1,13 @@
 package users_interfaces
 
 import (
+	"context"
 	"go-boilerplate/internal/dtos"
 	"go-boilerplate/internal/models"
 )
 
 type Service interface {
-	GetUser(params dtos.GetUserReq) (user models.User, err error)
-	GetAllUsers(params dtos.GetAllUsersReq) (userList []models.User, err error)
-	RegisterUser(params dtos.RegisterUserReq) (err error)
+	GetUser(ctx context.Context, params dtos.GetUserReq) (user models.User, err error)
+	GetAllUsers(ctx context.Context, params dtos.GetAllUsersReq) (userList []models.User, err error)
+	RegisterUser(ctx context.Context, params dtos.RegisterUserReq) (err error)
 }

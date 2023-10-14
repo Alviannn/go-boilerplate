@@ -26,6 +26,8 @@ import (
 //	@Router			/users [get]
 func (d *RestDeliveryImpl) GetAllUsers(c echo.Context) (err error) {
 	var params dtos.GetAllUsersReq
+	ctx := c.Request().Context()
+
 	if err = c.Bind(&params); err != nil {
 		err = responses.NewError().
 			WithCode(http.StatusBadRequest).
@@ -35,7 +37,7 @@ func (d *RestDeliveryImpl) GetAllUsers(c echo.Context) (err error) {
 		return responses.New().WithError(err).Send(c)
 	}
 
-	data, err := d.Service.GetAllUsers(params)
+	data, err := d.Service.GetAllUsers(ctx, params)
 	return responses.New().
 		WithData(data).
 		WithError(err).

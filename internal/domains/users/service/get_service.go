@@ -1,6 +1,7 @@
 package users_service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -12,8 +13,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func (s *ServiceImpl) GetUser(params dtos.GetUserReq) (user models.User, err error) {
-	user, err = s.Repository.GetUser(params.ID)
+func (s *ServiceImpl) GetUser(ctx context.Context, params dtos.GetUserReq) (user models.User, err error) {
+	user, err = s.Repository.GetUser(ctx, params.ID)
 	if err != nil {
 		newErr := responses.NewError().
 			WithSourceError(err).

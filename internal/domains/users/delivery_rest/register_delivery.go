@@ -22,6 +22,8 @@ import (
 //	@Router			/users [post]
 func (d *RestDeliveryImpl) RegisterUser(c echo.Context) (err error) {
 	var params dtos.RegisterUserReq
+	ctx := c.Request().Context()
+
 	if err = c.Bind(&params); err != nil {
 		err = responses.NewError().
 			WithCode(http.StatusBadRequest).
@@ -31,7 +33,7 @@ func (d *RestDeliveryImpl) RegisterUser(c echo.Context) (err error) {
 		return responses.New().WithError(err).Send(c)
 	}
 
-	err = d.Service.RegisterUser(params)
+	err = d.Service.RegisterUser(ctx, params)
 	return responses.New().
 		WithError(err).
 		Send(c)
