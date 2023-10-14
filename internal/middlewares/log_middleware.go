@@ -31,12 +31,11 @@ func LogMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 func logRequest(c echo.Context, bodyResult any, elapsedTime time.Duration) (err error) {
 	req := c.Request()
-	ctx := req.Context()
 
 	reqHeader := c.Request().Header
 	requestUri := string(req.RequestURI)
 	httpMethod := string(req.Method)
-	requestId := fmt.Sprint(ctx.Value(constants.RequestIDKey))
+	requestId := fmt.Sprint(c.Get(constants.RequestIDKey))
 
 	log.Info().
 		Str("requestId", requestId).
