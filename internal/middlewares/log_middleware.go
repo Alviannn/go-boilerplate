@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-boilerplate/internal/constants"
 	"go-boilerplate/pkg/helpers"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -36,6 +37,7 @@ func logRequest(c echo.Context, bodyResult any, elapsedTime time.Duration) (err 
 	requestUri := string(req.RequestURI)
 	httpMethod := string(req.Method)
 	requestId := fmt.Sprint(c.Get(constants.RequestIDKey))
+	bodyResult = maskBody(bodyResult)
 
 	log.Info().
 		Str("requestId", requestId).
@@ -46,4 +48,26 @@ func logRequest(c echo.Context, bodyResult any, elapsedTime time.Duration) (err 
 		Any("header", reqHeader).
 		Msg("HTTP Request")
 	return
+}
+
+func maskBody(body any) any {
+	maskedValue := "************"
+
+	if sliceBody, ok := body.([]any); ok {
+		for i, item := range sliceBody {
+			sliceBody[i] = maskBody(item)
+		}
+		return sliceBody
+	}
+
+	mapBody := body.(map[string]any)
+	for key, value := range mapBody {
+		if innerMap, ok := mapBody[key].(map[string]any); ok {
+			mapBody[key] = maskBody(innerMap)
+		}
+		if _, ok := value.(string); strings.ToLower(key) == "password" && ok {
+			mapBody[key] = maskedValue
+		}
+	}
+	return mapBody
 }
