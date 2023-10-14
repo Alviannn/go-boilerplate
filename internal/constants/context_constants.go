@@ -1,5 +1,7 @@
 package constants
 
+type ContextKey string
+
 const (
-	RequestIDKey = string("requestid")
+	RequestIDKey = ContextKey("requestid")
 )

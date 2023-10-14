@@ -36,7 +36,7 @@ func logRequest(c echo.Context, bodyResult any, elapsedTime time.Duration) (err 
 	reqHeader := c.Request().Header
 	requestUri := string(req.RequestURI)
 	httpMethod := string(req.Method)
-	requestId := fmt.Sprint(c.Get(constants.RequestIDKey))
+	requestId := fmt.Sprint(req.Context().Value(constants.RequestIDKey))
 	bodyResult = maskBody(bodyResult)
 
 	log.Info().

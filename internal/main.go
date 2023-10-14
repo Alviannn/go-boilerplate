@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"go-boilerplate/internal/constants"
 	domains_interfaces "go-boilerplate/internal/domains/interfaces"
@@ -52,7 +53,11 @@ func StartServer() (err error) {
 		app.Use(echo_middlewares.RemoveTrailingSlash())
 		app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
 			RequestIDHandler: func(c echo.Context, rid string) {
-				c.Set(constants.RequestIDKey, rid)
+				req := c.Request()
+				ctx := req.Context()
+
+				newReq := req.WithContext(context.WithValue(ctx, constants.RequestIDKey, rid))
+				c.SetRequest(newReq)
 			},
 		}))
 		app.Use(middlewares.LogMiddleware)
