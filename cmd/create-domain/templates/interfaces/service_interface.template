@@ -1,10 +1,11 @@
 package {domain_snake_name}_interfaces
 
 import (
+    "context"
 	"{module_name}/internal/dtos"
 	"{module_name}/internal/models"
 )
 
 type Service interface {
-	Get{domain_pascal_name}(params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} models.{domain_pascal_name}, err error)
+	Get{domain_pascal_name}(ctx context.Context, params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} models.{domain_pascal_name}, err error)
 }

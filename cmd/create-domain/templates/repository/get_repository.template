@@ -1,8 +1,11 @@
 package {domain_snake_name}_repository
 
-import "{module_name}/internal/models"
+import (
+    "context"
+    "{module_name}/internal/models"
+)
 
-func (r *RepositoryImpl) Get{domain_pascal_name}(id int64) ({domain_camel_name} models.{domain_pascal_name}, err error) {
-	err = r.DB.First(&{domain_camel_name}, "id = ?", id).Error
+func (r *RepositoryImpl) Get{domain_pascal_name}(ctx context.Context, id int64) ({domain_camel_name} models.{domain_pascal_name}, err error) {
+	err = r.DB.WithContext(ctx).First(&{domain_camel_name}, "id = ?", id).Error
 	return
 }
