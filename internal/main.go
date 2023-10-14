@@ -74,10 +74,12 @@ func StartServer() (err error) {
 	return
 }
 
-// @title		API documentation
-// @version	1.0
-// @schemes	http https
-// @host		localhost:5000
+// main starts the REST API server
+//
+//	@title		API documentation
+//	@version	1.0
+//	@schemes	http https
+//	@host		localhost:5000
 func main() {
 	if err := StartServer(); err != nil {
 		log.Fatal().Err(err).Send()
