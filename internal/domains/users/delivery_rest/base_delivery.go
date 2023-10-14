@@ -13,7 +13,7 @@ type RestDeliveryImpl struct {
 	Service users_interfaces.Service
 }
 
-func NewRestDelivery(p RestDeliveryImpl) users_interfaces.RestDelivery {
+func NewRestDelivery(p RestDeliveryImpl) *RestDeliveryImpl {
 	return &p
 }
 
