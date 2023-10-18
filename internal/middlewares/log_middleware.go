@@ -64,17 +64,26 @@ func writeLogRequest(c echo.Context, body any) {
 func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 	req := c.Request()
 	ctx := req.Context()
+	res := c.Response()
 
 	requestID := fmt.Sprint(ctx.Value(constants.RequestIDKey))
 	body = maskBody(body)
 
-	log.Info().
+	logEvent := log.Info()
+	isErrorResponse := (res.Status >= 400 && res.Status <= 500)
+
+	if isErrorResponse {
+		logEvent = log.Error()
+	}
+
+	logEvent.
 		Str("request_id", requestID).
 		Str("method", req.Method).
 		Str("uri", req.RequestURI).
 		Str("elapsed_time", fmt.Sprintf("%dms", elapsedTime.Milliseconds())).
+		Int("status_code", res.Status).
 		Any("body", body).
-		Any("headers", c.Response().Header()).
+		Any("headers", res.Header()).
 		Msg("HTTP Response")
 }
 
