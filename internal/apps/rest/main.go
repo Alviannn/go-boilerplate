@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"go-boilerplate/internal/apps/rest/middlewares"
 	"go-boilerplate/internal/constants"
 	domains_interfaces "go-boilerplate/internal/domains/interfaces"
-	"go-boilerplate/internal/middlewares"
 	"go-boilerplate/pkg/databases"
 	"go-boilerplate/pkg/dependencies"
 	"os"
