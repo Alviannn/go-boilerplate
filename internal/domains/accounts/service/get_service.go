@@ -1,4 +1,4 @@
-package users_service
+package accounts_service
 
 import (
 	"context"
@@ -13,18 +13,18 @@ import (
 	"gorm.io/gorm"
 )
 
-func (s *ServiceImpl) GetUser(ctx context.Context, params dtos.GetUserReq) (user models.User, err error) {
-	user, err = s.Repository.GetUser(ctx, params.ID)
+func (s *ServiceImpl) Get(ctx context.Context, params dtos.GetAccountReq) (account models.Account, err error) {
+	account, err = s.Repository.Get(ctx, params.ID)
 	if err != nil {
 		newErr := responses.NewError().
 			WithSourceError(err).
 			WithCode(http.StatusInternalServerError).
-			WithMessage(fmt.Sprintf("Cannot fetch user with ID %d", params.ID))
+			WithMessage(fmt.Sprintf("Failed to get account with ID %d", params.ID))
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			newErr.
 				WithCode(http.StatusNotFound).
-				WithMessage(fmt.Sprintf("Cannot find user with ID %d", params.ID))
+				WithMessage(fmt.Sprintf("Cannot find account with ID %d", params.ID))
 		}
 
 		err = newErr

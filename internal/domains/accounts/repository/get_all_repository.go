@@ -1,4 +1,4 @@
-package users_repository
+package accounts_repository
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"go-boilerplate/internal/models"
 )
 
-func (r *RepositoryImpl) GetAllUsers(ctx context.Context, params dtos.GetAllUsersReq) (userList []models.User, err error) {
+func (r *RepositoryImpl) GetAll(ctx context.Context, params dtos.GetAllAccountsReq) (accounts []models.Account, err error) {
 	query := r.DB.WithContext(ctx)
 
 	if params.Email != "" {
@@ -26,6 +26,6 @@ func (r *RepositoryImpl) GetAllUsers(ctx context.Context, params dtos.GetAllUser
 		query = query.Offset(params.Offset)
 	}
 
-	err = query.Find(&userList).Error
+	err = query.Find(&accounts).Error
 	return
 }

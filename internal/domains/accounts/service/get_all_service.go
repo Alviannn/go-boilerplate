@@ -1,4 +1,4 @@
-package users_service
+package accounts_service
 
 import (
 	"context"
@@ -8,12 +8,12 @@ import (
 	"net/http"
 )
 
-func (s *ServiceImpl) GetAllUsers(ctx context.Context, params dtos.GetAllUsersReq) (userList []models.User, err error) {
-	userList, err = s.Repository.GetAllUsers(ctx, params)
+func (s *ServiceImpl) GetAll(ctx context.Context, params dtos.GetAllAccountsReq) (accounts []models.Account, err error) {
+	accounts, err = s.Repository.GetAll(ctx, params)
 	if err != nil {
 		err = responses.NewError().
 			WithSourceError(err).
-			WithMessage("Failed to get all users.").
+			WithMessage("Failed to get all accounts.").
 			WithCode(http.StatusInternalServerError)
 	}
 	return

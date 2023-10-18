@@ -1,13 +1,13 @@
 package domains
 
 import (
+	"go-boilerplate/internal/domains/accounts"
 	"go-boilerplate/internal/domains/health"
-	"go-boilerplate/internal/domains/users"
 
 	"github.com/goava/di"
 )
 
 var Modules = di.Options(
-	users.Module,
+	accounts.Module,
 	health.Module,
 )

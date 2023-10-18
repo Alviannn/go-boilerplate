@@ -1,4 +1,4 @@
-package users_service
+package accounts_service
 
 import (
 	"context"
@@ -10,11 +10,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (s *ServiceImpl) RegisterUser(ctx context.Context, params dtos.RegisterUserReq) (err error) {
-	if s.Repository.IsUserExistByEmail(ctx, params.Email) {
+func (s *ServiceImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) (err error) {
+	if s.Repository.IsExistByEmail(ctx, params.Email) {
 		err = responses.NewError().
 			WithCode(http.StatusBadRequest).
-			WithMessage("User is already registered.")
+			WithMessage("Account is already registered.")
 		return
 	}
 
@@ -28,10 +28,10 @@ func (s *ServiceImpl) RegisterUser(ctx context.Context, params dtos.RegisterUser
 	}
 
 	params.Password = string(hashed)
-	if err = s.Repository.RegisterUser(ctx, params); err != nil {
+	if err = s.Repository.Register(ctx, params); err != nil {
 		err = responses.NewError().
 			WithSourceError(err).
-			WithMessage("Failed to register new user.").
+			WithMessage("Failed to register new account.").
 			WithCode(http.StatusBadRequest)
 	}
 

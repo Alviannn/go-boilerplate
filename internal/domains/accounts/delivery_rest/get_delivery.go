@@ -1,4 +1,4 @@
-package users_delivery_rest
+package accounts_delivery_rest
 
 import (
 	"net/http"
@@ -9,20 +9,20 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// GetUser gets user detail by the user ID
+// GetByID gets account detail by the account ID
 //
-//	@Summary		Gets user details
-//	@Description	Gets user details by the user ID
-//	@Tags			users
+//	@Summary		Gets account details
+//	@Description	Gets account details by the account ID
+//	@Tags			accounts
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int	true	"User's ID"
-//	@Success		200	{object}	models.User
+//	@Param			id	path		int	true	"Account's ID"
+//	@Success		200	{object}	models.Account
 //	@Failure		400	{object}	responses.ErrorResponse
 //	@Failure		500	{object}	responses.ErrorResponse
-//	@Router			/users/{id} [get]
-func (d *RestDeliveryImpl) GetUser(c echo.Context) (err error) {
-	var params dtos.GetUserReq
+//	@Router			/accounts/{id} [get]
+func (d *RestDeliveryImpl) GetByID(c echo.Context) (err error) {
+	var params dtos.GetAccountReq
 	ctx := c.Request().Context()
 
 	if err = c.Bind(&params); err != nil {
@@ -34,9 +34,9 @@ func (d *RestDeliveryImpl) GetUser(c echo.Context) (err error) {
 		return responses.New().WithError(err).Send(c)
 	}
 
-	user, err := d.Service.GetUser(ctx, params)
+	account, err := d.Service.Get(ctx, params)
 	return responses.New().
-		WithData(user).
+		WithData(account).
 		WithError(err).
 		WithSuccessCode(http.StatusOK).
 		Send(c)

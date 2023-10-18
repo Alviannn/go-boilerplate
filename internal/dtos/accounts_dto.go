@@ -1,17 +1,17 @@
 package dtos
 
-type RegisterUserReq struct {
+type RegisterAccountReq struct {
 	Username string `json:"username"`
 	FullName string `json:"fullName"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-type GetUserReq struct {
+type GetAccountReq struct {
 	ID int64 `param:"id"`
 }
 
-type GetAllUsersReq struct {
+type GetAllAccountsReq struct {
 	Username string `query:"username" json:"username"`
 	Email    string `query:"email" json:"email"`
 	FullName string `query:"fullName" json:"fullName"`
