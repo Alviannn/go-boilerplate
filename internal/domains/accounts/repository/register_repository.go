@@ -16,14 +16,3 @@ func (r *RepositoryImpl) Register(ctx context.Context, params dtos.RegisterAccou
 
 	return r.DB.WithContext(ctx).Create(&newAccount).Error
 }
-
-func (r *RepositoryImpl) IsExistByEmail(ctx context.Context, email string) bool {
-	var account models.Account
-	query := r.DB.WithContext(ctx).
-		Select("id").
-		Where("email = ?", email).
-		Limit(1).
-		Find(&account)
-
-	return query.Error == nil && account.ID != 0
-}
