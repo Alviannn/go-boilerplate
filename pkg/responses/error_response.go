@@ -9,7 +9,7 @@ import (
 type (
 	ErrorResponse struct {
 		Message            string   `json:"message"`
-		SourceErrorMessage string   `json:"sourceErrorMessage"`
+		SourceErrorMessage string   `json:"source_error_message"`
 		Stack              []string `json:"stack"`
 	}
 )
@@ -33,4 +33,8 @@ func parseAsCustomErrorOrNil(err error) *CustomError {
 	}
 
 	return NewError().WithSourceError(err)
+}
+
+func (res ErrorResponse) IsValid() bool {
+	return res.Message != "" || len(res.Stack) > 0 || res.SourceErrorMessage != ""
 }
