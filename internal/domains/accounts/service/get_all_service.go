@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func (s *ServiceImpl) GetAll(ctx context.Context, params dtos.GetAllAccountsReq) (accounts []models.Account, err error) {
+func (s *serviceImpl) GetAll(ctx context.Context, params dtos.GetAllAccountsReq) (accounts []models.Account, err error) {
 	accounts, err = s.Repository.GetAll(ctx, params)
 	if err != nil {
 		err = responses.NewError().

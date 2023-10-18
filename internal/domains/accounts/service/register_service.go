@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (s *ServiceImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) (err error) {
+func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) (err error) {
 	if s.Repository.IsExistByEmail(ctx, params.Email) {
 		err = responses.NewError().
 			WithCode(http.StatusBadRequest).

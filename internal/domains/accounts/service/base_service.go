@@ -2,16 +2,14 @@ package accounts_service
 
 import (
 	accounts_interfaces "go-boilerplate/internal/domains/accounts/interfaces"
-
-	"github.com/goava/di"
 )
 
-type ServiceImpl struct {
-	di.Inject
-
+type serviceImpl struct {
 	Repository accounts_interfaces.Repository
 }
 
-func NewService(p ServiceImpl) accounts_interfaces.Service {
-	return &p
+func NewService(repository accounts_interfaces.Repository) accounts_interfaces.Service {
+	return &serviceImpl{
+		Repository: repository,
+	}
 }

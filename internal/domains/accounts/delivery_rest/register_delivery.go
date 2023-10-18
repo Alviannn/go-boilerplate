@@ -20,7 +20,7 @@ import (
 //	@Failure		400			{object}	responses.ErrorResponse
 //	@Failure		500			{object}	responses.ErrorResponse
 //	@Router			/accounts [post]
-func (d *RestDeliveryImpl) Register(c echo.Context) (err error) {
+func (d *restDeliveryImpl) Register(c echo.Context) (err error) {
 	var params dtos.RegisterAccountReq
 	ctx := c.Request().Context()
 

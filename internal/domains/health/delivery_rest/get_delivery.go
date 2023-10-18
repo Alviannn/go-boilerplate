@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (d *RestDeliveryImpl) GetHealth(c echo.Context) (err error) {
+func (d *restDeliveryImpl) GetHealth(c echo.Context) (err error) {
 	currentTime := time.Now().Format(time.DateTime)
 	return responses.New().
 		WithData(currentTime).

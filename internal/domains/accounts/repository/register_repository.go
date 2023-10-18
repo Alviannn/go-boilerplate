@@ -6,7 +6,7 @@ import (
 	"go-boilerplate/internal/models"
 )
 
-func (r *RepositoryImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) error {
+func (r *repositoryImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) error {
 	newAccount := models.Account{
 		Username: params.Username,
 		FullName: params.FullName,

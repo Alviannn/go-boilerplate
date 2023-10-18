@@ -5,7 +5,7 @@ import (
 	"go-boilerplate/internal/models"
 )
 
-func (r *RepositoryImpl) IsExistByEmail(ctx context.Context, email string) bool {
+func (r *repositoryImpl) IsExistByEmail(ctx context.Context, email string) bool {
 	var account models.Account
 	query := r.DB.WithContext(ctx).
 		Select("id").

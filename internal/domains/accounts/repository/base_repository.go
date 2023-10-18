@@ -3,16 +3,15 @@ package accounts_repository
 import (
 	accounts_interfaces "go-boilerplate/internal/domains/accounts/interfaces"
 
-	"github.com/goava/di"
 	"gorm.io/gorm"
 )
 
-type RepositoryImpl struct {
-	di.Inject
-
+type repositoryImpl struct {
 	DB *gorm.DB
 }
 
-func NewRepository(p RepositoryImpl) accounts_interfaces.Repository {
-	return &p
+func NewRepository(db *gorm.DB) accounts_interfaces.Repository {
+	return &repositoryImpl{
+		DB: db,
+	}
 }

@@ -24,7 +24,7 @@ import (
 //	@Failure		400			{object}	responses.ErrorResponse
 //	@Failure		500			{object}	responses.ErrorResponse
 //	@Router			/accounts [get]
-func (d *RestDeliveryImpl) GetAll(c echo.Context) (err error) {
+func (d *restDeliveryImpl) GetAll(c echo.Context) (err error) {
 	var params dtos.GetAllAccountsReq
 	ctx := c.Request().Context()
 
