@@ -1,0 +1,13 @@
+package {domain_snake_name}_repository
+
+import (
+    "context"
+    "{module_name}/internal/models"
+)
+
+func (r *repositoryImpl) GetByID(ctx context.Context, id int64) ({domain_camel_name} models.{domain_pascal_name}, err error) {
+	err = r.DB.WithContext(ctx).
+		First(&{domain_camel_name}, "id = ?", id).
+		Error
+	return
+}

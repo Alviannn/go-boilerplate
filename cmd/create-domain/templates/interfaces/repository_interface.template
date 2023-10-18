@@ -6,5 +6,5 @@ import (
 )
 
 type Repository interface {
-	Get{domain_pascal_name}(ctx context.Context, id int64) ({domain_camel_name} models.{domain_pascal_name}, err error)
+	GetByID(ctx context.Context, id int64) ({domain_camel_name} models.{domain_pascal_name}, err error)
 }

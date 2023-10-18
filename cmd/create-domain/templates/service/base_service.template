@@ -1,16 +1,15 @@
 package {domain_snake_name}_service
 
 import (
-	"github.com/goava/di"
 	{domain_snake_name}_interfaces "{module_name}/internal/domains/{domain_snake_name}/interfaces"
 )
 
-type ServiceImpl struct {
-	di.Inject
-
+type serviceImpl struct {
 	Repository {domain_snake_name}_interfaces.Repository
 }
 
-func NewService(p ServiceImpl) {domain_snake_name}_interfaces.Service {
-	return &p
+func NewService(repository {domain_snake_name}_interfaces.Repository) {domain_snake_name}_interfaces.Service {
+	return &serviceImpl{
+        Repository: repository,
+    }
 }

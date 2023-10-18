@@ -7,5 +7,5 @@ import (
 )
 
 type Service interface {
-	Get{domain_pascal_name}(ctx context.Context, params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} models.{domain_pascal_name}, err error)
+	GetByID(ctx context.Context, params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} models.{domain_pascal_name}, err error)
 }

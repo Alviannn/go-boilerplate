@@ -9,8 +9,8 @@ import (
 	"{module_name}/pkg/responses"
 )
 
-func (s *ServiceImpl) Get{domain_pascal_name}(ctx context.Context, params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} models.{domain_pascal_name}, err error) {
-	{domain_camel_name}, err = s.Repository.Get{domain_pascal_name}(params.ID)
+func (s *serviceImpl) GetByID(ctx context.Context, params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} models.{domain_pascal_name}, err error) {
+	{domain_camel_name}, err = s.Repository.GetByID(params.ID)
 	if err != nil {
 		err = responses.NewError().
 			WithSourceError(err).

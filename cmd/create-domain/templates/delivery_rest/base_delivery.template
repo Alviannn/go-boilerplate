@@ -1,23 +1,22 @@
 package {domain_snake_name}_delivery_rest
 
 import (
-	"github.com/goava/di"
 	"github.com/labstack/echo/v4"
 	{domain_snake_name}_interfaces "{module_name}/internal/domains/{domain_snake_name}/interfaces"
 )
 
-type RestDeliveryImpl struct {
-	di.Inject
-
+type restDeliveryImpl struct {
 	Service {domain_snake_name}_interfaces.Service
 }
 
-func NewRestDelivery(p RestDeliveryImpl) *RestDeliveryImpl {
-	return &p
+func NewRestDelivery(service {domain_snake_name}_interfaces.Service) *restDeliveryImpl {
+	return &restDeliveryImpl{
+		Service: service,
+    }
 }
 
-func (d *RestDeliveryImpl) SetupRouter(echo *echo.Echo) {
+func (d *restDeliveryImpl) SetupRouter(echo *echo.Echo) {
 	group := echo.Group("{domain_snake_name}")
 
-	group.GET("/:id", d.Get{domain_pascal_name})
+	group.GET("/:id", d.GetByID)
 }

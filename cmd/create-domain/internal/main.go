@@ -17,7 +17,7 @@ type CreateTemplateParams struct {
 }
 
 func main() {
-	flagSet := flag.NewFlagSet("create-feature", flag.ExitOnError)
+	flagSet := flag.NewFlagSet("create-domain", flag.ExitOnError)
 	domainName := flagSet.String("domain", "", "The domain or parent of the feature, for example 'super_hero', in snake case.")
 
 	cliArgs := os.Args[1:]
