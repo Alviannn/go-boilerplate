@@ -13,8 +13,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func (s *ServiceImpl) Get(ctx context.Context, params dtos.GetAccountReq) (account models.Account, err error) {
-	account, err = s.Repository.Get(ctx, params.ID)
+func (s *ServiceImpl) GetByID(ctx context.Context, params dtos.GetAccountReq) (account models.Account, err error) {
+	account, err = s.Repository.GetByID(ctx, params.ID)
 	if err != nil {
 		newErr := responses.NewError().
 			WithSourceError(err).

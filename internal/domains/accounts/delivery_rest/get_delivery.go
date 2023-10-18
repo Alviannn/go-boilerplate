@@ -34,7 +34,7 @@ func (d *RestDeliveryImpl) GetByID(c echo.Context) (err error) {
 		return responses.New().WithError(err).Send(c)
 	}
 
-	account, err := d.Service.Get(ctx, params)
+	account, err := d.Service.GetByID(ctx, params)
 	return responses.New().
 		WithData(account).
 		WithError(err).
