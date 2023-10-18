@@ -1,53 +1,81 @@
 package middlewares
 
 import (
+	"encoding/json"
 	"fmt"
 	"go-boilerplate/internal/constants"
-	"go-boilerplate/pkg/helpers"
 	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
 )
 
 func LogMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) (err error) {
-		startTime := time.Now()
+	startTime := time.Now()
 
-		var clonedBody any
-		if err := helpers.Echo.CloneBindedBody(c, &clonedBody); err != nil {
-			clonedBody = nil
-		}
+	bodyDumpMiddleware := echoMiddleware.BodyDumpWithConfig(echoMiddleware.BodyDumpConfig{
+		Handler: func(c echo.Context, reqRawBody, resRawBody []byte) {
+			logRequest(c, reqRawBody)
 
-		if err := next(c); err != nil {
-			c.Error(err)
-		}
+			elapsedTime := time.Since(startTime)
+			logResponse(c, resRawBody, elapsedTime)
+		},
+	})
 
-		elapsedTime := time.Since(startTime)
-		err = logRequest(c, clonedBody, elapsedTime)
-		return
-	}
+	return bodyDumpMiddleware(next)
 }
 
-func logRequest(c echo.Context, bodyResult any, elapsedTime time.Duration) (err error) {
+func logRequest(c echo.Context, rawBody []byte) {
+	var reqBody any
+	if err := json.Unmarshal(rawBody, &reqBody); err != nil {
+		reqBody = nil
+	}
+
+	writeLogRequest(c, reqBody)
+}
+
+func logResponse(c echo.Context, rawBody []byte, elapsedTime time.Duration) {
+	var resBody any
+	if err := json.Unmarshal(rawBody, &resBody); err != nil {
+		resBody = nil
+	}
+
+	writeLogResponse(c, resBody, elapsedTime)
+}
+
+func writeLogRequest(c echo.Context, body any) {
 	req := c.Request()
 
 	reqHeader := c.Request().Header
-	requestUri := string(req.RequestURI)
-	httpMethod := string(req.Method)
-	requestId := fmt.Sprint(req.Context().Value(constants.RequestIDKey))
-	bodyResult = maskBody(bodyResult)
+	requestID := fmt.Sprint(req.Context().Value(constants.RequestIDKey))
+	body = maskBody(body)
 
 	log.Info().
-		Str("requestId", requestId).
-		Str("method", httpMethod).
-		Str("uri", requestUri).
-		Str("elapsed", fmt.Sprintf("%dms", elapsedTime.Milliseconds())).
-		Any("body", bodyResult).
-		Any("header", reqHeader).
+		Str("requestId", requestID).
+		Str("method", req.Method).
+		Str("uri", req.RequestURI).
+		Any("body", body).
+		Any("headers", reqHeader).
 		Msg("HTTP Request")
-	return
+}
+
+func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
+	req := c.Request()
+	ctx := req.Context()
+
+	requestID := fmt.Sprint(ctx.Value(constants.RequestIDKey))
+	body = maskBody(body)
+
+	log.Info().
+		Str("request_id", requestID).
+		Str("method", req.Method).
+		Str("uri", req.RequestURI).
+		Str("elapsed_time", fmt.Sprintf("%dms", elapsedTime.Milliseconds())).
+		Any("body", body).
+		Any("headers", c.Response().Header()).
+		Msg("HTTP Response")
 }
 
 func maskBody(body any) any {
@@ -60,7 +88,11 @@ func maskBody(body any) any {
 		return sliceBody
 	}
 
-	mapBody := body.(map[string]any)
+	mapBody, ok := body.(map[string]any)
+	if !ok {
+		return body
+	}
+
 	for key, value := range mapBody {
 		if innerMap, ok := mapBody[key].(map[string]any); ok {
 			mapBody[key] = maskBody(innerMap)
