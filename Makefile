@@ -1,14 +1,15 @@
 include .env
 
 APP_NAME := go-boilerplate
-SOURCE_PATH := ./internal/
+APP_PATH := ./internal/apps
+SOURCE_REST_PATH := $(APP_PATH)/rest
 
 CREATE_DOMAIN_CMD := go run ./cmd/create-domain/internal/main.go
 MIGRATION_CMD := go run ./cmd/migrations/internal/main.go
 
-DBMATE_URL := postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable
+DBMATE_URL := postgres://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
 DBMATE_CMD_PREFIX := dbmate --migrations-dir './migrations' --no-dump-schema
-DBMATE_CMD_WITH_URL_PREFIX := ${DBMATE_CMD_PREFIX} --url ${DBMATE_URL}
+DBMATE_CMD_WITH_URL_PREFIX := $(DBMATE_CMD_PREFIX) --url $(DBMATE_URL)
 
 GOOS_VAR := linux
 BIN_EXT :=
@@ -29,59 +30,63 @@ endif
 help: ## Shows this command.
 	@printf 'These are the available commands in our Makefile.\n'
 	@printf '-------------------------------------------------\n'
-	@grep -E '^[a-zA-Z0-9_-]+:' Makefile | awk 'BEGIN { FS = ":( ##)?" }; { printf "\033[0;31m%-20s\033[0m%s\n", $$1, $$2 };'
+	@grep -E '^[a-zA-Z0-9_-]+:' Makefile | awk 'BEGIN { FS = " ##" }; { printf "\033[0;31m%-20s\033[0m%s\n", $$1, $$2 };'
 
 .PHONY: clean
 clean: ## Cleans the build directory by removing all binary files.
 	rm -rf build/*
 
-.PHONY: build
-build: ## Builds the app based on your operating system.
+# --------------------------------------v REST API v-------------------------------------- #
+
+.PHONY: build-rest
+build-rest: ## Builds REST API app based on your operating system.
 	go mod tidy -v
-	GOOS=$(GOOS_VAR) go build -v -o ./build/$(APP_NAME) $(SOURCE_PATH)
+	GOOS=$(GOOS_VAR) go build -v -o ./build/$(APP_NAME)-rest$(BIN_EXT) $(SOURCE_REST_PATH)
 
-.PHONY: build-prod
-build-prod: ## Builds the app for production purpose.
+.PHONY: build-rest-prod
+build-rest-prod: ## Builds REST API app for production purpose.
 	go mod tidy -v
-	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -gcflags "all=-trimpath=$(pwd)" -o ./build/$(APP_NAME)_linux_amd64 -v $(SOURCE_PATH)
+	GOOS=linux GOARCH=amd64 go build -v -ldflags="-s -w" -gcflags "all=-trimpath=$(pwd)" -o ./build/$(APP_NAME)-rest_linux_amd64 $(SOURCE_REST_PATH)
 
-.PHONY: start
-start: ## Starts the app from 'build' directory.
-	ENVIRONMENT=production ./build/$(APP_NAME)
+.PHONY: start-rest
+start-rest: ## Starts REST API app from 'build' directory.
+	ENVIRONMENT=production ./build/$(APP_NAME)-rest
 
-.PHONY: start-prod
-start-prod: ## Starts the app from 'build' directory for production.
-	ENVIRONMENT=production ./build/$(APP_NAME)_linux_amd64
+.PHONY: start-rest-prod
+start-rest-prod: ## Starts REST API app from 'build' directory for production.
+	ENVIRONMENT=production ./build/$(APP_NAME)-rest_linux_amd64
 
-.PHONY: start-dev
-start-dev: ## Starts the app with 'air' to allow live/hot reloading as you edit the code.
-	ENVIRONMENT=development air -c ./.air.toml
+.PHONY: start-rest-dev
+start-rest-dev: ## Starts REST API app with 'air' to allow live/hot reloading as you edit the code.
+	ENVIRONMENT=development air -c ./.air.rest.toml
+
+# ---------------------------------------------------------------------------------------- #
 
 .PHONY: docs-fmt
 docs-fmt: ## Format the swagger annotations within the codebase.
-	swag fmt -d $(SOURCE_PATH)
+	swag fmt -d $(SOURCE_REST_PATH)
 
 .PHONY: docs-gen
 docs-gen: docs-fmt ## Generate swagger API documentation for this app.
 	mkdir -p ./docs
-	swag init -d $(SOURCE_PATH),./pkg/responses
+	swag init -d $(SOURCE_REST_PATH),./pkg/responses
 
 .PHONY: create-domain
-create-domain: ## Creates a domain for the app according to boilerplate (ex, make create-domain domain=finance_reports).
+create-domain: ## Creates a domain for the app according to boilerplate (ex: make create-domain domain=finance_reports).
 	$(CREATE_DOMAIN_CMD) -domain $(domain)
 
 .PHONY: migration-new
 migration-new: ## Create a new migration file (ex, migration-new name=create_accounts_table).
-	${DBMATE_CMD_PREFIX} new ${name}
+	$(DBMATE_CMD_PREFIX) new $(name)
 
 .PHONY: migration-status
 migration-status: ## Show the migration status.
-	${DBMATE_CMD_WITH_URL_PREFIX} status
+	$(DBMATE_CMD_WITH_URL_PREFIX) status
 
 .PHONY: migration-up
 migration-up: ## Execute all migration files.
-	${DBMATE_CMD_WITH_URL_PREFIX} up
+	$(DBMATE_CMD_WITH_URL_PREFIX) up
 
 .PHONY: migration-down
 migration-down: ## Rollback 1 migration.
-	${DBMATE_CMD_WITH_URL_PREFIX} down
+	$(DBMATE_CMD_WITH_URL_PREFIX) down
