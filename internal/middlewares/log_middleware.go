@@ -3,8 +3,8 @@ package middlewares
 import (
 	"encoding/json"
 	"fmt"
+	"go-boilerplate/cmd/create-domain/internal/helpers"
 	"go-boilerplate/internal/constants"
-	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -80,6 +80,12 @@ func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 
 func maskBody(body any) any {
 	maskedValue := "************"
+	fieldsToMask := []string{
+		"password",
+		"token",
+		"access_token",
+		"refresh_token",
+	}
 
 	if sliceBody, ok := body.([]any); ok {
 		for i, item := range sliceBody {
@@ -97,7 +103,7 @@ func maskBody(body any) any {
 		if innerMap, ok := mapBody[key].(map[string]any); ok {
 			mapBody[key] = maskBody(innerMap)
 		}
-		if _, ok := value.(string); strings.ToLower(key) == "password" && ok {
+		if _, ok := value.(string); ok && helpers.Slice[string].IsIn(fieldsToMask, key) {
 			mapBody[key] = maskedValue
 		}
 	}
