@@ -10,7 +10,7 @@ import (
 )
 
 func (s *serviceImpl) GetByID(ctx context.Context, params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} models.{domain_pascal_name}, err error) {
-	{domain_camel_name}, err = s.Repository.GetByID(params.ID)
+	{domain_camel_name}, err = s.PostgresRepository.GetByID(params.ID)
 	if err != nil {
 		err = responses.NewError().
 			WithSourceError(err).
