@@ -6,6 +6,10 @@ import (
 )
 
 func (r *postgresRepositoryImpl) GetByID(ctx context.Context, accountID int64) (account models.Account, err error) {
-	err = r.DB.WithContext(ctx).First(&account, "id = ?", accountID).Error
+	err = r.DB.
+		WithContext(ctx).
+		Limit(1).
+		Find(&account, "id = ?", accountID).
+		Error
 	return
 }
