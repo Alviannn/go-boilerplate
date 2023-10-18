@@ -18,7 +18,22 @@ func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountR
 		return
 	}
 
-	hashed, err := bcrypt.GenerateFromPassword([]byte(params.Password), constants.DefaultHashCost)
+	params.Password, err = s.hashPassword(params.Password)
+	if err != nil {
+		return
+	}
+
+	if err = s.PostgresRepository.Register(ctx, params); err != nil {
+		err = responses.NewError().
+			WithSourceError(err).
+			WithMessage("Failed to register new account.").
+			WithCode(http.StatusBadRequest)
+	}
+	return
+}
+
+func (s *serviceImpl) hashPassword(password string) (hashed string, err error) {
+	rawHashed, err := bcrypt.GenerateFromPassword([]byte(password), constants.DefaultHashCost)
 	if err != nil {
 		err = responses.NewError().
 			WithSourceError(err).
@@ -27,13 +42,6 @@ func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountR
 		return
 	}
 
-	params.Password = string(hashed)
-	if err = s.PostgresRepository.Register(ctx, params); err != nil {
-		err = responses.NewError().
-			WithSourceError(err).
-			WithMessage("Failed to register new account.").
-			WithCode(http.StatusBadRequest)
-	}
-
+	hashed = string(rawHashed)
 	return
 }
