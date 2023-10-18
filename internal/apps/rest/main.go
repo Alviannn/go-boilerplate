@@ -9,6 +9,7 @@ import (
 	"go-boilerplate/pkg/databases"
 	"go-boilerplate/pkg/dependencies"
 	"os"
+	"strings"
 
 	"github.com/goava/di"
 	"github.com/joho/godotenv"
@@ -50,6 +51,10 @@ func StartServer() (err error) {
 			return
 		}
 
+		app.Use(echo_middlewares.Secure())
+		app.Use(echo_middlewares.CORSWithConfig(echo_middlewares.CORSConfig{
+			AllowOrigins: strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ","),
+		}))
 		app.Use(echo_middlewares.RemoveTrailingSlash())
 		app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
 			RequestIDHandler: func(c echo.Context, rid string) {
