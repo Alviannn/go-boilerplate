@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./build/go-boilerplate"
-  cmd = "make build"
+  cmd = "make build-rest"
   delay = 500
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "cmd"]
   exclude_file = []
