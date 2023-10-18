@@ -1,4 +1,4 @@
-package accounts_repository
+package accounts_postgres_repository
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"go-boilerplate/internal/models"
 )
 
-func (r *repositoryImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) error {
+func (r *postgresRepositoryImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) error {
 	newAccount := models.Account{
 		Username: params.Username,
 		FullName: params.FullName,

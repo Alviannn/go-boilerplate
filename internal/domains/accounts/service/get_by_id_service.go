@@ -14,7 +14,7 @@ import (
 )
 
 func (s *serviceImpl) GetByID(ctx context.Context, params dtos.GetAccountReq) (account models.Account, err error) {
-	account, err = s.Repository.GetByID(ctx, params.ID)
+	account, err = s.PostgresRepository.GetByID(ctx, params.ID)
 	if err != nil {
 		newErr := responses.NewError().
 			WithSourceError(err).

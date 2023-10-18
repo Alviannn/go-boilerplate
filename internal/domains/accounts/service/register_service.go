@@ -11,7 +11,7 @@ import (
 )
 
 func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) (err error) {
-	if s.Repository.IsExistByEmail(ctx, params.Email) {
+	if s.PostgresRepository.IsExistByEmail(ctx, params.Email) {
 		err = responses.NewError().
 			WithCode(http.StatusBadRequest).
 			WithMessage("Account is already registered.")
@@ -28,7 +28,7 @@ func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountR
 	}
 
 	params.Password = string(hashed)
-	if err = s.Repository.Register(ctx, params); err != nil {
+	if err = s.PostgresRepository.Register(ctx, params); err != nil {
 		err = responses.NewError().
 			WithSourceError(err).
 			WithMessage("Failed to register new account.").

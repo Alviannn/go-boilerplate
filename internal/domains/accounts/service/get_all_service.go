@@ -9,7 +9,7 @@ import (
 )
 
 func (s *serviceImpl) GetAll(ctx context.Context, params dtos.GetAllAccountsReq) (accounts []models.Account, err error) {
-	accounts, err = s.Repository.GetAll(ctx, params)
+	accounts, err = s.PostgresRepository.GetAll(ctx, params)
 	if err != nil {
 		err = responses.NewError().
 			WithSourceError(err).

@@ -5,11 +5,11 @@ import (
 )
 
 type serviceImpl struct {
-	Repository accounts_interfaces.Repository
+	PostgresRepository accounts_interfaces.PostgresRepository
 }
 
-func NewService(repository accounts_interfaces.Repository) accounts_interfaces.Service {
+func NewService(postgresRepository accounts_interfaces.PostgresRepository) accounts_interfaces.Service {
 	return &serviceImpl{
-		Repository: repository,
+		PostgresRepository: postgresRepository,
 	}
 }
