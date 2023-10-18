@@ -1,5 +1,5 @@
 -- migrate:up
-CREATE TABLE users (
+CREATE TABLE accounts (
     id BIGSERIAL,
 
     username VARCHAR(64) NOT NULL,
@@ -11,12 +11,10 @@ CREATE TABLE users (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP,
 
-    PRIMARY KEY (id),
-    UNIQUE (username),
-    UNIQUE (email)
+    PRIMARY KEY (id)
 );
 
-CREATE INDEX ON users (deleted_at);
+CREATE INDEX ON accounts (deleted_at);
 
 -- migrate:down
-DROP TABLE users;
+DROP TABLE accounts;
