@@ -4,7 +4,7 @@ import (
 	"go-boilerplate/internal/domains"
 	"go-boilerplate/pkg/logger"
 
-	"github.com/goava/di"
+	"github.com/defval/di"
 	"gorm.io/gorm"
 )
 

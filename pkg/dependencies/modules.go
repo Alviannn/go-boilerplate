@@ -4,7 +4,7 @@ import (
 	"go-boilerplate/pkg/customvalidator"
 	"go-boilerplate/pkg/databases"
 
-	"github.com/goava/di"
+	"github.com/defval/di"
 	"github.com/labstack/echo/v4"
 )
 

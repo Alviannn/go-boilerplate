@@ -4,7 +4,7 @@ import (
 	health_delivery_rest "go-boilerplate/internal/domains/health/delivery_rest"
 	domains_interfaces "go-boilerplate/internal/domains/interfaces"
 
-	"github.com/goava/di"
+	"github.com/defval/di"
 )
 
 var Module = di.Options(

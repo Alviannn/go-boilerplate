@@ -6,7 +6,7 @@ import (
 	accounts_service "go-boilerplate/internal/domains/accounts/service"
 	domains_interfaces "go-boilerplate/internal/domains/interfaces"
 
-	"github.com/goava/di"
+	"github.com/defval/di"
 )
 
 var Module = di.Options(

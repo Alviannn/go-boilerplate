@@ -4,7 +4,7 @@ import (
 	"go-boilerplate/internal/domains/accounts"
 	"go-boilerplate/internal/domains/health"
 
-	"github.com/goava/di"
+	"github.com/defval/di"
 )
 
 var Modules = di.Options(

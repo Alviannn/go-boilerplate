@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/goava/di"
+	"github.com/defval/di"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	echo_middlewares "github.com/labstack/echo/v4/middleware"
