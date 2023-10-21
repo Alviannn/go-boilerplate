@@ -31,51 +31,45 @@ func RegisterRouters(echo *echo.Echo, container *di.Container) (err error) {
 	return
 }
 
-func StartServer() (err error) {
+func StartServer(container *di.Container) (err error) {
 	if err = godotenv.Load(); err != nil {
 		return
 	}
 
-	container, err := dependencies.NewForStartup()
-	if err != nil {
+	// Force DB to load and test the connection.
+	var gorm *gorm.DB
+	if err = container.Resolve(&gorm); err != nil {
+		return
+	}
+	if err = databases.MigratePosgres(); err != nil {
 		return
 	}
 
-	err = container.Invoke(func(app *echo.Echo) (err error) {
-		// Force DB to load and test the connection.
-		var gorm *gorm.DB
-		if err = container.Resolve(&gorm); err != nil {
-			return
-		}
-		if err = databases.MigratePosgres(); err != nil {
-			return
-		}
+	app := echo.New()
 
-		app.Use(echo_middlewares.Secure())
-		app.Use(echo_middlewares.CORSWithConfig(echo_middlewares.CORSConfig{
-			AllowOrigins: strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ","),
-		}))
-		app.Use(echo_middlewares.RemoveTrailingSlash())
-		app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
-			RequestIDHandler: func(c echo.Context, rid string) {
-				req := c.Request()
-				ctx := req.Context()
+	app.Use(echo_middlewares.Secure())
+	app.Use(echo_middlewares.CORSWithConfig(echo_middlewares.CORSConfig{
+		AllowOrigins: strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ","),
+	}))
+	app.Use(echo_middlewares.RemoveTrailingSlash())
+	app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
+		RequestIDHandler: func(c echo.Context, rid string) {
+			req := c.Request()
+			ctx := req.Context()
 
-				newReq := req.WithContext(context.WithValue(ctx, constants.RequestIDKey, rid))
-				c.SetRequest(newReq)
-			},
-		}))
-		app.Use(middlewares.LogMiddleware)
+			newReq := req.WithContext(context.WithValue(ctx, constants.RequestIDKey, rid))
+			c.SetRequest(newReq)
+		},
+	}))
+	app.Use(middlewares.LogMiddleware)
 
-		// Override error handler middleware
-		if err = RegisterRouters(app, container); err != nil {
-			return
-		}
-
-		app.HTTPErrorHandler = middlewares.CustomErrorHandler()
-		err = app.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
+	// Override error handler middleware
+	if err = RegisterRouters(app, container); err != nil {
 		return
-	})
+	}
+
+	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
+	err = app.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
 	return
 }
 
@@ -86,7 +80,12 @@ func StartServer() (err error) {
 //	@schemes	http https
 //	@host		localhost:5000
 func main() {
-	if err := StartServer(); err != nil {
+	container, err := dependencies.NewForStartup()
+	if err != nil {
+		return
+	}
+
+	if err := container.Invoke(StartServer); err != nil {
 		log.Fatal().Err(err).Send()
 	}
 }
