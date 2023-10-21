@@ -5,7 +5,6 @@ import (
 	"go-boilerplate/pkg/databases"
 
 	"github.com/defval/di"
-	"github.com/labstack/echo/v4"
 )
 
 // appModules stores all necessary modules here for DI (Dependency Injection),
@@ -13,5 +12,4 @@ import (
 var appModules = di.Options(
 	di.Provide(customvalidator.NewValidator),
 	di.Provide(databases.NewPostgresDB),
-	di.Provide(echo.New),
 )
