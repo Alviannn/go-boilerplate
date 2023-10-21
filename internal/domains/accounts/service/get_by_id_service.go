@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"go-boilerplate/internal/dtos"
-	"go-boilerplate/internal/models"
+	postgres_models "go-boilerplate/internal/models/postgres"
 	"go-boilerplate/pkg/responses"
 )
 
-func (s *serviceImpl) GetByID(ctx context.Context, params dtos.GetAccountReq) (account models.Account, err error) {
+func (s *serviceImpl) GetByID(ctx context.Context, params dtos.GetAccountReq) (account postgres_models.Account, err error) {
 	account, err = s.PostgresRepository.GetByID(ctx, params.ID)
 	if err != nil {
 		err = responses.NewError().

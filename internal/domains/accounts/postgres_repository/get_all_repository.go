@@ -3,10 +3,10 @@ package accounts_postgres_repository
 import (
 	"context"
 	"go-boilerplate/internal/dtos"
-	"go-boilerplate/internal/models"
+	postgres_models "go-boilerplate/internal/models/postgres"
 )
 
-func (r *postgresRepositoryImpl) GetAll(ctx context.Context, params dtos.GetAllAccountsReq) (accounts []models.Account, err error) {
+func (r *postgresRepositoryImpl) GetAll(ctx context.Context, params dtos.GetAllAccountsReq) (accounts []postgres_models.Account, err error) {
 	query := r.DB.WithContext(ctx)
 
 	if params.Email != "" {

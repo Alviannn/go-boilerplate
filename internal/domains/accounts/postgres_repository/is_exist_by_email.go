@@ -2,11 +2,11 @@ package accounts_postgres_repository
 
 import (
 	"context"
-	"go-boilerplate/internal/models"
+	postgres_models "go-boilerplate/internal/models/postgres"
 )
 
 func (r *postgresRepositoryImpl) IsExistByEmail(ctx context.Context, email string) bool {
-	var account models.Account
+	var account postgres_models.Account
 	query := r.DB.WithContext(ctx).
 		Select("id").
 		Where("email = ?", email).

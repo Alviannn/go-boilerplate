@@ -2,10 +2,10 @@ package accounts_postgres_repository
 
 import (
 	"context"
-	"go-boilerplate/internal/models"
+	postgres_models "go-boilerplate/internal/models/postgres"
 )
 
-func (r *postgresRepositoryImpl) GetByID(ctx context.Context, accountID int64) (account models.Account, err error) {
+func (r *postgresRepositoryImpl) GetByID(ctx context.Context, accountID int64) (account postgres_models.Account, err error) {
 	err = r.DB.
 		WithContext(ctx).
 		Limit(1).
