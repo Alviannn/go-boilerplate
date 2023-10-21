@@ -1,30 +1,34 @@
-package responses
+package response
 
 import (
+	"go-boilerplate/pkg/customerror"
 	"net/http"
 	"reflect"
-
-	"github.com/labstack/echo/v4"
 )
 
-type ResponseBuilder struct {
+type Builder struct {
 	Data        any
 	Error       error
 	SuccessCode int
 }
 
-func New() *ResponseBuilder {
-	return &ResponseBuilder{
+type Response struct {
+	Data       any
+	StatusCode int
+}
+
+func NewBuilder() *Builder {
+	return &Builder{
 		SuccessCode: http.StatusOK,
 	}
 }
 
-func (b *ResponseBuilder) WithData(data any) *ResponseBuilder {
+func (b *Builder) WithData(data any) *Builder {
 	b.Data = data
 	return b
 }
 
-func (b *ResponseBuilder) WithSuccessCode(statusCode int) *ResponseBuilder {
+func (b *Builder) WithSuccessCode(statusCode int) *Builder {
 	if statusCode == 0 {
 		statusCode = http.StatusOK
 	}
@@ -32,8 +36,19 @@ func (b *ResponseBuilder) WithSuccessCode(statusCode int) *ResponseBuilder {
 	return b
 }
 
-func (b *ResponseBuilder) WithError(err error) *ResponseBuilder {
-	b.Error = parseAsCustomErrorOrNil(err)
+func sanitizeError(err error) *customerror.Error {
+	if err == nil {
+		return nil
+	}
+	if customError, ok := err.(*customerror.Error); ok {
+		return customError
+	}
+
+	return customerror.New().WithSourceError(err)
+}
+
+func (b *Builder) WithError(err error) *Builder {
+	b.Error = sanitizeError(err)
 	return b
 }
 
@@ -46,7 +61,7 @@ func (b *ResponseBuilder) WithError(err error) *ResponseBuilder {
 // Anything that's not a slice or struct or `nil` value
 // will become the default zero value of the type,
 // ex: empty string stays as "".
-func (b *ResponseBuilder) sanitizeData() any {
+func (b *Builder) sanitizeData() any {
 	dataReflect := reflect.ValueOf(b.Data)
 	dataKind := dataReflect.Kind()
 
@@ -69,9 +84,14 @@ func (b *ResponseBuilder) sanitizeData() any {
 	return newData
 }
 
-func (b *ResponseBuilder) Send(c echo.Context) error {
-	if customErr := parseAsCustomErrorOrNil(b.Error); customErr != nil {
-		return c.JSON(customErr.Code, customErr.BuildResponse())
+func (b *Builder) Build() (res Response) {
+	res.Data = b.sanitizeData()
+	res.StatusCode = b.SuccessCode
+
+	if customErr := sanitizeError(b.Error); customErr != nil {
+		res.Data = customErr.ToJSON()
+		res.StatusCode = customErr.Code
 	}
-	return c.JSON(b.SuccessCode, b.sanitizeData())
+
+	return
 }

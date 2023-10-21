@@ -1,4 +1,4 @@
-package responses
+package customerror
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"github.com/ztrue/tracerr"
 )
 
-// CustomError is the standard error for this `responses` package,
+// Error is the standard error for this `responses` package,
 // where we can give as much details as possible in the response.
 //
 // It's created using `responses.NewError()` function since it has
@@ -16,7 +16,7 @@ import (
 //
 // This struct is using builder pattern, you can see the code example
 // in `responses.NewError()` function.
-type CustomError struct {
+type Error struct {
 	// SourceError is the real source of error.
 	//
 	// It acts as a detail that shows where the error really came from,
@@ -46,12 +46,28 @@ type CustomError struct {
 	Code int
 }
 
-func (e *CustomError) WithMessage(message string) *CustomError {
+type ErrorJSON struct {
+	Message            string   `json:"message"`
+	SourceErrorMessage string   `json:"source_error_message"`
+	Stack              []string `json:"stack"`
+}
+
+func New() *Error {
+	customError := &Error{
+		Message: "Unhandled error",
+		Code:    http.StatusInternalServerError,
+	}
+	customError.thisError = tracerr.Wrap(customError)
+
+	return customError
+}
+
+func (e *Error) WithMessage(message string) *Error {
 	e.Message = message
 	return e
 }
 
-func (e *CustomError) WithCode(statusCode int) *CustomError {
+func (e *Error) WithCode(statusCode int) *Error {
 	// Defaults to internal server error (500) when it's empty
 	// because we're sending it as HTTP response.
 	if statusCode == 0 {
@@ -62,8 +78,8 @@ func (e *CustomError) WithCode(statusCode int) *CustomError {
 	return e
 }
 
-func (e *CustomError) WithSourceError(err error) *CustomError {
-	if customError, ok := err.(*CustomError); ok {
+func (e *Error) WithSourceError(err error) *Error {
+	if customError, ok := err.(*Error); ok {
 		// Reuse the traceable errors instead of recreating it
 		// in order to keep the stack trace.
 		err = customError.GetWorkingError()
@@ -82,7 +98,7 @@ func (e *CustomError) WithSourceError(err error) *CustomError {
 //
 // The first priority is `SourceError`, although when the value
 // is `nil` it will be replaced with `ThisError`.
-func (e *CustomError) GetWorkingError() (err error) {
+func (e *Error) GetWorkingError() (err error) {
 	err = e.SourceError
 	if err == nil {
 		err = e.thisError
@@ -91,7 +107,7 @@ func (e *CustomError) GetWorkingError() (err error) {
 	return err
 }
 
-func (e *CustomError) GetStackTrace() []string {
+func (e *Error) GetStackTrace() []string {
 	// Use `make` to avoid returning `nil` value
 	stackList := make([]string, 0)
 	rawStackList := tracerr.StackTrace(e.GetWorkingError())
@@ -103,14 +119,14 @@ func (e *CustomError) GetStackTrace() []string {
 	return stackList
 }
 
-func (e *CustomError) BuildResponse() ErrorResponse {
-	return ErrorResponse{
+func (e *Error) Error() string {
+	return e.Message
+}
+
+func (e *Error) ToJSON() ErrorJSON {
+	return ErrorJSON{
 		Message:            e.Message,
 		SourceErrorMessage: e.GetWorkingError().Error(),
 		Stack:              e.GetStackTrace(),
 	}
-}
-
-func (e CustomError) Error() string {
-	return e.Message
 }
