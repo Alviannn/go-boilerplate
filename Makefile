@@ -7,7 +7,7 @@ SOURCE_REST_PATH := $(APP_PATH)/rest
 CREATE_DOMAIN_CMD := go run ./cmd/create-domain/internal/main.go
 MIGRATION_CMD := go run ./cmd/migrations/internal/main.go
 
-DBMATE_URL := postgres://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
+DBMATE_URL := mysql://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)
 DBMATE_CMD_PREFIX := dbmate --migrations-dir './migrations' --no-dump-schema
 DBMATE_CMD_WITH_URL_PREFIX := $(DBMATE_CMD_PREFIX) --url $(DBMATE_URL)
 

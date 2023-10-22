@@ -1,10 +1,10 @@
 services:
-  postgres:
-    image: postgres:15
+  mariadb:
+    image: mariadb:11
     restart: on-failure
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: hello123
-      POSTGRES_DB: todolist
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: rootAdmin123
+      MYSQL_DATABASE: todolist
     ports:
-      - 5432:5432
+      - 3306:3306
