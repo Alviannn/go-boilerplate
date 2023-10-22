@@ -1,7 +1,8 @@
 package middlewares
 
 import (
-	"go-boilerplate/pkg/responses"
+	"go-boilerplate/pkg/customerror"
+	"go-boilerplate/pkg/response"
 
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
@@ -9,12 +10,16 @@ import (
 
 func CustomErrorHandler() echo.HTTPErrorHandler {
 	return func(err error, c echo.Context) {
-		customErr := responses.NewError().WithSourceError(err)
+		var customError *customerror.Error
+		if castableError, ok := err.(*customerror.Error); ok {
+			customError = castableError
+		} else {
+			customError = customerror.New().WithSourceError(err)
+		}
 
-		log.Error().Err(customErr).Msg("Unhandled error")
+		log.Error().Err(customError).Msg("Unhandled error")
 
-		responses.New().
-			WithError(customErr).
-			Send(c)
+		res := response.NewBuilder().WithError(customError).Build()
+		c.JSON(res.StatusCode, res.Data)
 	}
 }

@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"go-boilerplate/pkg/customerror"
 	"io"
 	"os"
 
@@ -11,7 +12,7 @@ import (
 func SetupLogger() error {
 	os.Mkdir("logs", os.ModePerm)
 
-	zerolog.ErrorMarshalFunc = HandleCustomError
+	zerolog.ErrorMarshalFunc = errorHandler
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	var consoleWriter io.Writer = os.Stdout
@@ -34,4 +35,13 @@ func SetupLogger() error {
 	multi := zerolog.MultiLevelWriter(consoleWriter, rotateFileWriter)
 	log.Logger = log.Output(multi)
 	return nil
+}
+
+func errorHandler(err error) any {
+	customError, ok := err.(*customerror.Error)
+	if !ok {
+		return err
+	}
+
+	return customError.ToJSON()
 }
