@@ -1,21 +1,21 @@
 package {domain_snake_name}_service
 
 import (
-    "context"
+	"context"
 	"net/http"
 
 	"{module_name}/internal/dtos"
-	"{module_name}/internal/models"
-	"{module_name}/pkg/responses"
+	mysql_models "{module_name}/internal/models/mysql"
+	"{module_name}/pkg/customerror"
 )
 
-func (s *serviceImpl) GetByID(ctx context.Context, params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} models.{domain_pascal_name}, err error) {
-	{domain_camel_name}, err = s.PostgresRepository.GetByID(params.ID)
+func (s *serviceImpl) GetByID(ctx context.Context, params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} mysql_models.{domain_pascal_name}, err error) {
+	{domain_camel_name}, err = s.MySQLRepository.GetByID(params.ID)
 	if err != nil {
-		err = responses.NewError().
+		err = customerror.New().
 			WithSourceError(err).
 			WithCode(http.StatusBadRequest).
-			WithMessage("Failed to get {domain_camel_name} by ID.")
+			WithMessage("Failed to get data by ID.")
 	}
 	return
 }

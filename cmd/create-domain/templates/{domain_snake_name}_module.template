@@ -1,15 +1,16 @@
 package {domain_snake_name}
 
 import (
-	"github.com/goava/di"
 	{domain_snake_name}_delivery_rest "{module_name}/internal/domains/{domain_snake_name}/delivery_rest"
-	{domain_snake_name}_postgres_repository "{module_name}/internal/domains/{domain_snake_name}/postgres_repository"
+	{domain_snake_name}_mysql_repository "{module_name}/internal/domains/{domain_snake_name}/mysql_repository"
 	{domain_snake_name}_service "{module_name}/internal/domains/{domain_snake_name}/service"
 	domains_interfaces "{module_name}/internal/domains/interfaces"
+
+	"github.com/defval/di"
 )
 
 var Module = di.Options(
-	di.Provide({domain_snake_name}_postgres_repository.NewPostgresRepository),
-	di.Provide({domain_snake_name}_service.NewService),
-	di.Provide({domain_snake_name}_delivery_rest.NewRestDelivery, di.As(new(domains_interfaces.BaseRestDelivery))),
+	di.Provide({domain_snake_name}_mysql_repository.New),
+	di.Provide({domain_snake_name}_service.New),
+	di.Provide({domain_snake_name}_delivery_rest.New, di.As(new(domains_interfaces.BaseRestDelivery))),
 )

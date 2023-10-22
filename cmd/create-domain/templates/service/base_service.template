@@ -5,11 +5,11 @@ import (
 )
 
 type serviceImpl struct {
-	PostgresRepository {domain_snake_name}_interfaces.PostgresRepository
+	MySQLRepository {domain_snake_name}_interfaces.MySQLRepository
 }
 
-func NewService(postgresRepository {domain_snake_name}_interfaces.PostgresRepository) {domain_snake_name}_interfaces.Service {
+func Newe(mysqlRepository {domain_snake_name}_interfaces.MySQLRepository) {domain_snake_name}_interfaces.Service {
 	return &serviceImpl{
-        PostgresRepository: postgresRepository,
-    }
+		MySQLRepository: mysqlRepository,
+	}
 }

@@ -1,0 +1,10 @@
+package {domain_snake_name}_interfaces
+
+import (
+	"context"
+	mysql_models "{module_name}/internal/models/mysql"
+)
+
+type MySQLRepository interface {
+	GetByID(ctx context.Context, id int64) ({domain_camel_name} mysql_models.{domain_pascal_name}, err error)
+}

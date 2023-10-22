@@ -1,11 +1,11 @@
 package {domain_snake_name}_interfaces
 
 import (
-    "context"
+	"context"
 	"{module_name}/internal/dtos"
-	"{module_name}/internal/models"
+	mysql_models "{module_name}/internal/models/mysql"
 )
 
 type Service interface {
-	GetByID(ctx context.Context, params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} models.{domain_pascal_name}, err error)
+	GetByID(ctx context.Context, params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} mysql_models.{domain_pascal_name}, err error)
 }

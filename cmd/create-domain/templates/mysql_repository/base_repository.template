@@ -5,12 +5,12 @@ import (
 	{domain_snake_name}_interfaces "{module_name}/internal/domains/{domain_snake_name}/interfaces"
 )
 
-type postgresRepositoryImpl struct {
+type repositoryImpl struct {
 	DB *gorm.DB
 }
 
-func NewPostgresRepository(db *gorm.DB) {domain_snake_name}_interfaces.PostgresRepository {
-	return &postgresRepositoryImpl{
+func New(db *gorm.DB) {domain_snake_name}_interfaces.MySQLRepository {
+	return &repositoryImpl{
 		DB: db,
-    }
+	}
 }
