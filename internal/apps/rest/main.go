@@ -41,7 +41,7 @@ func StartServer(container *di.Container) (err error) {
 	if err = container.Resolve(&gorm); err != nil {
 		return
 	}
-	if err = databases.MigratePosgres(); err != nil {
+	if err = databases.MigrateMySQL(); err != nil {
 		return
 	}
 
