@@ -1,7 +1,7 @@
 package health_delivery_rest
 
 import (
-	"go-boilerplate/pkg/responses"
+	"go-boilerplate/pkg/response"
 	"net/http"
 	"time"
 
@@ -10,8 +10,10 @@ import (
 
 func (d *restDeliveryImpl) GetHealth(c echo.Context) (err error) {
 	currentTime := time.Now().Format(time.DateTime)
-	return responses.New().
+	res := response.NewBuilder().
 		WithData(currentTime).
 		WithSuccessCode(http.StatusOK).
-		Send(c)
+		Build()
+
+	return c.JSON(res.StatusCode, res.Data)
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"go-boilerplate/internal/constants"
 	"go-boilerplate/internal/dtos"
-	"go-boilerplate/pkg/responses"
+	"go-boilerplate/pkg/customerror"
 	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
@@ -12,7 +12,7 @@ import (
 
 func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) (err error) {
 	if s.PostgresRepository.IsExistByEmail(ctx, params.Email) {
-		err = responses.NewError().
+		err = customerror.New().
 			WithCode(http.StatusBadRequest).
 			WithMessage("Account is already registered.")
 		return
@@ -24,7 +24,7 @@ func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountR
 	}
 
 	if err = s.PostgresRepository.Register(ctx, params); err != nil {
-		err = responses.NewError().
+		err = customerror.New().
 			WithSourceError(err).
 			WithMessage("Failed to register new account.").
 			WithCode(http.StatusBadRequest)
@@ -35,7 +35,7 @@ func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountR
 func (s *serviceImpl) hashPassword(password string) (hashed string, err error) {
 	rawHashed, err := bcrypt.GenerateFromPassword([]byte(password), constants.DefaultHashCost)
 	if err != nil {
-		err = responses.NewError().
+		err = customerror.New().
 			WithSourceError(err).
 			WithMessage("Failed to hash password.").
 			WithCode(http.StatusBadRequest)

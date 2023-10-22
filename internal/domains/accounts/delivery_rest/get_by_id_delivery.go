@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"go-boilerplate/internal/dtos"
-	"go-boilerplate/pkg/responses"
+	"go-boilerplate/pkg/customerror"
+	"go-boilerplate/pkg/response"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,22 +23,29 @@ import (
 //	@Failure		500	{object}	responses.ErrorResponse
 //	@Router			/accounts/{id} [get]
 func (d *restDeliveryImpl) GetByID(c echo.Context) (err error) {
-	var params dtos.GetAccountReq
-	ctx := c.Request().Context()
+	var (
+		params dtos.GetAccountReq
+		res    response.Response
+
+		ctx = c.Request().Context()
+	)
 
 	if err = c.Bind(&params); err != nil {
-		err = responses.NewError().
+		err = customerror.New().
 			WithCode(http.StatusBadRequest).
 			WithSourceError(err).
 			WithMessage("Failed to bind parameters")
 
-		return responses.New().WithError(err).Send(c)
+		res = response.NewBuilder().WithError(err).Build()
+		return c.JSON(res.StatusCode, res.Data)
 	}
 
 	account, err := d.Service.GetByID(ctx, params)
-	return responses.New().
+	res = response.NewBuilder().
+		WithSuccessCode(http.StatusOK).
 		WithData(account).
 		WithError(err).
-		WithSuccessCode(http.StatusOK).
-		Send(c)
+		Build()
+
+	return c.JSON(res.StatusCode, res.Data)
 }

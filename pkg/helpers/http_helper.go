@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"bytes"
-	"go-boilerplate/pkg/responses"
+	"go-boilerplate/pkg/customerror"
 	"io"
 	"net/http"
 )
@@ -18,7 +18,7 @@ func (h *httpHelper) CloneRequestBody(req *http.Request) (clonedBody []byte, err
 
 	clonedBody, err = io.ReadAll(req.Body)
 	if err != nil {
-		err = responses.NewError().
+		err = customerror.New().
 			WithSourceError(err).
 			WithCode(http.StatusInternalServerError).
 			WithMessage("Failed to read request body.")
