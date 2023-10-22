@@ -10,7 +10,7 @@ type repositoryImpl struct {
 	DB *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) accounts_interfaces.MySQLRepository {
+func New(db *gorm.DB) accounts_interfaces.MySQLRepository {
 	return &repositoryImpl{
 		DB: db,
 	}

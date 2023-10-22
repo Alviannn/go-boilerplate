@@ -6,17 +6,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type restDeliveryImpl struct {
+type deliveryImpl struct {
 	Service accounts_interfaces.Service
 }
 
-func NewRestDelivery(service accounts_interfaces.Service) *restDeliveryImpl {
-	return &restDeliveryImpl{
+func New(service accounts_interfaces.Service) *deliveryImpl {
+	return &deliveryImpl{
 		Service: service,
 	}
 }
 
-func (d *restDeliveryImpl) SetupRouter(echo *echo.Echo) {
+func (d *deliveryImpl) SetupRouter(echo *echo.Echo) {
 	router := echo.Group("accounts")
 
 	router.GET("/:id", d.GetByID)

@@ -8,7 +8,7 @@ type serviceImpl struct {
 	MySQLRepository accounts_interfaces.MySQLRepository
 }
 
-func NewService(mysqlRepository accounts_interfaces.MySQLRepository) accounts_interfaces.Service {
+func New(mysqlRepository accounts_interfaces.MySQLRepository) accounts_interfaces.Service {
 	return &serviceImpl{
 		MySQLRepository: mysqlRepository,
 	}

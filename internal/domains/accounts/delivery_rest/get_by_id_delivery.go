@@ -22,7 +22,7 @@ import (
 //	@Failure		400	{object}	responses.ErrorResponse
 //	@Failure		500	{object}	responses.ErrorResponse
 //	@Router			/accounts/{id} [get]
-func (d *restDeliveryImpl) GetByID(c echo.Context) (err error) {
+func (d *deliveryImpl) GetByID(c echo.Context) (err error) {
 	var (
 		params dtos.GetAccountReq
 		res    response.Response

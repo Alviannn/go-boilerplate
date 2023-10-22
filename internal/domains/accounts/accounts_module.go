@@ -10,7 +10,7 @@ import (
 )
 
 var Module = di.Options(
-	di.Provide(accounts_mysql_repository.NewRepository),
-	di.Provide(accounts_service.NewService),
-	di.Provide(accounts_delivery_rest.NewRestDelivery, di.As(new(domains_interfaces.BaseRestDelivery))),
+	di.Provide(accounts_mysql_repository.New),
+	di.Provide(accounts_service.New),
+	di.Provide(accounts_delivery_rest.New, di.As(new(domains_interfaces.BaseRestDelivery))),
 )
