@@ -1,4 +1,4 @@
-package postgres_models
+package mysql_models
 
 import (
 	"time"
@@ -7,7 +7,7 @@ import (
 )
 
 type BaseModel struct {
-	ID        int64          `gorm:"primaryKey;type:bigserial" json:"id"`
+	ID        int64          `gorm:"primaryKey" json:"id"`
 	CreatedAt time.Time      `gorm:"autoCreateTime;not null" json:"createdAt"`
 	UpdatedAt time.Time      `gorm:"autoUpdateTime;not null" json:"updatedAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deletedAt" swaggertype:"string"`

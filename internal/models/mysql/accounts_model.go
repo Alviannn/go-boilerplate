@@ -1,4 +1,4 @@
-package postgres_models
+package mysql_models
 
 type Account struct {
 	BaseModel

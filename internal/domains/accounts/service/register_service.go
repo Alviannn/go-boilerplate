@@ -11,7 +11,7 @@ import (
 )
 
 func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) (err error) {
-	if s.PostgresRepository.IsExistByEmail(ctx, params.Email) {
+	if s.MySQLRepository.IsExistByEmail(ctx, params.Email) {
 		err = customerror.New().
 			WithCode(http.StatusBadRequest).
 			WithMessage("Account is already registered.")
@@ -23,7 +23,7 @@ func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountR
 		return
 	}
 
-	if err = s.PostgresRepository.Register(ctx, params); err != nil {
+	if err = s.MySQLRepository.Register(ctx, params); err != nil {
 		err = customerror.New().
 			WithSourceError(err).
 			WithMessage("Failed to register new account.").

@@ -6,12 +6,12 @@ import (
 	"net/http"
 
 	"go-boilerplate/internal/dtos"
-	postgres_models "go-boilerplate/internal/models/postgres"
+	mysql_models "go-boilerplate/internal/models/mysql"
 	"go-boilerplate/pkg/customerror"
 )
 
-func (s *serviceImpl) GetByID(ctx context.Context, params dtos.GetAccountReq) (account postgres_models.Account, err error) {
-	account, err = s.PostgresRepository.GetByID(ctx, params.ID)
+func (s *serviceImpl) GetByID(ctx context.Context, params dtos.GetAccountReq) (account mysql_models.Account, err error) {
+	account, err = s.MySQLRepository.GetByID(ctx, params.ID)
 	if err != nil {
 		err = customerror.New().
 			WithSourceError(err).

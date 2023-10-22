@@ -11,5 +11,5 @@ import (
 // then registered at `New` and `NewForTransaction`
 var appModules = di.Options(
 	di.Provide(customvalidator.NewValidator),
-	di.Provide(databases.NewPostgresDB),
+	di.Provide(databases.NewMySQLDB),
 )
