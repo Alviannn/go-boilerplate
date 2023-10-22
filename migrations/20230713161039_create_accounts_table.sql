@@ -1,20 +1,19 @@
 -- migrate:up
-CREATE TABLE accounts (
-    id BIGSERIAL,
+CREATE TABLE IF NOT EXISTS accounts (
+    id BIGINT NOT NULL AUTO_INCREMENT,
 
     username VARCHAR(64) NOT NULL,
     full_name VARCHAR(256) NOT NULL,
     email VARCHAR(128) NOT NULL,
     password VARCHAR(128) NOT NULL,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+    deleted_at TIMESTAMP NULL DEFAULT NULL,
 
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    INDEX (deleted_at)
 );
-
-CREATE INDEX ON accounts (deleted_at);
 
 -- migrate:down
 DROP TABLE accounts;
