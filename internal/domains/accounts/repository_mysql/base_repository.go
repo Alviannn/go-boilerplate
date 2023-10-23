@@ -1,4 +1,4 @@
-package accounts_mysql_repository
+package accounts_repository_mysql
 
 import (
 	accounts_interfaces "go-boilerplate/internal/domains/accounts/interfaces"
@@ -10,7 +10,7 @@ type repositoryImpl struct {
 	DB *gorm.DB
 }
 
-func New(db *gorm.DB) accounts_interfaces.MySQLRepository {
+func New(db *gorm.DB) accounts_interfaces.RepositoryMySQL {
 	return &repositoryImpl{
 		DB: db,
 	}

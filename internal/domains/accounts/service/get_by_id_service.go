@@ -11,7 +11,7 @@ import (
 )
 
 func (s *serviceImpl) GetByID(ctx context.Context, params dtos.GetAccountReq) (account mysql_models.Account, err error) {
-	account, err = s.MySQLRepository.GetByID(ctx, params.ID)
+	account, err = s.RepositoryMySQL.GetByID(ctx, params.ID)
 	if err != nil {
 		err = customerror.New().
 			WithSourceError(err).

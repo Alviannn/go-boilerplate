@@ -9,7 +9,7 @@ import (
 )
 
 func (s *serviceImpl) GetAll(ctx context.Context, params dtos.GetAllAccountsReq) (accounts []mysql_models.Account, err error) {
-	accounts, err = s.MySQLRepository.GetAll(ctx, params)
+	accounts, err = s.RepositoryMySQL.GetAll(ctx, params)
 	if err != nil {
 		err = customerror.New().
 			WithSourceError(err).

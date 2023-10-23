@@ -27,7 +27,7 @@ func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountR
 		return
 	}
 
-	if err = s.MySQLRepository.Register(ctx, params); err != nil {
+	if err = s.RepositoryMySQL.Register(ctx, params); err != nil {
 		err = customerror.New().
 			WithSourceError(err).
 			WithMessage("Failed to register new account.").
@@ -37,7 +37,7 @@ func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountR
 }
 
 func (s *serviceImpl) isEmailExist(ctx context.Context, email string) (isExist bool, err error) {
-	isExist, err = s.MySQLRepository.IsExistByEmail(ctx, email)
+	isExist, err = s.RepositoryMySQL.IsExistByEmail(ctx, email)
 	if err != nil {
 		err = customerror.New().
 			WithCode(http.StatusInternalServerError).

@@ -1,4 +1,4 @@
-package accounts_mysql_repository
+package accounts_repository_mysql
 
 import (
 	"context"

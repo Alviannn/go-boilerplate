@@ -5,11 +5,11 @@ import (
 )
 
 type serviceImpl struct {
-	MySQLRepository accounts_interfaces.MySQLRepository
+	RepositoryMySQL accounts_interfaces.RepositoryMySQL
 }
 
-func New(mysqlRepository accounts_interfaces.MySQLRepository) accounts_interfaces.Service {
+func New(repositoryMySQL accounts_interfaces.RepositoryMySQL) accounts_interfaces.Service {
 	return &serviceImpl{
-		MySQLRepository: mysqlRepository,
+		RepositoryMySQL: repositoryMySQL,
 	}
 }
