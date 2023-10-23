@@ -11,10 +11,14 @@ import (
 )
 
 func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) (err error) {
-	if s.MySQLRepository.IsExistByEmail(ctx, params.Email) {
+	isExist, err := s.isEmailExist(ctx, params.Email)
+	if err != nil {
+		return
+	}
+	if isExist {
 		err = customerror.New().
-			WithCode(http.StatusBadRequest).
-			WithMessage("Account is already registered.")
+			WithCode(http.StatusConflict).
+			WithMessage("Account with this email already exists.")
 		return
 	}
 
@@ -27,7 +31,17 @@ func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountR
 		err = customerror.New().
 			WithSourceError(err).
 			WithMessage("Failed to register new account.").
-			WithCode(http.StatusBadRequest)
+			WithCode(http.StatusInternalServerError)
+	}
+	return
+}
+
+func (s *serviceImpl) isEmailExist(ctx context.Context, email string) (isExist bool, err error) {
+	isExist, err = s.MySQLRepository.IsExistByEmail(ctx, email)
+	if err != nil {
+		err = customerror.New().
+			WithCode(http.StatusInternalServerError).
+			WithMessage("Failed to check account existence.")
 	}
 	return
 }
