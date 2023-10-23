@@ -21,7 +21,7 @@ import (
 //	@Param			fullName	query		string	false	"Account's full name"
 //	@Param			limit		query		int		false	"Limit the amount data to show"
 //	@Param			offset		query		int		false	"The data offset, or where it should start"
-//	@Success		200			{object}	[]models.Account
+//	@Success		200			{object}	[]models_mysql.Account
 //	@Failure		400			{object}	customerror.ErrorJSON
 //	@Failure		500			{object}	customerror.ErrorJSON
 //	@Router			/accounts [get]

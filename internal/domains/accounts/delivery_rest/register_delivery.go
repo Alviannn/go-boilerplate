@@ -18,8 +18,8 @@ import (
 //	@Produce		json
 //	@Param			newAccount	body		dtos.RegisterAccountReq	true	"New account details"
 //	@Success		200			{object}	any
-//	@Failure		400			{object}	responses.ErrorResponse
-//	@Failure		500			{object}	responses.ErrorResponse
+//	@Failure		400			{object}	customerror.ErrorJSON
+//	@Failure		500			{object}	customerror.ErrorJSON
 //	@Router			/accounts [post]
 func (d *deliveryImpl) Register(c echo.Context) (err error) {
 	var (

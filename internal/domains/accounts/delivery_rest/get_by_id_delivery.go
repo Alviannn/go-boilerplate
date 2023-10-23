@@ -18,9 +18,9 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		int	true	"Account's ID"
-//	@Success		200	{object}	models.Account
-//	@Failure		400	{object}	responses.ErrorResponse
-//	@Failure		500	{object}	responses.ErrorResponse
+//	@Success		200	{object}	models_mysql.Account
+//	@Failure		400	{object}	customerror.ErrorJSON
+//	@Failure		500	{object}	customerror.ErrorJSON
 //	@Router			/accounts/{id} [get]
 func (d *deliveryImpl) GetByID(c echo.Context) (err error) {
 	var (
