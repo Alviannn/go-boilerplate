@@ -2,7 +2,7 @@ package {domain_snake_name}
 
 import (
 	{domain_snake_name}_delivery_rest "{module_name}/internal/domains/{domain_snake_name}/delivery_rest"
-	{domain_snake_name}_mysql_repository "{module_name}/internal/domains/{domain_snake_name}/mysql_repository"
+	{domain_snake_name}_repository_mysql "{module_name}/internal/domains/{domain_snake_name}/repository_mysql"
 	{domain_snake_name}_service "{module_name}/internal/domains/{domain_snake_name}/service"
 	domains_interfaces "{module_name}/internal/domains/interfaces"
 
@@ -10,7 +10,7 @@ import (
 )
 
 var Module = di.Options(
-	di.Provide({domain_snake_name}_mysql_repository.New),
+	di.Provide({domain_snake_name}_repository_mysql.New),
 	di.Provide({domain_snake_name}_service.New),
 	di.Provide({domain_snake_name}_delivery_rest.New, di.As(new(domains_interfaces.BaseRestDelivery))),
 )

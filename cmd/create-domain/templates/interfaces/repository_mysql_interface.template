@@ -5,6 +5,6 @@ import (
 	mysql_models "{module_name}/internal/models/mysql"
 )
 
-type MySQLRepository interface {
+type RepositoryMySQL interface {
 	GetByID(ctx context.Context, id int64) ({domain_camel_name} mysql_models.{domain_pascal_name}, err error)
 }

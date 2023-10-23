@@ -1,4 +1,4 @@
-package {domain_snake_name}_repository
+package {domain_snake_name}_repository_mysql
 
 import (
 	"gorm.io/gorm"
@@ -9,7 +9,7 @@ type repositoryImpl struct {
 	DB *gorm.DB
 }
 
-func New(db *gorm.DB) {domain_snake_name}_interfaces.MySQLRepository {
+func New(db *gorm.DB) {domain_snake_name}_interfaces.RepositoryMySQL {
 	return &repositoryImpl{
 		DB: db,
 	}

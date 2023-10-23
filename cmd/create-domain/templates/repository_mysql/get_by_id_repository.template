@@ -1,4 +1,4 @@
-package {domain_snake_name}_repository
+package {domain_snake_name}_repository_mysql
 
 import (
 	"context"
