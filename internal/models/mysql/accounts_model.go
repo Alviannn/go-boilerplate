@@ -1,4 +1,4 @@
-package mysql_models
+package models_mysql
 
 type Account struct {
 	BaseModel

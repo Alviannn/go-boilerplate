@@ -3,10 +3,10 @@ package accounts_repository_mysql
 import (
 	"context"
 	"go-boilerplate/internal/dtos"
-	mysql_models "go-boilerplate/internal/models/mysql"
+	models_mysql "go-boilerplate/internal/models/mysql"
 )
 
-func (r *repositoryImpl) GetAll(ctx context.Context, params dtos.GetAllAccountsReq) (accounts []mysql_models.Account, err error) {
+func (r *repositoryImpl) GetAll(ctx context.Context, params dtos.GetAllAccountsReq) (accounts []models_mysql.Account, err error) {
 	query := r.DB.WithContext(ctx)
 
 	if params.Email != "" {
