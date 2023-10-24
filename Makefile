@@ -1,18 +1,23 @@
 include .env
 
 APP_NAME := go-boilerplate
-APP_PATH := ./internal/apps
-SOURCE_REST_PATH := $(APP_PATH)/rest
+
+SOURCE_PATH           := ./internal
+SOURCE_DOMAINS_PATH   := $(SOURCE_PATH)/domains
+SOURCE_DTOS_PATH      := $(SOURCE_PATH)/dtos
+SOURCE_MODELS_PATH    := $(SOURCE_PATH)/models
+SOURCE_REST_PATH      := $(SOURCE_PATH)/apps/rest
+PKG_CUSTOM_ERROR_PATH := ./pkg/customerror
 
 CREATE_DOMAIN_CMD := go run ./cmd/create-domain/internal/main.go
-MIGRATION_CMD := go run ./cmd/migrations/internal/main.go
+MIGRATION_CMD     := go run ./cmd/migrations/internal/main.go
 
-DBMATE_URL := mysql://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)
-DBMATE_CMD_PREFIX := dbmate --migrations-dir './migrations' --no-dump-schema
+DBMATE_URL                 := mysql://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)
+DBMATE_CMD_PREFIX          := dbmate --migrations-dir './migrations' --no-dump-schema
 DBMATE_CMD_WITH_URL_PREFIX := $(DBMATE_CMD_PREFIX) --url $(DBMATE_URL)
 
 GOOS_VAR := linux
-BIN_EXT :=
+BIN_EXT  :=
 
 ifeq ($(OS), Windows_NT)
 	GOOS_VAR := windows
@@ -69,7 +74,7 @@ docs-fmt: ## Format the swagger annotations within the codebase.
 .PHONY: docs-gen
 docs-gen: docs-fmt ## Generate swagger API documentation for this app.
 	mkdir -p ./docs
-	swag init -d $(SOURCE_REST_PATH),./pkg/responses
+	swag init -d $(SOURCE_REST_PATH),$(SOURCE_DOMAINS_PATH),$(SOURCE_MODELS_PATH),$(SOURCE_DTOS_PATH),$(PKG_CUSTOM_ERROR_PATH)
 
 .PHONY: create-domain
 create-domain: ## Creates a domain for the app according to boilerplate (ex: make create-domain domain=finance_reports).
