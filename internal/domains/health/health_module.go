@@ -8,5 +8,5 @@ import (
 )
 
 var Module = di.Options(
-	di.Provide(health_delivery_rest.NewRestDelivery, di.As(new(domains_interfaces.BaseRestDelivery))),
+	di.Provide(health_delivery_rest.New, di.As(new(domains_interfaces.BaseRestDelivery))),
 )

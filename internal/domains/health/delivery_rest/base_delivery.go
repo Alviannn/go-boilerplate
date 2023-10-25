@@ -4,14 +4,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type restDeliveryImpl struct{}
+type deliveryImpl struct{}
 
-func NewRestDelivery() *restDeliveryImpl {
-	return &restDeliveryImpl{}
+func New() *deliveryImpl {
+	return &deliveryImpl{}
 }
 
-func (d *restDeliveryImpl) SetupRouter(app *echo.Echo) {
+func (d *deliveryImpl) SetupRouter(app *echo.Echo) {
 	group := app.Group("/health")
 
-	group.GET("", d.GetHealth)
+	group.GET("", d.Get)
 }
