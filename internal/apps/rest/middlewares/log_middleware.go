@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func LogMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func Log(next echo.HandlerFunc) echo.HandlerFunc {
 	startTime := time.Now()
 
 	bodyDumpMiddleware := echoMiddleware.BodyDumpWithConfig(echoMiddleware.BodyDumpConfig{

@@ -61,7 +61,7 @@ func StartServer(container *di.Container) (err error) {
 			c.SetRequest(newReq)
 		},
 	}))
-	app.Use(middlewares.LogMiddleware)
+	app.Use(middlewares.Log)
 
 	// Override error handler middleware
 	if err = RegisterRouters(app, container); err != nil {
