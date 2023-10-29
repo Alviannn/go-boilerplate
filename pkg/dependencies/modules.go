@@ -10,6 +10,6 @@ import (
 // appModules stores all necessary modules here for DI (Dependency Injection),
 // then registered at `New` and `NewForTransaction`
 var appModules = di.Options(
-	di.Provide(customvalidator.NewValidator),
+	di.Provide(customvalidator.New),
 	di.Provide(databases.NewMySQLDB),
 )

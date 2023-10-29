@@ -10,8 +10,8 @@ type Validator struct {
 	ActualValidator *validator.Validate
 }
 
-// NewValidator creates the custom validator instance.
-func NewValidator() *Validator {
+// New creates the custom validator instance.
+func New() *Validator {
 	return &Validator{
 		ActualValidator: validator.New(),
 	}
