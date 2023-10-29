@@ -16,7 +16,7 @@ tmp_dir = "build"
   include_file = []
   log = "build-errors.log"
   send_interrupt = false
-  stop_on_error = false
+  stop_on_error = true
 
 [color]
   build = "yellow"
