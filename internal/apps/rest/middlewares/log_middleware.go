@@ -37,7 +37,7 @@ func writeLogRequest(c echo.Context, body any) {
 	body = maskBody(body)
 
 	log.Info().
-		Str("requestId", requestID).
+		Str("request_id", requestID).
 		Str("method", req.Method).
 		Str("uri", req.RequestURI).
 		Any("body", body).
