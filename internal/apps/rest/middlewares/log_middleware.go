@@ -34,7 +34,7 @@ func writeLogRequest(c echo.Context, body any) {
 
 	reqHeader := c.Request().Header
 	requestID := fmt.Sprint(req.Context().Value(constants.RequestIDKey))
-	body = maskBody(body)
+	body = maskJSONBody(body)
 
 	log.Info().
 		Str("request_id", requestID).
@@ -51,7 +51,7 @@ func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 	res := c.Response()
 
 	requestID := fmt.Sprint(ctx.Value(constants.RequestIDKey))
-	body = maskBody(body)
+	body = maskJSONBody(body)
 
 	logEvent := log.Info()
 	isErrorResponse := (res.Status >= 400 && res.Status <= 500)
@@ -71,7 +71,7 @@ func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 		Msg("HTTP Response")
 }
 
-func maskBody(body any) any {
+func maskJSONBody(body any) any {
 	maskedValue := "************"
 	fieldsToMask := []string{
 		"password",
@@ -80,29 +80,28 @@ func maskBody(body any) any {
 		"refresh_token",
 	}
 
-	if sliceBody, ok := body.([]any); ok {
-		for i, item := range sliceBody {
-			sliceBody[i] = maskBody(item)
+	switch typedBody := body.(type) {
+	case []any:
+		for i, item := range typedBody {
+			typedBody[i] = maskJSONBody(item)
 		}
-		return sliceBody
-	}
 
-	mapBody, ok := body.(map[string]any)
-	if !ok {
+		return typedBody
+	case map[string]any:
+		for key, value := range typedBody {
+			isShouldMask := helpers.Slice[string]().IsIn(fieldsToMask, key)
+			if _, ok := value.(string); ok && isShouldMask {
+				typedBody[key] = maskedValue
+				continue
+			}
+
+			typedBody[key] = maskJSONBody(value)
+		}
+
+		return typedBody
+	default:
 		return body
 	}
-
-	for key, value := range mapBody {
-		if innerMap, ok := mapBody[key].(map[string]any); ok {
-			mapBody[key] = maskBody(innerMap)
-		}
-
-		isShouldMask := helpers.Slice[string]().IsIn(fieldsToMask, key)
-		if _, ok := value.(string); ok && isShouldMask {
-			mapBody[key] = maskedValue
-		}
-	}
-	return mapBody
 }
 
 func unmarshalAnyOrNil(jsonValue []byte) (value any) {
