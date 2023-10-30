@@ -17,32 +17,16 @@ func Log(next echo.HandlerFunc) echo.HandlerFunc {
 
 	bodyDumpMiddleware := echoMiddleware.BodyDumpWithConfig(echoMiddleware.BodyDumpConfig{
 		Handler: func(c echo.Context, reqRawBody, resRawBody []byte) {
-			logRequest(c, reqRawBody)
+			reqBody := unmarshalAnyOrNil(reqRawBody)
+			writeLogRequest(c, reqBody)
 
 			elapsedTime := time.Since(startTime)
-			logResponse(c, resRawBody, elapsedTime)
+			resBody := unmarshalAnyOrNil(resRawBody)
+			writeLogResponse(c, resBody, elapsedTime)
 		},
 	})
 
 	return bodyDumpMiddleware(next)
-}
-
-func logRequest(c echo.Context, rawBody []byte) {
-	var reqBody any
-	if err := json.Unmarshal(rawBody, &reqBody); err != nil {
-		reqBody = nil
-	}
-
-	writeLogRequest(c, reqBody)
-}
-
-func logResponse(c echo.Context, rawBody []byte, elapsedTime time.Duration) {
-	var resBody any
-	if err := json.Unmarshal(rawBody, &resBody); err != nil {
-		resBody = nil
-	}
-
-	writeLogResponse(c, resBody, elapsedTime)
 }
 
 func writeLogRequest(c echo.Context, body any) {
@@ -119,4 +103,11 @@ func maskBody(body any) any {
 		}
 	}
 	return mapBody
+}
+
+func unmarshalAnyOrNil(jsonValue []byte) (value any) {
+	if err := json.Unmarshal(jsonValue, &value); err != nil {
+		value = nil
+	}
+	return
 }
