@@ -69,7 +69,7 @@ start-rest-dev: ## Starts REST API app with 'air' to allow live/hot reloading as
 
 .PHONY: docs-fmt
 docs-fmt: ## Format the swagger annotations within the codebase.
-	swag fmt -d $(SOURCE_REST_PATH)
+	swag fmt -d $(SOURCE_REST_PATH),$(SOURCE_DOMAINS_PATH)
 
 .PHONY: docs-gen
 docs-gen: docs-fmt ## Generate swagger API documentation for this app.
