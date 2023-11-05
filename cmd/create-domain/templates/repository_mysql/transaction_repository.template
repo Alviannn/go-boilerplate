@@ -1,0 +1,15 @@
+package {domain_snake_name}_repository_mysql
+
+import (
+	"{module_name}/internal/constants"
+	accounts_interfaces "{module_name}/internal/domains/{domain_snake_name}/interfaces"
+	"{module_name}/internal/dtos"
+
+	"gorm.io/gorm"
+)
+
+func (r *repositoryImpl) Transaction(deps dtos.TxDependencies) {domain_snake_name}_interfaces.RepositoryMySQL {
+	return &repositoryImpl{
+		Tx: deps[constants.DependencyKeyMySQLTx].(*gorm.DB),
+	}
+}

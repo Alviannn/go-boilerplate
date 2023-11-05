@@ -5,9 +5,23 @@ import (
 	mysql_models "{module_name}/internal/models/mysql"
 )
 
-func (r *repositoryImpl) GetByID(ctx context.Context, id int64) ({domain_camel_name} mysql_models.{domain_pascal_name}, err error) {
-	err = r.DB.WithContext(ctx).
-		First(&{domain_camel_name}, "id = ?", id).
-		Error
+func (r *repositoryImpl) GetByID(ctx context.Context, id int64) ({domain_camel_name} models_mysql.{domain_pascal_name}, err error) {
+	query := r.db().WithContext(ctx).
+		Limit(1).
+		Where("id = ?", id)
+
+	if err = query.Find(&{domain_camel_name}).Error; err != nil {
+		err = customerror.New().
+			WithSourceError(err).
+			WithCode(http.StatusInternalServerError).
+			WithMessage("Failed to get {domain_camel_name}.")
+		return
+	}
+	if !{domain_camel_name}.IsExist() {
+		err = customerror.New().
+			WithCode(http.StatusNotFound).
+			WithMessage(fmt.Sprintf("Cannot find {domain_camel_name} with ID %d", id))
+		return
+	}
 	return
 }

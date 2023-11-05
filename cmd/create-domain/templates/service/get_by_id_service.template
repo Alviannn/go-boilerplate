@@ -11,11 +11,5 @@ import (
 
 func (s *serviceImpl) GetByID(ctx context.Context, params dtos.Get{domain_pascal_name}Req) ({domain_camel_name} mysql_models.{domain_pascal_name}, err error) {
 	{domain_camel_name}, err = s.RepositoryMySQL.GetByID(params.ID)
-	if err != nil {
-		err = customerror.New().
-			WithSourceError(err).
-			WithCode(http.StatusBadRequest).
-			WithMessage("Failed to get data by ID.")
-	}
 	return
 }

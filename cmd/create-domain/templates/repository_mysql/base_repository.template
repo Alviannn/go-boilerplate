@@ -7,10 +7,18 @@ import (
 
 type repositoryImpl struct {
 	DB *gorm.DB
+	Tx *gorm.DB
 }
 
 func New(db *gorm.DB) {domain_snake_name}_interfaces.RepositoryMySQL {
 	return &repositoryImpl{
 		DB: db,
 	}
+}
+
+func (r *repositoryImpl) db() *gorm.DB {
+	if r.Tx != nil {
+		return r.Tx
+	}
+	return r.db()
 }
