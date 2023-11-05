@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"go-boilerplate/internal/constants"
 	"go-boilerplate/pkg/helpers"
+	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -32,16 +34,18 @@ func Log(next echo.HandlerFunc) echo.HandlerFunc {
 func writeLogRequest(c echo.Context, body any) {
 	req := c.Request()
 
-	reqHeader := c.Request().Header
 	requestID := fmt.Sprint(req.Context().Value(constants.RequestIDKey))
 	body = maskJSONBody(body)
+
+	header := c.Request().Header.Clone()
+	maskHeaders(header)
 
 	log.Info().
 		Str("request_id", requestID).
 		Str("method", req.Method).
 		Str("uri", req.RequestURI).
 		Any("body", body).
-		Any("headers", reqHeader).
+		Any("headers", header).
 		Msg("HTTP Request")
 }
 
@@ -60,6 +64,9 @@ func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 		logEvent = log.Error()
 	}
 
+	header := res.Header().Clone()
+	maskHeaders(header)
+
 	logEvent.
 		Str("request_id", requestID).
 		Str("method", req.Method).
@@ -67,7 +74,7 @@ func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 		Str("elapsed_time", fmt.Sprintf("%dms", elapsedTime.Milliseconds())).
 		Int("status_code", res.Status).
 		Any("body", body).
-		Any("headers", res.Header()).
+		Any("headers", header).
 		Msg("HTTP Response")
 }
 
@@ -109,4 +116,25 @@ func unmarshalAnyOrNil(jsonValue []byte) (value any) {
 		value = nil
 	}
 	return
+}
+
+func maskHeaders(headers http.Header) {
+	maskedValue := "************"
+	fieldsToMask := []string{
+		"refresh_token",
+		"access_token",
+	}
+
+	for mapKey, mapValue := range headers {
+		for arrayIndex, arrayValue := range mapValue {
+			for _, fieldToMask := range fieldsToMask {
+				regex, err := regexp.Compile(fmt.Sprintf(`%s=[a-zA-Z0-9._-]+;`, fieldToMask))
+				if err != nil {
+					continue
+				}
+
+				headers[mapKey][arrayIndex] = regex.ReplaceAllString(arrayValue, fmt.Sprintf("%s=%s;", fieldToMask, maskedValue))
+			}
+		}
+	}
 }
