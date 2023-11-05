@@ -16,7 +16,7 @@ func (r *repositoryImpl) Register(ctx context.Context, params dtos.AccountRegist
 		Password: params.Password,
 	}
 
-	query := r.DB.WithContext(ctx).Create(&newAccount)
+	query := r.db().WithContext(ctx).Create(&newAccount)
 	if err = query.Error; err != nil {
 		err = customerror.New().
 			WithSourceError(err).

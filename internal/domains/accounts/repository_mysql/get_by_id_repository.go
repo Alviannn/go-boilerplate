@@ -9,7 +9,7 @@ import (
 )
 
 func (r *repositoryImpl) GetByID(ctx context.Context, accountID int64) (account models_mysql.Account, err error) {
-	query := r.DB.WithContext(ctx).
+	query := r.db().WithContext(ctx).
 		Limit(1).
 		Where("id = ?", accountID)
 
