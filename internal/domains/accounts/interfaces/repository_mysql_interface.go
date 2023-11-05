@@ -10,5 +10,5 @@ type RepositoryMySQL interface {
 	GetByID(ctx context.Context, accountID int64) (account models_mysql.Account, err error)
 	GetAll(ctx context.Context, params dtos.AccountGetAllRequest) (accounts []models_mysql.Account, err error)
 	Register(ctx context.Context, params dtos.AccountRegisterRequest) error
-	IsExistByEmail(ctx context.Context, email string) (exist bool, err error)
+	ExistByEmail(ctx context.Context, email string) (exist bool, err error)
 }

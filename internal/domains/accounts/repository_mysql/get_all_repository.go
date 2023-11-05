@@ -4,6 +4,8 @@ import (
 	"context"
 	"go-boilerplate/internal/dtos"
 	models_mysql "go-boilerplate/internal/models/mysql"
+	"go-boilerplate/pkg/customerror"
+	"net/http"
 )
 
 func (r *repositoryImpl) GetAll(ctx context.Context, params dtos.AccountGetAllRequest) (accounts []models_mysql.Account, err error) {
@@ -26,6 +28,11 @@ func (r *repositoryImpl) GetAll(ctx context.Context, params dtos.AccountGetAllRe
 		query = query.Offset(params.Offset)
 	}
 
-	err = query.Find(&accounts).Error
+	if err = query.Find(&accounts).Error; err != nil {
+		err = customerror.New().
+			WithSourceError(err).
+			WithCode(http.StatusInternalServerError).
+			WithMessage("Failed to get all accounts.")
+	}
 	return
 }
