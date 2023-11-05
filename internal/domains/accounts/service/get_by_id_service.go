@@ -10,7 +10,7 @@ import (
 	"go-boilerplate/pkg/customerror"
 )
 
-func (s *serviceImpl) GetByID(ctx context.Context, params dtos.GetAccountReq) (account models_mysql.Account, err error) {
+func (s *serviceImpl) GetByID(ctx context.Context, params dtos.AccountGetRequest) (account models_mysql.Account, err error) {
 	account, err = s.RepositoryMySQL.GetByID(ctx, params.ID)
 	if err != nil {
 		err = customerror.New().

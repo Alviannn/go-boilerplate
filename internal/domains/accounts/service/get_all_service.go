@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func (s *serviceImpl) GetAll(ctx context.Context, params dtos.GetAllAccountsReq) (accounts []models_mysql.Account, err error) {
+func (s *serviceImpl) GetAll(ctx context.Context, params dtos.AccountGetAllRequest) (accounts []models_mysql.Account, err error) {
 	accounts, err = s.RepositoryMySQL.GetAll(ctx, params)
 	if err != nil {
 		err = customerror.New().

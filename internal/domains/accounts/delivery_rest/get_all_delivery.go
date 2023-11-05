@@ -27,7 +27,7 @@ import (
 //	@Router			/accounts [get]
 func (d *deliveryImpl) GetAll(c echo.Context) (err error) {
 	var (
-		params dtos.GetAllAccountsReq
+		params dtos.AccountGetAllRequest
 		res    response.Response
 
 		ctx = c.Request().Context()

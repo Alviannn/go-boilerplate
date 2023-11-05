@@ -23,7 +23,7 @@ import (
 //	@Router			/accounts [post]
 func (d *deliveryImpl) Register(c echo.Context) (err error) {
 	var (
-		params dtos.RegisterAccountReq
+		params dtos.AccountRegisterRequest
 		res    response.Response
 
 		ctx = c.Request().Context()

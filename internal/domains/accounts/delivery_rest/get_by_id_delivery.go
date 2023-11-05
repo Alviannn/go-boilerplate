@@ -24,7 +24,7 @@ import (
 //	@Router			/accounts/{id} [get]
 func (d *deliveryImpl) GetByID(c echo.Context) (err error) {
 	var (
-		params dtos.GetAccountReq
+		params dtos.AccountGetRequest
 		res    response.Response
 
 		ctx = c.Request().Context()

@@ -6,7 +6,7 @@ import (
 	models_mysql "go-boilerplate/internal/models/mysql"
 )
 
-func (r *repositoryImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) error {
+func (r *repositoryImpl) Register(ctx context.Context, params dtos.AccountRegisterRequest) error {
 	newAccount := models_mysql.Account{
 		Username: params.Username,
 		FullName: params.FullName,

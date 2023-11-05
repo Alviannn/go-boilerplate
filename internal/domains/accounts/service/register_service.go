@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (s *serviceImpl) Register(ctx context.Context, params dtos.RegisterAccountReq) (err error) {
+func (s *serviceImpl) Register(ctx context.Context, params dtos.AccountRegisterRequest) (err error) {
 	isExist, err := s.isEmailExist(ctx, params.Email)
 	if err != nil {
 		return
