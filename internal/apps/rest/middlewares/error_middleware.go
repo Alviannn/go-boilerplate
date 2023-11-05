@@ -10,16 +10,10 @@ import (
 
 func CustomErrorHandler() echo.HTTPErrorHandler {
 	return func(err error, c echo.Context) {
-		var customError *customerror.Error
-		if castableError, ok := err.(*customerror.Error); ok {
-			customError = castableError
-		} else {
-			customError = customerror.New().WithSourceError(err)
-		}
+		customErr := customerror.New().WithSourceError(err)
+		log.Error().Err(customErr).Msg("Unhandled error")
 
-		log.Error().Err(customError).Msg("Unhandled error")
-
-		res := response.NewBuilder().WithError(customError).Build()
+		res := response.NewBuilder().WithError(customErr).Build()
 		c.JSON(res.StatusCode, res.Data)
 	}
 }
