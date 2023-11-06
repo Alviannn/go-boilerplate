@@ -7,6 +7,7 @@ import (
 	"go-boilerplate/pkg/helpers"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -19,6 +20,11 @@ func Log(next echo.HandlerFunc) echo.HandlerFunc {
 
 	bodyDumpMiddleware := echoMiddleware.BodyDumpWithConfig(echoMiddleware.BodyDumpConfig{
 		Handler: func(c echo.Context, reqRawBody, resRawBody []byte) {
+			uri := c.Request().RequestURI
+			if strings.Contains(uri, "swagger") {
+				return
+			}
+
 			reqBody := unmarshalAnyOrNil(reqRawBody)
 			writeLogRequest(c, reqBody)
 
