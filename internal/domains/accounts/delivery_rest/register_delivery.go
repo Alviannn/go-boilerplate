@@ -16,7 +16,7 @@ import (
 //	@Tags			accounts
 //	@Accept			json
 //	@Produce		json
-//	@Param			newAccount	body		dtos.RegisterAccountReq	true	"New account details"
+//	@Param			newAccount	body		dtos.AccountRegisterRequest	true	"New account details"
 //	@Success		200			{object}	any
 //	@Failure		400			{object}	customerror.ErrorJSON
 //	@Failure		500			{object}	customerror.ErrorJSON
