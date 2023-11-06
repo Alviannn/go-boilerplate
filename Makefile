@@ -41,15 +41,24 @@ help: ## Shows this command.
 clean: ## Cleans the build directory by removing all binary files.
 	rm -rf build/*
 
+.PHONY: docs-fmt
+docs-fmt: ## Format the swagger annotations within the codebase.
+	swag fmt -d $(SOURCE_REST_PATH),$(SOURCE_DOMAINS_PATH)
+
+.PHONY: docs-gen
+docs-gen: docs-fmt ## Generate swagger API documentation for this app.
+	mkdir -p $(SOURCE_REST_PATH)/docs
+	swag init -d $(SOURCE_REST_PATH),$(SOURCE_DOMAINS_PATH),$(SOURCE_MODELS_PATH),$(SOURCE_DTOS_PATH),$(PKG_CUSTOM_ERROR_PATH) -o $(SOURCE_REST_PATH)/docs
+
 # --------------------------------------v REST API v-------------------------------------- #
 
 .PHONY: build-rest
-build-rest: ## Builds REST API app based on your operating system.
+build-rest: docs-gen ## Builds REST API app based on your operating system.
 	go mod tidy -v
 	GOOS=$(GOOS_VAR) go build -v -o ./build/$(APP_NAME)-rest$(BIN_EXT) $(SOURCE_REST_PATH)
 
 .PHONY: build-rest-prod
-build-rest-prod: ## Builds REST API app for production purpose.
+build-rest-prod: docs-gen ## Builds REST API app for production purpose.
 	go mod tidy -v
 	GOOS=linux GOARCH=amd64 go build -v -ldflags="-s -w" -gcflags "all=-trimpath=$(pwd)" -o ./build/$(APP_NAME)-rest_linux_amd64 $(SOURCE_REST_PATH)
 
@@ -66,15 +75,6 @@ start-rest-dev: ## Starts REST API app with 'air' to allow live/hot reloading as
 	ENVIRONMENT=development air -c ./.air.rest.toml
 
 # ---------------------------------------------------------------------------------------- #
-
-.PHONY: docs-fmt
-docs-fmt: ## Format the swagger annotations within the codebase.
-	swag fmt -d $(SOURCE_REST_PATH),$(SOURCE_DOMAINS_PATH)
-
-.PHONY: docs-gen
-docs-gen: docs-fmt ## Generate swagger API documentation for this app.
-	mkdir -p ./docs
-	swag init -d $(SOURCE_REST_PATH),$(SOURCE_DOMAINS_PATH),$(SOURCE_MODELS_PATH),$(SOURCE_DTOS_PATH),$(PKG_CUSTOM_ERROR_PATH)
 
 .PHONY: create-domain
 create-domain: ## Creates a domain for the app according to boilerplate (ex: make create-domain domain=finance_reports).
