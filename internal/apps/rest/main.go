@@ -71,7 +71,9 @@ func StartServer(container *di.Container) (err error) {
 		return
 	}
 
-	app.GET("/rest-swagger/*", echoSwagger.WrapHandler)
+	if os.Getenv("ENVIRONMENT") != "production" {
+		app.GET("/rest-swagger/*", echoSwagger.WrapHandler)
+	}
 
 	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
 	err = app.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
