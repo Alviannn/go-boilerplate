@@ -16,7 +16,10 @@ import (
 	"github.com/labstack/echo/v4"
 	echo_middlewares "github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"gorm.io/gorm"
+
+	_ "go-boilerplate/internal/apps/rest/docs"
 )
 
 func RegisterRouters(echo *echo.Echo, container *di.Container) (err error) {
@@ -51,7 +54,7 @@ func StartServer(container *di.Container) (err error) {
 	app.Use(echo_middlewares.CORSWithConfig(echo_middlewares.CORSConfig{
 		AllowOrigins: strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ","),
 	}))
-	app.Use(echo_middlewares.RemoveTrailingSlash())
+	app.Pre(echo_middlewares.RemoveTrailingSlash())
 	app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
 		RequestIDHandler: func(c echo.Context, rid string) {
 			req := c.Request()
@@ -67,6 +70,8 @@ func StartServer(container *di.Container) (err error) {
 	if err = RegisterRouters(app, container); err != nil {
 		return
 	}
+
+	app.GET("/rest-swagger/*", echoSwagger.WrapHandler)
 
 	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
 	err = app.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))

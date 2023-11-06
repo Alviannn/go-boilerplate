@@ -1,6 +1,5 @@
 .env
 
-docs/
 build/
 tmp/
 logs/
