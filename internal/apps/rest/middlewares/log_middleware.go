@@ -85,7 +85,6 @@ func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 }
 
 func maskJSONBody(body any) any {
-	maskedValue := "************"
 	fieldsToMask := []string{
 		"password",
 		"token",
@@ -104,7 +103,7 @@ func maskJSONBody(body any) any {
 		for key, value := range typedBody {
 			isShouldMask := helpers.Slice[string]().IsIn(fieldsToMask, key)
 			if _, ok := value.(string); ok && isShouldMask {
-				typedBody[key] = maskedValue
+				typedBody[key] = constants.MaskedValue
 				continue
 			}
 
@@ -117,30 +116,42 @@ func maskJSONBody(body any) any {
 	}
 }
 
+func maskHeaders(header http.Header) {
+	maskCookies(header)
+	maskAuthorization(header)
+}
+
+func maskCookies(header http.Header) {
+	cookieFields := []string{
+		"refresh_token",
+	}
+
+	for mapKey, mapValue := range header {
+		for arrayIndex, arrayValue := range mapValue {
+			for _, field := range cookieFields {
+				regex, err := regexp.Compile(fmt.Sprintf(`%s=[a-zA-Z0-9._-]+`, field))
+				if err != nil {
+					continue
+				}
+
+				header[mapKey][arrayIndex] = regex.ReplaceAllString(arrayValue, fmt.Sprintf("%s=%s", field, constants.MaskedValue))
+			}
+		}
+	}
+}
+
+func maskAuthorization(header http.Header) {
+	authorization := header.Get("Authorization")
+	if strings.HasPrefix(authorization, "Bearer ") {
+		return
+	}
+
+	header.Set("Authorization", fmt.Sprintf("Bearer %s", constants.MaskedValue))
+}
+
 func unmarshalAnyOrNil(jsonValue []byte) (value any) {
 	if err := json.Unmarshal(jsonValue, &value); err != nil {
 		value = nil
 	}
 	return
-}
-
-func maskHeaders(headers http.Header) {
-	maskedValue := "************"
-	fieldsToMask := []string{
-		"refresh_token",
-		"access_token",
-	}
-
-	for mapKey, mapValue := range headers {
-		for arrayIndex, arrayValue := range mapValue {
-			for _, fieldToMask := range fieldsToMask {
-				regex, err := regexp.Compile(fmt.Sprintf(`%s=[a-zA-Z0-9._-]+;`, fieldToMask))
-				if err != nil {
-					continue
-				}
-
-				headers[mapKey][arrayIndex] = regex.ReplaceAllString(arrayValue, fmt.Sprintf("%s=%s;", fieldToMask, maskedValue))
-			}
-		}
-	}
 }
