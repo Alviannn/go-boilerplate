@@ -142,7 +142,7 @@ func maskCookies(header http.Header) {
 
 func maskAuthorization(header http.Header) {
 	authorization := header.Get("Authorization")
-	if strings.HasPrefix(authorization, "Bearer ") {
+	if !strings.HasPrefix(authorization, "Bearer ") {
 		return
 	}
 
