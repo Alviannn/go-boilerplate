@@ -10,7 +10,8 @@ import (
 func (r *repositoryImpl) ExistByEmail(ctx context.Context, email string) (exist bool, err error) {
 	var account models_mysql.Account
 
-	query := r.db().WithContext(ctx).
+	query := r.getDB(ctx).
+		WithContext(ctx).
 		Select("id").
 		Where("email = ?", email).
 		Limit(1)

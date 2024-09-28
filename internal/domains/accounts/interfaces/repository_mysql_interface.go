@@ -7,7 +7,7 @@ import (
 )
 
 type RepositoryMySQL interface {
-	Transaction(deps dtos.TxDependencies) RepositoryMySQL
+	Transaction(ctx context.Context, fc func(newCtx context.Context) error) (err error)
 
 	GetByID(ctx context.Context, accountID int64) (account models_mysql.Account, err error)
 	GetAll(ctx context.Context, params dtos.AccountGetAllRequest) (accounts []models_mysql.Account, err error)

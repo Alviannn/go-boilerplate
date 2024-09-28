@@ -1,25 +1,31 @@
 package accounts_repository_mysql
 
 import (
+	"context"
+	"go-boilerplate/internal/constants"
 	accounts_interfaces "go-boilerplate/internal/domains/accounts/interfaces"
 
 	"gorm.io/gorm"
 )
 
 type repositoryImpl struct {
-	DB *gorm.DB
-	Tx *gorm.DB
+	db *gorm.DB
 }
 
 func New(db *gorm.DB) accounts_interfaces.RepositoryMySQL {
 	return &repositoryImpl{
-		DB: db,
+		db: db,
 	}
 }
 
-func (r *repositoryImpl) db() *gorm.DB {
-	if r.Tx != nil {
-		return r.Tx
+func (r *repositoryImpl) getDB(ctx context.Context) (gormDB *gorm.DB) {
+	gormDB = r.db
+
+	if value := ctx.Value(constants.GormTransactionKey); value != nil {
+		if gormTx, ok := value.(*gorm.DB); ok {
+			gormDB = gormTx
+		}
 	}
-	return r.db()
+
+	return
 }

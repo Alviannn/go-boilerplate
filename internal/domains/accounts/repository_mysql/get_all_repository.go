@@ -9,7 +9,7 @@ import (
 )
 
 func (r *repositoryImpl) GetAll(ctx context.Context, params dtos.AccountGetAllRequest) (accounts []models_mysql.Account, err error) {
-	query := r.db().WithContext(ctx)
+	query := r.getDB(ctx).WithContext(ctx)
 
 	if params.Email != "" {
 		query = query.Where("email = ?", params.Email)

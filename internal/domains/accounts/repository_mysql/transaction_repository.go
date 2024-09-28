@@ -1,15 +1,15 @@
 package accounts_repository_mysql
 
 import (
+	"context"
 	"go-boilerplate/internal/constants"
-	accounts_interfaces "go-boilerplate/internal/domains/accounts/interfaces"
-	"go-boilerplate/internal/dtos"
 
 	"gorm.io/gorm"
 )
 
-func (r *repositoryImpl) Transaction(deps dtos.TxDependencies) accounts_interfaces.RepositoryMySQL {
-	return &repositoryImpl{
-		Tx: deps[constants.DependencyKeyMySQLTx].(*gorm.DB),
-	}
+func (r *repositoryImpl) Transaction(ctx context.Context, fc func(newCtx context.Context) error) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		newCtx := context.WithValue(ctx, constants.GormTransactionKey, tx)
+		return fc(newCtx)
+	})
 }
