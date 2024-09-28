@@ -3,7 +3,6 @@ package helpers
 import (
 	"os"
 	"path"
-	"strings"
 )
 
 func IsFileExist(filePath string) bool {
@@ -41,9 +40,4 @@ func ReadCompleteFilesInDir(filePath string) (filePaths []string, err error) {
 	}
 
 	return
-}
-
-func GetParentFile(filePath string) string {
-	parts := strings.Split(filePath, string(os.PathSeparator))
-	return path.Join(parts[:len(parts)-1]...)
 }

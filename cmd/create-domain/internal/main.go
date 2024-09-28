@@ -75,7 +75,7 @@ func WriteTemplateFiles(params CreateTemplateParams) (err error) {
 		outFilePath = ReplaceTemplateContent(outFilePath, params.DomainName)
 		outFilePath = strings.Replace(outFilePath, constants.TemplateFileExt, constants.GoFileExt, 1)
 
-		parentOutFilePath := helpers.GetParentFile(outFilePath)
+		parentOutFilePath := path.Dir(outFilePath)
 		if err = os.MkdirAll(parentOutFilePath, os.ModePerm); err != nil {
 			return err
 		}
