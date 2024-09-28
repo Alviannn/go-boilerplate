@@ -1,6 +1,8 @@
 package logger
 
 import (
+	"go-boilerplate/internal/configs"
+	"go-boilerplate/internal/constants"
 	"go-boilerplate/pkg/customerror"
 	"io"
 	"os"
@@ -15,11 +17,14 @@ func SetupLogger() error {
 	zerolog.ErrorMarshalFunc = errorHandler
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
-	var consoleWriter io.Writer = os.Stdout
+	var (
+		consoleWriter io.Writer = os.Stdout
+		config                  = configs.Default()
+	)
 
 	// When running in local environment (or basically not in production)
 	// we'll enable debugging and pretty print logging.
-	if os.Getenv("ENVIRONMENT") != "production" {
+	if config.Environment != constants.EnvProduction {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		consoleWriter = zerolog.ConsoleWriter{
 			Out:        os.Stdout,

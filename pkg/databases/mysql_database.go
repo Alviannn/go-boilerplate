@@ -2,8 +2,8 @@ package databases
 
 import (
 	"fmt"
+	"go-boilerplate/internal/configs"
 	"net/url"
-	"os"
 
 	"github.com/amacneil/dbmate/v2/pkg/dbmate"
 	_ "github.com/amacneil/dbmate/v2/pkg/driver/mysql"
@@ -13,12 +13,13 @@ import (
 )
 
 func NewMySQLDB() (db *gorm.DB, err error) {
+	mysqlConfig := configs.Default().MySQL
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=UTC",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASS"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
+		mysqlConfig.Username,
+		mysqlConfig.Password,
+		mysqlConfig.Host,
+		mysqlConfig.Port,
+		mysqlConfig.Name,
 	)
 
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{
@@ -27,12 +28,13 @@ func NewMySQLDB() (db *gorm.DB, err error) {
 }
 
 func MigrateMySQL() (err error) {
+	mysqlConfig := configs.Default().MySQL
 	rawDBUrl := fmt.Sprintf("mysql://%s:%s@%s:%s/%s",
-		os.Getenv("DB_USER"),
-		url.QueryEscape(os.Getenv("DB_PASS")),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
+		mysqlConfig.Username,
+		url.QueryEscape(mysqlConfig.Password),
+		mysqlConfig.Host,
+		mysqlConfig.Port,
+		mysqlConfig.Name,
 	)
 
 	dbUrl, err := url.Parse(rawDBUrl)

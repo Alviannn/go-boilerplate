@@ -4,15 +4,14 @@ import (
 	"context"
 	"fmt"
 	"go-boilerplate/internal/apps/rest/middlewares"
+	"go-boilerplate/internal/configs"
 	"go-boilerplate/internal/constants"
 	domains_interfaces "go-boilerplate/internal/domains/interfaces"
+	"go-boilerplate/pkg/customvalidator"
 	"go-boilerplate/pkg/databases"
 	"go-boilerplate/pkg/dependencies"
-	"os"
-	"strings"
 
 	"github.com/defval/di"
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	echo_middlewares "github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
@@ -34,14 +33,14 @@ func RegisterRouters(echo *echo.Echo, container *di.Container) (err error) {
 	return
 }
 
-func StartServer(container *di.Container) (err error) {
-	if err = godotenv.Load(); err != nil {
+func StartServer(container *di.Container, validator *customvalidator.Validator) (err error) {
+	if err = configs.Load(validator); err != nil {
 		return
 	}
 
+	var gormDB *gorm.DB
 	// Force DB to load and test the connection.
-	var gorm *gorm.DB
-	if err = container.Resolve(&gorm); err != nil {
+	if err = container.Resolve(&gormDB); err != nil {
 		return
 	}
 	if err = databases.MigrateMySQL(); err != nil {
@@ -49,10 +48,11 @@ func StartServer(container *di.Container) (err error) {
 	}
 
 	app := echo.New()
+	config := configs.Default()
 
 	app.Use(echo_middlewares.Secure())
 	app.Use(echo_middlewares.CORSWithConfig(echo_middlewares.CORSConfig{
-		AllowOrigins: strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ","),
+		AllowOrigins: config.CORSAllowedOrigins,
 	}))
 	app.Pre(echo_middlewares.RemoveTrailingSlash())
 	app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
@@ -71,12 +71,12 @@ func StartServer(container *di.Container) (err error) {
 		return
 	}
 
-	if os.Getenv("ENVIRONMENT") != "production" {
+	if config.Environment != constants.EnvProduction {
 		app.GET("/rest-swagger/*", echoSwagger.WrapHandler)
 	}
 
 	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
-	err = app.Start(fmt.Sprintf(":%s", os.Getenv("PORT")))
+	err = app.Start(fmt.Sprintf(":%d", config.Port))
 	return
 }
 

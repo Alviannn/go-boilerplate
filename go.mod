@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/amacneil/dbmate/v2 v2.6.0
+	github.com/caarlos0/env/v11 v11.2.2
 	github.com/defval/di v1.12.0
 	github.com/go-playground/validator/v10 v10.15.5
 	github.com/joho/godotenv v1.5.1
