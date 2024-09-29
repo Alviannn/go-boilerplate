@@ -3,7 +3,6 @@ include .env
 APP_NAME := go-boilerplate
 
 SOURCE_PATH           := ./internal
-SOURCE_DOMAINS_PATH   := $(SOURCE_PATH)/domains
 SOURCE_DTOS_PATH      := $(SOURCE_PATH)/dtos
 SOURCE_MODELS_PATH    := $(SOURCE_PATH)/models
 SOURCE_REST_PATH      := $(SOURCE_PATH)/apps/rest
@@ -43,12 +42,17 @@ clean: ## Cleans the build directory by removing all binary files.
 
 .PHONY: docs-fmt
 docs-fmt: ## Format the swagger annotations within the codebase.
-	swag fmt -d $(SOURCE_REST_PATH),$(SOURCE_DOMAINS_PATH)
+	swag fmt -d $(SOURCE_REST_PATH)
 
 .PHONY: docs-gen
 docs-gen: docs-fmt ## Generate swagger API documentation for this app.
 	mkdir -p $(SOURCE_REST_PATH)/docs
-	swag init -d $(SOURCE_REST_PATH),$(SOURCE_DOMAINS_PATH),$(SOURCE_MODELS_PATH),$(SOURCE_DTOS_PATH),$(PKG_CUSTOM_ERROR_PATH) -o $(SOURCE_REST_PATH)/docs
+	swag init -d\
+	 $(SOURCE_REST_PATH),\
+	$(shell find $(SOURCE_MODELS_PATH)/* -type d | tr '\n' ',' | sed 's/,$$//'),\
+	$(SOURCE_DTOS_PATH),\
+	$(PKG_CUSTOM_ERROR_PATH)\
+	 -o $(SOURCE_REST_PATH)/docs
 
 # --------------------------------------v REST API v-------------------------------------- #
 
