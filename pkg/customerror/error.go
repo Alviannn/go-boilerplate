@@ -1,6 +1,7 @@
 package customerror
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ztrue/tracerr"
@@ -49,6 +50,7 @@ type Error struct {
 type ErrorJSON struct {
 	Message            string   `json:"message"`
 	SourceErrorMessage string   `json:"source_error_message"`
+	StackLine          string   `json:"stack_line,omitempty"`
 	Stack              []string `json:"stack,omitempty"`
 }
 
@@ -119,6 +121,16 @@ func (e *Error) GetStackTrace() []string {
 	return stackList
 }
 
+func (e *Error) GetStackLine() string {
+	rawStackList := tracerr.StackTrace(e.GetWorkingError())
+	if len(rawStackList) < 2 {
+		return ""
+	}
+
+	rawStack := rawStackList[1]
+	return fmt.Sprintf("%s at line %d", rawStack.Func, rawStack.Line)
+}
+
 func (e *Error) Error() string {
 	return e.Message
 }
@@ -127,6 +139,7 @@ func (e *Error) ToJSON() ErrorJSON {
 	return ErrorJSON{
 		Message:            e.Message,
 		SourceErrorMessage: e.GetWorkingError().Error(),
+		StackLine:          e.GetStackLine(),
 		Stack:              e.GetStackTrace(),
 	}
 }
