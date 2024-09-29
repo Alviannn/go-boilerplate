@@ -64,7 +64,7 @@ build-rest: docs-gen ## Builds REST API app based on your operating system.
 .PHONY: build-rest-prod
 build-rest-prod: docs-gen ## Builds REST API app for production purpose.
 	go mod tidy -v
-	GOOS=linux GOARCH=amd64 go build -v -ldflags="-s -w" -gcflags "all=-trimpath=$(pwd)" -o ./build/$(APP_NAME)-rest_linux_amd64 $(SOURCE_REST_PATH)
+	GOOS=linux GOARCH=amd64 go build -v -trimpath -ldflags="-s -w" -o ./build/$(APP_NAME)-rest_linux_amd64 $(SOURCE_REST_PATH)
 
 .PHONY: start-rest
 start-rest: ## Starts REST API app from 'build' directory.
