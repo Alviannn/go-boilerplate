@@ -18,7 +18,7 @@ type Config struct {
 
 var defaultConfig Config
 
-func Load(validator *customvalidator.Validator) (err error) {
+func Load() (err error) {
 	if err = godotenv.Load(); err != nil {
 		return
 	}
@@ -26,6 +26,7 @@ func Load(validator *customvalidator.Validator) (err error) {
 		return
 	}
 
+	validator := customvalidator.New()
 	err = validator.Validate(&defaultConfig)
 	return
 }

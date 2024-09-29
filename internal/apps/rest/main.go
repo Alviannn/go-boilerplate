@@ -36,10 +36,6 @@ func registerRouters(echo *echo.Echo, container *di.Container) (err error) {
 }
 
 func StartServer(container *di.Container, validator *customvalidator.Validator) (err error) {
-	if err = configs.Load(validator); err != nil {
-		return
-	}
-
 	// Force DB to load and test the connection.
 	var gormDB *gorm.DB
 	if err = container.Resolve(&gormDB); err != nil {
@@ -89,6 +85,10 @@ func StartServer(container *di.Container, validator *customvalidator.Validator) 
 //	@schemes	http https
 //	@host		localhost:5000
 func main() {
+	if err := configs.Load(); err != nil {
+		panic(err)
+	}
+
 	container, err := dependencies.New(
 		repositories.Module(),
 		services.Module(),
