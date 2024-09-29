@@ -6,6 +6,7 @@ import (
 	"go-boilerplate/internal/apps/rest/middlewares"
 	"go-boilerplate/internal/configs"
 	"go-boilerplate/internal/constants"
+	"go-boilerplate/internal/domains"
 	domains_interfaces "go-boilerplate/internal/domains/interfaces"
 	"go-boilerplate/pkg/customvalidator"
 	"go-boilerplate/pkg/databases"
@@ -87,7 +88,9 @@ func StartServer(container *di.Container, validator *customvalidator.Validator) 
 //	@schemes	http https
 //	@host		localhost:5000
 func main() {
-	container, err := dependencies.NewForStartup()
+	container, err := dependencies.New(
+		domains.Modules,
+	)
 	if err != nil {
 		return
 	}
