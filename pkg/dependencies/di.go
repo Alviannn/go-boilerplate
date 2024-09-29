@@ -1,7 +1,6 @@
 package dependencies
 
 import (
-	"go-boilerplate/internal/domains"
 	"go-boilerplate/pkg/customvalidator"
 	"go-boilerplate/pkg/databases"
 	"go-boilerplate/pkg/logger"
@@ -21,7 +20,6 @@ func New(extraDeps ...di.Option) (container *di.Container, err error) {
 	deps := []di.Option{
 		di.Provide(customvalidator.New),
 		di.Provide(databases.NewMySQLDB),
-		domains.Modules,
 	}
 	deps = append(deps, extraDeps...)
 

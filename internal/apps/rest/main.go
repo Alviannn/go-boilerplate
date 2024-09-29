@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	controllers_rest "go-boilerplate/internal/apps/rest/controllers"
 	"go-boilerplate/internal/apps/rest/middlewares"
 	"go-boilerplate/internal/configs"
 	"go-boilerplate/internal/constants"
-	"go-boilerplate/internal/domains"
-	domains_interfaces "go-boilerplate/internal/domains/interfaces"
+	"go-boilerplate/internal/repositories"
+	"go-boilerplate/internal/services"
 	"go-boilerplate/pkg/customvalidator"
 	"go-boilerplate/pkg/databases"
 	"go-boilerplate/pkg/dependencies"
@@ -16,14 +17,14 @@ import (
 	"github.com/labstack/echo/v4"
 	echo_middlewares "github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
-	echoSwagger "github.com/swaggo/echo-swagger"
+	echo_swagger "github.com/swaggo/echo-swagger"
 	"gorm.io/gorm"
 
 	_ "go-boilerplate/internal/apps/rest/docs"
 )
 
-func RegisterRouters(echo *echo.Echo, container *di.Container) (err error) {
-	var restDeliveries []domains_interfaces.BaseRestDelivery
+func registerRouters(echo *echo.Echo, container *di.Container) (err error) {
+	var restDeliveries []controllers_rest.Controller
 	if err = container.Resolve(&restDeliveries); err != nil {
 		return
 	}
@@ -39,8 +40,8 @@ func StartServer(container *di.Container, validator *customvalidator.Validator) 
 		return
 	}
 
-	var gormDB *gorm.DB
 	// Force DB to load and test the connection.
+	var gormDB *gorm.DB
 	if err = container.Resolve(&gormDB); err != nil {
 		return
 	}
@@ -68,12 +69,12 @@ func StartServer(container *di.Container, validator *customvalidator.Validator) 
 	app.Use(middlewares.Log)
 
 	// Override error handler middleware
-	if err = RegisterRouters(app, container); err != nil {
+	if err = registerRouters(app, container); err != nil {
 		return
 	}
 
 	if config.Environment != constants.EnvProduction {
-		app.GET("/rest-swagger/*", echoSwagger.WrapHandler)
+		app.GET("/rest-swagger/*", echo_swagger.WrapHandler)
 	}
 
 	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
@@ -89,7 +90,9 @@ func StartServer(container *di.Container, validator *customvalidator.Validator) 
 //	@host		localhost:5000
 func main() {
 	container, err := dependencies.New(
-		domains.Modules,
+		repositories.Module(),
+		services.Module(),
+		controllers_rest.Module(),
 	)
 	if err != nil {
 		return

@@ -1,4 +1,4 @@
-package accounts_interfaces
+package repositories_mysql
 
 import (
 	"context"
@@ -6,9 +6,11 @@ import (
 	models_mysql "go-boilerplate/internal/models/mysql"
 )
 
-type RepositoryMySQL interface {
+type TxMySQLRepository interface {
 	Transaction(ctx context.Context, fc func(newCtx context.Context) error) (err error)
+}
 
+type AccountsMySQLRepository interface {
 	GetByID(ctx context.Context, accountID int64) (account models_mysql.Account, err error)
 	GetAll(ctx context.Context, params dtos.AccountGetAllRequest) (accounts []models_mysql.Account, err error)
 	Register(ctx context.Context, params dtos.AccountRegisterRequest) error

@@ -1,7 +1,7 @@
-package domains_interfaces
+package controllers_rest
 
 import "github.com/labstack/echo/v4"
 
-type BaseRestDelivery interface {
+type Controller interface {
 	SetupRouter(app *echo.Echo)
 }
