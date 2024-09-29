@@ -16,7 +16,9 @@ type accounts struct {
 }
 
 func NewAccounts(db *gorm.DB) AccountsMySQLRepository {
-	return &accounts{}
+	return &accounts{
+		DB: db,
+	}
 }
 
 func (r *accounts) GetByID(ctx context.Context, accountID int64) (account models_mysql.Account, err error) {
