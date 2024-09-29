@@ -185,6 +185,9 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "stack_line": {
+                    "type": "string"
                 }
             }
         },

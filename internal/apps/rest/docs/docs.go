@@ -189,6 +189,9 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "stack_line": {
+                    "type": "string"
                 }
             }
         },

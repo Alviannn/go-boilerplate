@@ -9,6 +9,8 @@ definitions:
         items:
           type: string
         type: array
+      stack_line:
+        type: string
     type: object
   dtos.AccountRegisterRequest:
     properties:
