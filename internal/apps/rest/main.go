@@ -75,6 +75,8 @@ func StartServer(container *di.Container) (err error) {
 	}
 
 	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
+	app.JSONSerializer = middlewares.NewErrorGuardJSONSerializer(app)
+
 	err = app.Start(fmt.Sprintf(":%d", config.Port))
 	return
 }

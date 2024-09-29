@@ -49,7 +49,7 @@ type Error struct {
 type ErrorJSON struct {
 	Message            string   `json:"message"`
 	SourceErrorMessage string   `json:"source_error_message"`
-	Stack              []string `json:"stack"`
+	Stack              []string `json:"stack,omitempty"`
 }
 
 func New() *Error {

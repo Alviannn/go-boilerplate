@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-boilerplate/internal/constants"
+	"go-boilerplate/pkg/customerror"
 	"go-boilerplate/pkg/helpers"
 	"net/http"
 	"regexp"
@@ -29,7 +30,12 @@ func Log(next echo.HandlerFunc) echo.HandlerFunc {
 			writeLogRequest(c, reqBody)
 
 			elapsedTime := time.Since(startTime)
+
 			resBody := unmarshalAnyOrNil(resRawBody)
+			if errorRespBody := getTraceableErrorAsAny(c); errorRespBody != nil {
+				resBody = errorRespBody
+			}
+
 			writeLogResponse(c, resBody, elapsedTime)
 		},
 	})
@@ -156,4 +162,24 @@ func unmarshalAnyOrNil(jsonValue []byte) (value any) {
 		value = nil
 	}
 	return
+}
+
+func getTraceableErrorAsAny(c echo.Context) any {
+	ctx := c.Request().Context()
+	value := ctx.Value(constants.HTTPTraceableError)
+	if value == nil {
+		return nil
+	}
+
+	traceableError, ok := value.(customerror.ErrorJSON)
+	if !ok {
+		return nil
+	}
+
+	marshaledError, err := json.Marshal(&traceableError)
+	if err != nil {
+		return nil
+	}
+
+	return unmarshalAnyOrNil(marshaledError)
 }
