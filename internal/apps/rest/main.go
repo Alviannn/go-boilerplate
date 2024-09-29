@@ -9,7 +9,6 @@ import (
 	"go-boilerplate/internal/constants"
 	"go-boilerplate/internal/repositories"
 	"go-boilerplate/internal/services"
-	"go-boilerplate/pkg/customvalidator"
 	"go-boilerplate/pkg/databases"
 	"go-boilerplate/pkg/dependencies"
 
@@ -35,7 +34,7 @@ func registerRouters(echo *echo.Echo, container *di.Container) (err error) {
 	return
 }
 
-func StartServer(container *di.Container, validator *customvalidator.Validator) (err error) {
+func StartServer(container *di.Container) (err error) {
 	// Force DB to load and test the connection.
 	var gormDB *gorm.DB
 	if err = container.Resolve(&gormDB); err != nil {
@@ -58,7 +57,9 @@ func StartServer(container *di.Container, validator *customvalidator.Validator) 
 			req := c.Request()
 			ctx := req.Context()
 
-			newReq := req.WithContext(context.WithValue(ctx, constants.RequestIDKey, rid))
+			newCtx := context.WithValue(ctx, constants.RequestIDKey, rid)
+			newReq := req.WithContext(newCtx)
+
 			c.SetRequest(newReq)
 		},
 	}))

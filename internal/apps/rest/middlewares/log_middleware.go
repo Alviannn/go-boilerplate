@@ -11,14 +11,14 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	echoMiddleware "github.com/labstack/echo/v4/middleware"
+	echo_middleware "github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
 )
 
 func Log(next echo.HandlerFunc) echo.HandlerFunc {
 	startTime := time.Now()
 
-	bodyDumpMiddleware := echoMiddleware.BodyDumpWithConfig(echoMiddleware.BodyDumpConfig{
+	bodyDumpMiddleware := echo_middleware.BodyDumpWithConfig(echo_middleware.BodyDumpConfig{
 		Handler: func(c echo.Context, reqRawBody, resRawBody []byte) {
 			uri := c.Request().RequestURI
 			if strings.Contains(uri, "swagger") {
@@ -38,39 +38,41 @@ func Log(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 func writeLogRequest(c echo.Context, body any) {
-	req := c.Request()
+	var (
+		req = c.Request()
+		ctx = req.Context()
 
-	requestID := fmt.Sprint(req.Context().Value(constants.RequestIDKey))
-	body = maskJSONBody(body)
+		requestID = fmt.Sprint(ctx.Value(constants.RequestIDKey)) // Use `Sprint` just incase the request ID is `nil`.
+		header    = req.Header.Clone()
+	)
 
-	header := c.Request().Header.Clone()
 	maskHeaders(header)
 
 	log.Info().
 		Str("request_id", requestID).
 		Str("method", req.Method).
 		Str("uri", req.RequestURI).
-		Any("body", body).
+		Any("body", maskJSONBody(body)).
 		Any("headers", header).
 		Msg("HTTP Request")
 }
 
 func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
-	req := c.Request()
-	ctx := req.Context()
-	res := c.Response()
+	var (
+		req = c.Request()
+		ctx = req.Context()
+		res = c.Response()
 
-	requestID := fmt.Sprint(ctx.Value(constants.RequestIDKey))
-	body = maskJSONBody(body)
-
-	logEvent := log.Info()
-	isErrorResponse := (res.Status >= 400 && res.Status <= 500)
+		logEvent        = log.Info()
+		isErrorResponse = (res.Status >= 400 && res.Status <= 500)
+		header          = res.Header().Clone()
+		requestID       = fmt.Sprint(ctx.Value(constants.RequestIDKey)) // Use `Sprint` just incase the request ID is `nil`.
+	)
 
 	if isErrorResponse {
 		logEvent = log.Error()
 	}
 
-	header := res.Header().Clone()
 	maskHeaders(header)
 
 	logEvent.
@@ -79,7 +81,7 @@ func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 		Str("uri", req.RequestURI).
 		Str("elapsed_time", fmt.Sprintf("%dms", elapsedTime.Milliseconds())).
 		Int("status_code", res.Status).
-		Any("body", body).
+		Any("body", maskJSONBody(body)).
 		Any("headers", header).
 		Msg("HTTP Response")
 }
