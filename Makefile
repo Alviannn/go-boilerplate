@@ -80,10 +80,6 @@ start-rest-dev: ## Starts REST API app with 'air' to allow live/hot reloading as
 
 # ---------------------------------------------------------------------------------------- #
 
-.PHONY: create-domain
-create-domain: ## Creates a domain for the app according to boilerplate (ex: make create-domain domain=finance_reports).
-	$(CREATE_DOMAIN_CMD) -domain $(domain)
-
 .PHONY: migration-new
 migration-new: ## Create a new migration file (ex, migration-new name=create_accounts_table).
 	$(DBMATE_CMD_PREFIX) new $(name)
