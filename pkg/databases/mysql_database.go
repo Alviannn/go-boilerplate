@@ -23,7 +23,7 @@ func NewMySQLDB() (db *gorm.DB, err error) {
 	)
 
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Error),
+		Logger: logger.Default.LogMode(logger.Warn),
 	})
 }
 
