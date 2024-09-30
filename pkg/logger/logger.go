@@ -14,7 +14,7 @@ import (
 func SetupLogger() error {
 	os.Mkdir("logs", os.ModePerm)
 
-	zerolog.ErrorMarshalFunc = errorHandler
+	zerolog.ErrorMarshalFunc = errorMarshaller
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	var (
@@ -42,7 +42,7 @@ func SetupLogger() error {
 	return nil
 }
 
-func errorHandler(err error) any {
+func errorMarshaller(err error) any {
 	customError, ok := err.(*customerror.Error)
 	if !ok {
 		return err
