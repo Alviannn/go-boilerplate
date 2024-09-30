@@ -48,7 +48,7 @@ func writeLogRequest(c echo.Context, body any) {
 		req = c.Request()
 		ctx = req.Context()
 
-		requestID = fmt.Sprint(ctx.Value(constants.RequestIDKey)) // Use `Sprint` just incase the request ID is `nil`.
+		requestID = fmt.Sprint(ctx.Value(constants.CtxKeyRequestID)) // Use `Sprint` just incase the request ID is `nil`.
 		header    = req.Header.Clone()
 	)
 
@@ -72,7 +72,7 @@ func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 		logEvent        = log.Info()
 		isErrorResponse = (res.Status >= 400)
 		header          = res.Header().Clone()
-		requestID       = fmt.Sprint(ctx.Value(constants.RequestIDKey)) // Use `Sprint` just incase the request ID is `nil`.
+		requestID       = fmt.Sprint(ctx.Value(constants.CtxKeyRequestID)) // Use `Sprint` just incase the request ID is `nil`.
 	)
 
 	if isErrorResponse {
@@ -166,7 +166,7 @@ func unmarshalAnyOrNil(jsonValue []byte) (value any) {
 
 func getTraceableErrorAsAny(c echo.Context) any {
 	ctx := c.Request().Context()
-	value := ctx.Value(constants.HTTPTraceableError)
+	value := ctx.Value(constants.CtxKeyHTTPTraceableError)
 	if value == nil {
 		return nil
 	}

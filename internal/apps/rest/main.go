@@ -57,7 +57,7 @@ func StartServer(container *di.Container) (err error) {
 			req := c.Request()
 			ctx := req.Context()
 
-			newCtx := context.WithValue(ctx, constants.RequestIDKey, rid)
+			newCtx := context.WithValue(ctx, constants.CtxKeyRequestID, rid)
 			newReq := req.WithContext(newCtx)
 
 			c.SetRequest(newReq)

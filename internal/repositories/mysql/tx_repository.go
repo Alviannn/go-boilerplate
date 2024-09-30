@@ -21,7 +21,7 @@ func (r *tx) Transaction(ctx context.Context, fc func(newCtx context.Context) er
 	db := getDB(ctx, r.DB)
 
 	return db.Transaction(func(gormTx *gorm.DB) error {
-		newCtx := context.WithValue(ctx, constants.GormTransactionKey, gormTx)
+		newCtx := context.WithValue(ctx, constants.CtxKeyGormTransaction, gormTx)
 		return fc(newCtx)
 	})
 }

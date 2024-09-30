@@ -17,7 +17,7 @@ func Module() di.Option {
 
 func getDB(ctx context.Context, db *gorm.DB) (gormDB *gorm.DB) {
 	gormDB = db
-	if value := ctx.Value(constants.GormTransactionKey); value != nil {
+	if value := ctx.Value(constants.CtxKeyGormTransaction); value != nil {
 		if gormTx, ok := value.(*gorm.DB); ok {
 			gormDB = gormTx
 		}

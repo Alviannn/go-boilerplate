@@ -33,7 +33,7 @@ func (t *ErrorGuardJSONSerializer) Serialize(c echo.Context, i interface{}, inde
 
 		// Store original error in `context` so it can log
 		// with stack trace in the logger middleware.
-		newCtx := context.WithValue(ctx, constants.HTTPTraceableError, customErrorJSON)
+		newCtx := context.WithValue(ctx, constants.CtxKeyHTTPTraceableError, customErrorJSON)
 		newReq := req.WithContext(newCtx)
 
 		c.SetRequest(newReq)
