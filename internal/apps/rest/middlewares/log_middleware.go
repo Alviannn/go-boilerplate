@@ -70,7 +70,7 @@ func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 		res = c.Response()
 
 		logEvent        = log.Info()
-		isErrorResponse = (res.Status >= 400 && res.Status <= 500)
+		isErrorResponse = (res.Status >= 400)
 		header          = res.Header().Clone()
 		requestID       = fmt.Sprint(ctx.Value(constants.RequestIDKey)) // Use `Sprint` just incase the request ID is `nil`.
 	)
