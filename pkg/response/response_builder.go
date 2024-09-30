@@ -6,16 +6,23 @@ import (
 	"reflect"
 )
 
-type Builder struct {
-	Data        any
-	Error       error
-	SuccessCode int
-}
+var (
+	emptySlice = make([]string, 0)
+	emptyMap   = make(map[string]string)
+)
 
-type Response struct {
-	Data       any
-	StatusCode int
-}
+type (
+	Builder struct {
+		Data        any
+		Error       error
+		SuccessCode int
+	}
+
+	Response struct {
+		Data       any
+		StatusCode int
+	}
+)
 
 func NewBuilder() *Builder {
 	return &Builder{
@@ -36,7 +43,7 @@ func (b *Builder) WithSuccessCode(statusCode int) *Builder {
 	return b
 }
 
-func sanitizeError(err error) *customerror.Error {
+func (b *Builder) sanitizeError(err error) *customerror.Error {
 	if err == nil {
 		return nil
 	}
@@ -48,7 +55,7 @@ func sanitizeError(err error) *customerror.Error {
 }
 
 func (b *Builder) WithError(err error) *Builder {
-	b.Error = sanitizeError(err)
+	b.Error = b.sanitizeError(err)
 	return b
 }
 
@@ -61,34 +68,41 @@ func (b *Builder) WithError(err error) *Builder {
 // Anything that's not a slice or struct or `nil` value
 // will become the default zero value of the type,
 // ex: empty string stays as "".
-func (b *Builder) sanitizeData() any {
-	dataReflect := reflect.ValueOf(b.Data)
-	dataKind := dataReflect.Kind()
-
-	emptySlice := make([]string, 0)
-	emptyMap := make(map[string]string)
-
-	var newData any = b.Data
-	isDataStructOrSlice := (dataKind == reflect.Struct || dataKind == reflect.Slice)
-
-	if newData == nil {
+func (b *Builder) sanitizeData(data any) (newData any) {
+	if data == nil {
 		newData = emptyMap
-	} else if isDataStructOrSlice && dataReflect.IsZero() {
+		return
+	}
+
+	var (
+		dataReflect         = reflect.ValueOf(data)
+		dataKind            = dataReflect.Kind()
+		isDataStructOrSlice = (dataKind == reflect.Struct || dataKind == reflect.Slice)
+	)
+
+	if !isDataStructOrSlice {
+		newData = data
+		return
+	}
+
+	if dataReflect.IsZero() {
 		if dataKind == reflect.Struct {
 			newData = emptyMap
 		} else {
 			newData = emptySlice
 		}
+		return
 	}
 
-	return newData
+	newData = data
+	return
 }
 
 func (b *Builder) Build() (res Response) {
-	res.Data = b.sanitizeData()
+	res.Data = b.sanitizeData(b.Data)
 	res.StatusCode = b.SuccessCode
 
-	if customErr := sanitizeError(b.Error); customErr != nil {
+	if customErr := b.sanitizeError(b.Error); customErr != nil {
 		res.Data = customErr.ToJSON()
 		res.StatusCode = customErr.Code
 	}
