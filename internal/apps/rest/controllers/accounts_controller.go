@@ -42,7 +42,7 @@ func (ctl *accounts) SetupRouter(echo *echo.Echo) {
 //	@Router			/accounts/{id} [get]
 func (ctl *accounts) GetByID(c echo.Context) (err error) {
 	var (
-		params dtos.AccountGetRequest
+		params dtos.AccountGetReq
 		res    response.Response
 
 		ctx = c.Request().Context()
@@ -86,7 +86,7 @@ func (ctl *accounts) GetByID(c echo.Context) (err error) {
 //	@Router			/accounts [get]
 func (ctl *accounts) GetAll(c echo.Context) (err error) {
 	var (
-		params dtos.AccountGetAllRequest
+		params dtos.AccountGetAllReq
 		res    response.Response
 
 		ctx = c.Request().Context()
@@ -126,7 +126,7 @@ func (ctl *accounts) GetAll(c echo.Context) (err error) {
 //	@Router			/accounts [post]
 func (ctl *accounts) Register(c echo.Context) (err error) {
 	var (
-		params dtos.AccountRegisterRequest
+		params dtos.AccountRegisterReq
 		res    response.Response
 
 		ctx = c.Request().Context()

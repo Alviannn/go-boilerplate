@@ -7,7 +7,7 @@ import (
 )
 
 type AccountsService interface {
-	GetByID(ctx context.Context, params dtos.AccountGetRequest) (account models_mysql.Account, err error)
-	GetAll(ctx context.Context, params dtos.AccountGetAllRequest) (accounts []models_mysql.Account, err error)
-	Register(ctx context.Context, params dtos.AccountRegisterRequest) (err error)
+	GetByID(ctx context.Context, params dtos.AccountGetReq) (account models_mysql.Account, err error)
+	GetAll(ctx context.Context, params dtos.AccountGetAllReq) (accounts []models_mysql.Account, err error)
+	Register(ctx context.Context, params dtos.AccountRegisterReq) (err error)
 }

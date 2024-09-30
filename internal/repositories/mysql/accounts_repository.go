@@ -43,7 +43,7 @@ func (r *accounts) GetByID(ctx context.Context, accountID int64) (account models
 	return
 }
 
-func (r *accounts) GetAll(ctx context.Context, params dtos.AccountGetAllRequest) (accounts []models_mysql.Account, err error) {
+func (r *accounts) GetAll(ctx context.Context, params dtos.AccountGetAllReq) (accounts []models_mysql.Account, err error) {
 	query := getDB(ctx, r.DB).WithContext(ctx)
 
 	if params.Email != "" {
@@ -72,7 +72,7 @@ func (r *accounts) GetAll(ctx context.Context, params dtos.AccountGetAllRequest)
 	return
 }
 
-func (r *accounts) Register(ctx context.Context, params dtos.AccountRegisterRequest) (err error) {
+func (r *accounts) Register(ctx context.Context, params dtos.AccountRegisterReq) (err error) {
 	newAccount := models_mysql.Account{
 		Username: params.Username,
 		FullName: params.FullName,

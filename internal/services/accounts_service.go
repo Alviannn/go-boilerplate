@@ -22,17 +22,17 @@ func NewAccounts(mysqlRepo repositories_mysql.AccountsMySQLRepository) AccountsS
 	}
 }
 
-func (s *accounts) GetByID(ctx context.Context, params dtos.AccountGetRequest) (account models_mysql.Account, err error) {
+func (s *accounts) GetByID(ctx context.Context, params dtos.AccountGetReq) (account models_mysql.Account, err error) {
 	account, err = s.MySQLRepo.GetByID(ctx, params.ID)
 	return
 }
 
-func (s *accounts) GetAll(ctx context.Context, params dtos.AccountGetAllRequest) (accounts []models_mysql.Account, err error) {
+func (s *accounts) GetAll(ctx context.Context, params dtos.AccountGetAllReq) (accounts []models_mysql.Account, err error) {
 	accounts, err = s.MySQLRepo.GetAll(ctx, params)
 	return
 }
 
-func (s *accounts) Register(ctx context.Context, params dtos.AccountRegisterRequest) (err error) {
+func (s *accounts) Register(ctx context.Context, params dtos.AccountRegisterReq) (err error) {
 	isExist, err := s.MySQLRepo.ExistByEmail(ctx, params.Email)
 	if err != nil {
 		return
