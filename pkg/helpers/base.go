@@ -1,7 +1,8 @@
 package helpers
 
 var (
-	Http = httpHelper{}
+	Http   = httpHelper{}
+	Random = randomHelper{}
 )
 
 func Slice[T comparable]() sliceHelper[T] {
