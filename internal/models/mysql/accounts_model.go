@@ -8,7 +8,3 @@ type Account struct {
 	Email    string `json:"email"`
 	Password string `json:"-"` // don't allow password to ever be exported.
 }
-
-func (m *Account) IsExist() bool {
-	return m.ID != 0
-}

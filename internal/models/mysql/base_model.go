@@ -12,3 +12,7 @@ type BaseModel struct {
 	UpdatedAt time.Time      `gorm:"autoUpdateTime;not null" json:"updatedAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deletedAt" swaggertype:"string"`
 }
+
+func (m *BaseModel) IsExist() bool {
+	return m.ID != 0
+}
