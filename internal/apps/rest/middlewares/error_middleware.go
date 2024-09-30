@@ -10,10 +10,17 @@ import (
 
 func CustomErrorHandler() echo.HTTPErrorHandler {
 	return func(err error, c echo.Context) {
-		customErr := customerror.New().WithSourceError(err)
-		log.Error().Err(customErr).Msg("Unhandled error")
+		if c.Response().Committed { // Prevent sending double response
+			return
+		}
 
-		res := response.NewBuilder().WithError(customErr).Build()
+		customErr := customerror.New().WithSourceError(err)
+		log.Error().Err(customErr).Msg(customErr.Message)
+
+		res := response.NewBuilder().
+			WithError(customErr).
+			Build()
+
 		c.JSON(res.StatusCode, res.Data)
 	}
 }
