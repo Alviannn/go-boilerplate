@@ -27,37 +27,36 @@ func New() *Validator {
 // validation error message with a custom one made by
 // you using `CustomValidationMessage` interface.
 func (v *Validator) Validate(ptrValue any) (err error) {
-	err = v.ActualValidator.Struct(ptrValue)
 	// When there's no error we'll use the custom validation
 	// made by the developer.
-	if err == nil {
-		err = v.tryCustomValidation(ptrValue)
+	if err = v.ActualValidator.Struct(ptrValue); err == nil {
+		err = v.customValidate(ptrValue)
 		return
 	}
 
 	// Incase the validation is invalid, we're stopping
 	// the process here.
-	_, isOk := err.(*validator.InvalidValidationError)
-	if !isOk {
+	if _, ok := err.(*validator.InvalidValidationError); !ok {
 		return
 	}
 
 	validationErrors := err.(validator.ValidationErrors)
 	firstFieldError := validationErrors[0]
-
 	err = firstFieldError
+
 	// Try to use custom error message for the validation
 	// when the developer decides to overwrite the original error message.
-	if errWithCustomMessage := v.tryCustomValidationMessage(ptrValue, firstFieldError); errWithCustomMessage != nil {
+	errWithCustomMessage := v.changeValidationMessage(ptrValue, firstFieldError)
+	if errWithCustomMessage != nil {
 		err = errWithCustomMessage
 	}
 
 	return
 }
 
-func (*Validator) tryCustomValidation(v any) (err error) {
-	customValidation, isOk := v.(CustomValidation)
-	if !isOk {
+func (*Validator) customValidate(v any) (err error) {
+	customValidation, ok := v.(CustomValidation)
+	if !ok {
 		return
 	}
 
@@ -65,9 +64,9 @@ func (*Validator) tryCustomValidation(v any) (err error) {
 	return
 }
 
-func (*Validator) tryCustomValidationMessage(v any, fieldErr validator.FieldError) (err error) {
-	customValidationMessage, isOk := v.(CustomValidationMessage)
-	if !isOk {
+func (*Validator) changeValidationMessage(v any, fieldErr validator.FieldError) (err error) {
+	customValidationMessage, ok := v.(CustomValidationMessage)
+	if !ok {
 		return
 	}
 
