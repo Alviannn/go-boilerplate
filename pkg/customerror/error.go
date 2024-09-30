@@ -49,8 +49,8 @@ type Error struct {
 
 type ErrorJSON struct {
 	Message            string   `json:"message"`
-	SourceErrorMessage string   `json:"source_error_message"`
-	StackLine          string   `json:"stack_line,omitempty"`
+	SourceErrorMessage string   `json:"sourceErrorMessage"`
+	StackLine          string   `json:"stackLine,omitempty"`
 	Stack              []string `json:"stack,omitempty"`
 }
 
