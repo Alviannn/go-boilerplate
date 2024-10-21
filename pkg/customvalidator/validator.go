@@ -27,23 +27,24 @@ func New() *Validator {
 // Not limited to only that, it can also replace any
 // validation error message with a custom one made by
 // you using `CustomValidationMessage` interface.
-func (v *Validator) Validate(ptrValue any) (err error) {
-	if ptrValue == nil {
-		return errors.New("ptrValue cannot be nil")
+func (v *Validator) Validate(value any) (err error) {
+	valueRef := reflect.ValueOf(value)
+	if value == nil {
+		return errors.New("value cannot be nil")
 	}
 
-	typeRef := reflect.TypeOf(ptrValue)
-	if typeRef.Kind() != reflect.Ptr {
-		return errors.New("ptrValue must be a pointer")
-	}
-	if typeRef.Elem().Kind() != reflect.Struct {
-		return errors.New("ptrValue must be a pointer to a struct")
+	isTypeStruct := (valueRef.Kind() == reflect.Struct)
+	isTypePtrStruct := (valueRef.Kind() == reflect.Ptr && valueRef.Elem().Kind() == reflect.Struct)
+
+	if !isTypeStruct && !isTypePtrStruct {
+		err = errors.New("value must be a struct or a pointer to a struct")
+		return
 	}
 
 	// When there's no error we'll use the custom validation
 	// made by the developer.
-	if err = v.ActualValidator.Struct(ptrValue); err == nil {
-		err = v.customValidate(ptrValue)
+	if err = v.ActualValidator.Struct(value); err == nil {
+		err = v.customValidate(value)
 		return
 	}
 
@@ -59,7 +60,7 @@ func (v *Validator) Validate(ptrValue any) (err error) {
 
 	// Try to use custom error message for the validation
 	// when the developer decides to overwrite the original error message.
-	errWithCustomMessage := v.changeValidationMessage(ptrValue, firstFieldError)
+	errWithCustomMessage := v.changeValidationMessage(value, firstFieldError)
 	if errWithCustomMessage != nil {
 		err = errWithCustomMessage
 	}
