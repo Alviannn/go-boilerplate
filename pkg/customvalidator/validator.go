@@ -2,6 +2,7 @@ package customvalidator
 
 import (
 	"errors"
+	"reflect"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -27,6 +28,18 @@ func New() *Validator {
 // validation error message with a custom one made by
 // you using `CustomValidationMessage` interface.
 func (v *Validator) Validate(ptrValue any) (err error) {
+	if ptrValue == nil {
+		return errors.New("ptrValue cannot be nil")
+	}
+
+	typeRef := reflect.TypeOf(ptrValue)
+	if typeRef.Kind() != reflect.Ptr {
+		return errors.New("ptrValue must be a pointer")
+	}
+	if typeRef.Elem().Kind() != reflect.Struct {
+		return errors.New("ptrValue must be a pointer to a struct")
+	}
+
 	// When there's no error we'll use the custom validation
 	// made by the developer.
 	if err = v.ActualValidator.Struct(ptrValue); err == nil {
