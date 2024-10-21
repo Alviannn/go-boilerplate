@@ -3,7 +3,7 @@ package controllers_rest
 import (
 	"go-boilerplate/internal/dtos"
 	"go-boilerplate/internal/services"
-	"go-boilerplate/pkg/customerror"
+	"go-boilerplate/pkg/helpers"
 	"go-boilerplate/pkg/response"
 	"net/http"
 
@@ -48,12 +48,7 @@ func (ctl *accounts) GetByID(c echo.Context) (err error) {
 		ctx = c.Request().Context()
 	)
 
-	if err = c.Bind(&params); err != nil {
-		err = customerror.New().
-			WithCode(http.StatusBadRequest).
-			WithSourceError(err).
-			WithMessage("Failed to bind parameters")
-
+	if err = helpers.Echo.DefaultBind(c, &params); err != nil {
 		res = response.NewBuilder().WithError(err).Build()
 		return c.JSON(res.StatusCode, res.Data)
 	}
@@ -92,12 +87,7 @@ func (ctl *accounts) GetAll(c echo.Context) (err error) {
 		ctx = c.Request().Context()
 	)
 
-	if err = c.Bind(&params); err != nil {
-		err = customerror.New().
-			WithCode(http.StatusBadRequest).
-			WithSourceError(err).
-			WithMessage("Failed to bind parameters")
-
+	if err = helpers.Echo.DefaultBind(c, &params); err != nil {
 		res = response.NewBuilder().WithError(err).Build()
 		return c.JSON(res.StatusCode, res.Data)
 	}
@@ -132,12 +122,7 @@ func (ctl *accounts) Register(c echo.Context) (err error) {
 		ctx = c.Request().Context()
 	)
 
-	if err = c.Bind(&params); err != nil {
-		err = customerror.New().
-			WithCode(http.StatusBadRequest).
-			WithSourceError(err).
-			WithMessage("Failed to bind parameters")
-
+	if err = helpers.Echo.DefaultBind(c, &params); err != nil {
 		res = response.NewBuilder().WithError(err).Build()
 		return c.JSON(res.StatusCode, res.Data)
 	}
