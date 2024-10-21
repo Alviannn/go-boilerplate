@@ -119,7 +119,7 @@ func (ctl *accounts) GetAll(c echo.Context) (err error) {
 //	@Tags			accounts
 //	@Accept			json
 //	@Produce		json
-//	@Param			newAccount	body		dtos.AccountRegisterRequest	true	"New account details"
+//	@Param			newAccount	body		dtos.AccountRegisterReq	true	"New account details"
 //	@Success		200			{object}	any
 //	@Failure		400			{object}	customerror.ErrorJSON
 //	@Failure		500			{object}	customerror.ErrorJSON

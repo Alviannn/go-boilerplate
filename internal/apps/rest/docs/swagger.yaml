@@ -3,16 +3,16 @@ definitions:
     properties:
       message:
         type: string
-      source_error_message:
+      sourceErrorMessage:
         type: string
       stack:
         items:
           type: string
         type: array
-      stack_line:
+      stackLine:
         type: string
     type: object
-  dtos.AccountRegisterRequest:
+  dtos.AccountRegisterReq:
     properties:
       email:
         type: string
@@ -102,7 +102,7 @@ paths:
         name: newAccount
         required: true
         schema:
-          $ref: '#/definitions/dtos.AccountRegisterRequest'
+          $ref: '#/definitions/dtos.AccountRegisterReq'
       produces:
       - application/json
       responses:

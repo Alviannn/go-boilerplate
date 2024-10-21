@@ -103,7 +103,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.AccountRegisterRequest"
+                            "$ref": "#/definitions/dtos.AccountRegisterReq"
                         }
                     }
                 ],
@@ -181,7 +181,7 @@ const docTemplate = `{
                 "message": {
                     "type": "string"
                 },
-                "source_error_message": {
+                "sourceErrorMessage": {
                     "type": "string"
                 },
                 "stack": {
@@ -190,12 +190,12 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
-                "stack_line": {
+                "stackLine": {
                     "type": "string"
                 }
             }
         },
-        "dtos.AccountRegisterRequest": {
+        "dtos.AccountRegisterReq": {
             "type": "object",
             "properties": {
                 "email": {
