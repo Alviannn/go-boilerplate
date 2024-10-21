@@ -49,7 +49,7 @@ func (v *Validator) Validate(ptrValue any) (err error) {
 
 	// Incase the validation is invalid, we're stopping
 	// the process here.
-	if _, ok := err.(*validator.InvalidValidationError); !ok {
+	if _, ok := err.(*validator.InvalidValidationError); ok {
 		return
 	}
 
