@@ -6,11 +6,11 @@ import (
 	models_mysql "go-boilerplate/internal/models/mysql"
 )
 
-type TxMySQLRepository interface {
+type Tx interface {
 	Transaction(ctx context.Context, fc func(newCtx context.Context) error) (err error)
 }
 
-type AccountsMySQLRepository interface {
+type Accounts interface {
 	GetByID(ctx context.Context, accountID int64) (account models_mysql.Account, err error)
 	GetAll(ctx context.Context, params dtos.AccountGetAllReq) (accounts []models_mysql.Account, err error)
 	Register(ctx context.Context, params dtos.AccountRegisterReq) error

@@ -13,10 +13,10 @@ import (
 )
 
 type accounts struct {
-	MySQLRepo repositories_mysql.AccountsMySQLRepository
+	MySQLRepo repositories_mysql.Accounts
 }
 
-func NewAccounts(mysqlRepo repositories_mysql.AccountsMySQLRepository) AccountsService {
+func NewAccounts(mysqlRepo repositories_mysql.Accounts) AccountsService {
 	return &accounts{
 		MySQLRepo: mysqlRepo,
 	}

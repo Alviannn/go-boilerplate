@@ -11,7 +11,7 @@ type tx struct {
 	DB *gorm.DB
 }
 
-func NewTx(db *gorm.DB) TxMySQLRepository {
+func NewTx(db *gorm.DB) Tx {
 	return &tx{
 		DB: db,
 	}

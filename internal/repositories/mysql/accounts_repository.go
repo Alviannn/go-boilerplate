@@ -15,7 +15,7 @@ type accounts struct {
 	DB *gorm.DB
 }
 
-func NewAccounts(db *gorm.DB) AccountsMySQLRepository {
+func NewAccounts(db *gorm.DB) Accounts {
 	return &accounts{
 		DB: db,
 	}
