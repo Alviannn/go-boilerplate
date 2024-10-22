@@ -9,6 +9,7 @@ import (
 
 type Validator struct {
 	ActualValidator *validator.Validate
+	helper          helper
 }
 
 // New creates the custom validator instance.
@@ -32,7 +33,7 @@ func (v *Validator) Validate(value any) (err error) {
 		return errors.New("value cannot be nil")
 	}
 
-	if !v.isStructOrStructPtr(value) {
+	if !v.helper.isStruct(value) {
 		err = errors.New("value must be a struct or a pointer to a struct")
 		return
 	}
@@ -72,43 +73,48 @@ func (v *Validator) Validate(value any) (err error) {
 }
 
 func (v *Validator) recursiveValidation(value any) (err error) {
-	elemValueRef := reflect.ValueOf(value)
-	if elemValueRef.Kind() == reflect.Ptr {
-		elemValueRef = elemValueRef.Elem()
+	elemValueRef := reflect.Indirect(reflect.ValueOf(value))
+
+	if v.helper.isSliceOrArray(value) {
+		for i := 0; i < elemValueRef.Len(); i++ {
+			err = v.handleRecursiveValidationForFieldOrIndex(elemValueRef.Index(i))
+			if err != nil {
+				return
+			}
+		}
+		return
 	}
 
-	for i := 0; i < elemValueRef.NumField(); i++ {
-		var (
-			fieldRef      = elemValueRef.Field(i)
-			isCanContinue = v.isStructOrStructPtr(fieldRef.Interface())
-			fieldToPass   = any(nil)
-		)
-
-		if !isCanContinue {
-			continue
-		}
-
-		if fieldRef.Kind() == reflect.Ptr {
-			fieldToPass = fieldRef.Interface()
-		} else {
-			fieldToPass = fieldRef.Addr().Interface()
-		}
-
-		if err = v.Validate(fieldToPass); err != nil {
-			return
+	if v.helper.isStruct(value) {
+		for i := 0; i < elemValueRef.NumField(); i++ {
+			err = v.handleRecursiveValidationForFieldOrIndex(elemValueRef.Field(i))
+			if err != nil {
+				return
+			}
 		}
 	}
+
 	return
 }
 
-func (v *Validator) isStructOrStructPtr(value any) bool {
-	var (
-		valueRef        = reflect.ValueOf(value)
-		isTypeStruct    = (valueRef.Kind() == reflect.Struct)
-		isTypePtrStruct = (valueRef.Kind() == reflect.Ptr && valueRef.Elem().Kind() == reflect.Struct)
-	)
+func (v *Validator) handleRecursiveValidationForFieldOrIndex(valueRef reflect.Value) (err error) {
+	var valueToPass any
+	if valueRef.Kind() == reflect.Ptr || v.helper.isSliceOrArray(valueRef.Interface()) {
+		valueToPass = valueRef.Interface()
+	} else {
+		valueToPass = valueRef.Addr().Interface()
+	}
 
-	return isTypeStruct || isTypePtrStruct
+	if v.helper.isSliceOrArray(valueToPass) {
+		err = v.recursiveValidation(valueToPass)
+		return
+	}
+	if v.helper.isStruct(valueToPass) {
+		err = v.Validate(valueToPass)
+		return
+	}
+
+	return
 }
 
 func (*Validator) customValidate(v any) (err error) {
