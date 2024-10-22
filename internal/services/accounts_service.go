@@ -16,7 +16,7 @@ type accounts struct {
 	MySQLRepo repositories_mysql.Accounts
 }
 
-func NewAccounts(mysqlRepo repositories_mysql.Accounts) AccountsService {
+func NewAccounts(mysqlRepo repositories_mysql.Accounts) Accounts {
 	return &accounts{
 		MySQLRepo: mysqlRepo,
 	}

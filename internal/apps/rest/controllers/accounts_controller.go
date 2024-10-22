@@ -11,10 +11,10 @@ import (
 )
 
 type accounts struct {
-	Service services.AccountsService
+	Service services.Accounts
 }
 
-func NewAccounts(service services.AccountsService) *accounts {
+func NewAccounts(service services.Accounts) *accounts {
 	return &accounts{
 		Service: service,
 	}
