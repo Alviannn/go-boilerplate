@@ -1,108 +1,25 @@
 package customvalidator
 
 import (
-	"errors"
-	"fmt"
+	"go-boilerplate/pkg/customvalidator/testdata"
 	"strings"
 	"testing"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/suite"
 )
-
-type (
-	PersonSimple struct {
-		Name string `json:"name" validate:"required,min=3,max=100"`
-		Age  int    `json:"age" validate:"gte=0,lte=130"`
-	}
-)
-
-func (m *PersonSimple) Validate() (err error) {
-	if strings.Contains(m.Name, "Foo") {
-		err = errors.New("name cannot contain 'Foo'")
-		return
-	}
-	return
-}
-
-func (m *PersonSimple) ChangeValidationMessage(fieldErr validator.FieldError) (errorMessage string) {
-	structFieldName := fieldErr.StructField()
-	failedTag := fieldErr.Tag()
-
-	if structFieldName == "Age" && failedTag == "lte" {
-		errorMessage = fmt.Sprintf(
-			"%s must be less than or equal to %s",
-			structFieldName,
-			fieldErr.Param(),
-		)
-	}
-	return
-}
 
 type ValidatorTestSuite struct {
 	suite.Suite
 
 	validator             *Validator
-	defaultPersonSimple   PersonSimple
-	defaultPersonExtended PersonExtended
+	defaultPersonSimple   testdata.PersonSimple
+	defaultPersonExtended testdata.PersonExtended
 }
 
 func (s *ValidatorTestSuite) SetupTest() {
 	s.validator = New()
-
-	s.defaultPersonSimple = PersonSimple{
-		Name: "John",
-		Age:  30,
-	}
-
-	s.defaultPersonExtended = PersonExtended{
-		Name: "John",
-		Age:  30,
-
-		Address: Address{
-			Country: "USA",
-			City:    "New York",
-		},
-
-		MainCard: &Card{
-			Name:   "Visa",
-			Number: "123456789",
-		},
-
-		HobbyList: []Hobby{
-			{
-				Name:  "Dancing",
-				Score: 2,
-			},
-			{
-				Name:  "Traveling",
-				Score: 5,
-			},
-		},
-
-		HobbyListOfList: [][]Hobby{
-			{
-				{
-					Name:  "Dancing",
-					Score: 2,
-				},
-				{
-					Name:  "Traveling",
-					Score: 5,
-				},
-			},
-			{
-				{
-					Name:  "Cooking",
-					Score: 3,
-				},
-				{
-					Name:  "Reading",
-					Score: 4,
-				},
-			},
-		},
-	}
+	s.defaultPersonSimple = testdata.NewDefaultPersonSimple()
+	s.defaultPersonExtended = testdata.NewDefaultPersonExtended()
 }
 
 func TestValidatorTestSuite(t *testing.T) {
@@ -122,7 +39,7 @@ func (s *ValidatorTestSuite) TestValidateSimple() {
 		})
 
 		s.Run("when value is empty struct", func() {
-			person := PersonSimple{}
+			person := testdata.PersonSimple{}
 			s.Error(s.validator.Validate(&person))
 		})
 
@@ -176,57 +93,6 @@ func (s *ValidatorTestSuite) TestValidateSimple() {
 	})
 }
 
-type (
-	PersonExtended struct {
-		Name string `validate:"required,min=3,max=100"`
-		Age  int    `validate:"gte=0,lte=130"`
-
-		Address         Address   `validate:"required"`
-		MainCard        *Card     `validate:"required"`
-		HobbyList       []Hobby   `validate:"required,min=2,dive"`
-		HobbyListOfList [][]Hobby `validate:"required,min=2,dive"`
-	}
-
-	Address struct {
-		Country string `validate:"required,min=3"`
-		City    string `validate:"required,min=3"`
-	}
-
-	Card struct {
-		Name   string `validate:"required,min=3,max=100"`
-		Number string `validate:"required,min=3,max=100"`
-	}
-
-	Hobby struct {
-		Name  string `validate:"required,min=3,max=100"`
-		Score int    `validate:"gte=0,lte=5"`
-	}
-)
-
-func (m *Address) Validate() (err error) {
-	if m.Country == "Unknown" {
-		err = errors.New("country cannot be 'Unknown'")
-		return
-	}
-	return
-}
-
-func (m *Hobby) Validate() (err error) {
-	if m.Name == "Everything" {
-		err = errors.New("hobby name cannot be 'Everything'")
-		return
-	}
-	return
-}
-
-func (m *Card) Validate() (err error) {
-	if m.Name == "Unknown" {
-		err = errors.New("card name cannot be 'Unknown'")
-		return
-	}
-	return
-}
-
 func (s *ValidatorTestSuite) TestValidateExtended() {
 	s.Run("should pass", func() {
 		person := s.defaultPersonExtended
@@ -256,7 +122,7 @@ func (s *ValidatorTestSuite) TestValidateExtended() {
 	s.Run("should fail: hobby list", func() {
 		s.Run("when hobby list is empty", func() {
 			person := s.defaultPersonExtended
-			person.HobbyList = []Hobby{}
+			person.HobbyList = []testdata.Hobby{}
 			s.Error(s.validator.Validate(&person))
 		})
 
@@ -270,7 +136,7 @@ func (s *ValidatorTestSuite) TestValidateExtended() {
 	s.Run("should fail: hobby list of list", func() {
 		s.Run("when hobby list of list is empty", func() {
 			person := s.defaultPersonExtended
-			person.HobbyListOfList = [][]Hobby{}
+			person.HobbyListOfList = [][]testdata.Hobby{}
 			s.Error(s.validator.Validate(&person))
 		})
 
