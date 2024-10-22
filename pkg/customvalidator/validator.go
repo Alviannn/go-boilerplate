@@ -28,44 +28,87 @@ func New() *Validator {
 // validation error message with a custom one made by
 // you using `CustomValidationMessage` interface.
 func (v *Validator) Validate(value any) (err error) {
-	valueRef := reflect.ValueOf(value)
 	if value == nil {
 		return errors.New("value cannot be nil")
 	}
 
-	isTypeStruct := (valueRef.Kind() == reflect.Struct)
-	isTypePtrStruct := (valueRef.Kind() == reflect.Ptr && valueRef.Elem().Kind() == reflect.Struct)
-
-	if !isTypeStruct && !isTypePtrStruct {
+	if !v.isStructOrStructPtr(value) {
 		err = errors.New("value must be a struct or a pointer to a struct")
 		return
 	}
 
 	// When there's no error we'll use the custom validation
 	// made by the developer.
-	if err = v.ActualValidator.Struct(value); err == nil {
-		err = v.customValidate(value)
+	if err = v.ActualValidator.Struct(value); err != nil {
+		// Incase the validation is invalid, we're stopping
+		// the process here.
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			return
+		}
+
+		validationErrors := err.(validator.ValidationErrors)
+		firstFieldError := validationErrors[0]
+		err = firstFieldError
+
+		// Try to use custom error message for the validation
+		// when the developer decides to overwrite the original error message.
+		errWithCustomMessage := v.changeValidationMessage(value, firstFieldError)
+		if errWithCustomMessage != nil {
+			err = errWithCustomMessage
+		}
+		if err != nil {
+			return
+		}
 		return
 	}
 
-	// Incase the validation is invalid, we're stopping
-	// the process here.
-	if _, ok := err.(*validator.InvalidValidationError); ok {
+	if err = v.customValidate(value); err != nil {
 		return
 	}
-
-	validationErrors := err.(validator.ValidationErrors)
-	firstFieldError := validationErrors[0]
-	err = firstFieldError
-
-	// Try to use custom error message for the validation
-	// when the developer decides to overwrite the original error message.
-	errWithCustomMessage := v.changeValidationMessage(value, firstFieldError)
-	if errWithCustomMessage != nil {
-		err = errWithCustomMessage
+	if err = v.recursiveValidation(value); err != nil {
+		return
 	}
-
 	return
+}
+
+func (v *Validator) recursiveValidation(value any) (err error) {
+	elemValueRef := reflect.ValueOf(value)
+	if elemValueRef.Kind() == reflect.Ptr {
+		elemValueRef = elemValueRef.Elem()
+	}
+
+	for i := 0; i < elemValueRef.NumField(); i++ {
+		var (
+			fieldRef      = elemValueRef.Field(i)
+			isCanContinue = v.isStructOrStructPtr(fieldRef.Interface())
+			fieldToPass   = any(nil)
+		)
+
+		if !isCanContinue {
+			continue
+		}
+
+		if fieldRef.Kind() == reflect.Ptr {
+			fieldToPass = fieldRef.Interface()
+		} else {
+			fieldToPass = fieldRef.Addr().Interface()
+		}
+
+		if err = v.Validate(fieldToPass); err != nil {
+			return
+		}
+	}
+	return
+}
+
+func (v *Validator) isStructOrStructPtr(value any) bool {
+	var (
+		valueRef        = reflect.ValueOf(value)
+		isTypeStruct    = (valueRef.Kind() == reflect.Struct)
+		isTypePtrStruct = (valueRef.Kind() == reflect.Ptr && valueRef.Elem().Kind() == reflect.Struct)
+	)
+
+	return isTypeStruct || isTypePtrStruct
 }
 
 func (*Validator) customValidate(v any) (err error) {
