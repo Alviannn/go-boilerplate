@@ -102,6 +102,9 @@ func (v *Validator) handleRecursiveValidationForFieldOrIndex(valueRef reflect.Va
 	if valueRef.Kind() == reflect.Ptr || v.helper.isSliceOrArray(valueRef.Interface()) {
 		valueToPass = valueRef.Interface()
 	} else {
+		if !valueRef.CanAddr() {
+			return
+		}
 		valueToPass = valueRef.Addr().Interface()
 	}
 
