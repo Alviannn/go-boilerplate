@@ -4,8 +4,9 @@ import "errors"
 
 type (
 	PersonExtended struct {
-		Name string `validate:"required,min=3,max=100"`
-		Age  int    `validate:"gte=0,lte=130"`
+		Name         string   `validate:"required,min=3,max=100"`
+		Age          int      `validate:"gte=0,lte=130"`
+		NickNameList []string `validate:"required,min=2"`
 
 		Address         Address   `validate:"required"`
 		MainCard        *Card     `validate:"required"`
@@ -55,8 +56,13 @@ func (m *Card) Validate() (err error) {
 
 func NewDefaultPersonExtended() PersonExtended {
 	return PersonExtended{
-		Name: "John",
+		Name: "John Doe",
 		Age:  30,
+
+		NickNameList: []string{
+			"John",
+			"Doe",
+		},
 
 		Address: Address{
 			Country: "USA",

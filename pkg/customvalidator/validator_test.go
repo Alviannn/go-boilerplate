@@ -11,15 +11,11 @@ import (
 type ValidatorTestSuite struct {
 	suite.Suite
 
-	validator             *Validator
-	defaultPersonSimple   testdata.PersonSimple
-	defaultPersonExtended testdata.PersonExtended
+	validator *Validator
 }
 
 func (s *ValidatorTestSuite) SetupTest() {
 	s.validator = New()
-	s.defaultPersonSimple = testdata.NewDefaultPersonSimple()
-	s.defaultPersonExtended = testdata.NewDefaultPersonExtended()
 }
 
 func TestValidatorTestSuite(t *testing.T) {
@@ -28,7 +24,7 @@ func TestValidatorTestSuite(t *testing.T) {
 
 func (s *ValidatorTestSuite) TestValidateSimple() {
 	s.Run("should pass", func() {
-		person := s.defaultPersonSimple
+		person := testdata.NewDefaultPersonSimple()
 		s.Nil(s.validator.Validate(&person))
 	})
 
@@ -50,7 +46,7 @@ func (s *ValidatorTestSuite) TestValidateSimple() {
 	})
 
 	s.Run("should fail: name", func() {
-		person := s.defaultPersonSimple
+		person := testdata.NewDefaultPersonSimple()
 
 		s.Run("when name is empty", func() {
 			person.Name = ""
@@ -74,7 +70,7 @@ func (s *ValidatorTestSuite) TestValidateSimple() {
 	})
 
 	s.Run("should fail: age", func() {
-		person := s.defaultPersonSimple
+		person := testdata.NewDefaultPersonSimple()
 
 		s.Run("when age is negative", func() {
 			person.Age = -1
@@ -95,12 +91,12 @@ func (s *ValidatorTestSuite) TestValidateSimple() {
 
 func (s *ValidatorTestSuite) TestValidateExtended() {
 	s.Run("should pass", func() {
-		person := s.defaultPersonExtended
+		person := testdata.NewDefaultPersonExtended()
 		s.Nil(s.validator.Validate(&person))
 	})
 
 	s.Run("should fail: address", func() {
-		person := s.defaultPersonExtended
+		person := testdata.NewDefaultPersonExtended()
 
 		s.Run("when country is 'Unknown'", func() {
 			person.Address.Country = "Unknown"
@@ -109,11 +105,14 @@ func (s *ValidatorTestSuite) TestValidateExtended() {
 	})
 
 	s.Run("should fail: main card", func() {
-		mainCardClone := *s.defaultPersonExtended.MainCard
-		person := s.defaultPersonExtended
-		person.MainCard = &mainCardClone
+		s.Run("when card number is nil", func() {
+			person := testdata.NewDefaultPersonExtended()
+			person.MainCard = nil
+			s.Error(s.validator.Validate(&person))
+		})
 
 		s.Run("when card name is 'Unknown'", func() {
+			person := testdata.NewDefaultPersonExtended()
 			person.MainCard.Name = "Unknown"
 			s.EqualError(s.validator.Validate(&person), "card name cannot be 'Unknown'")
 		})
@@ -121,13 +120,13 @@ func (s *ValidatorTestSuite) TestValidateExtended() {
 
 	s.Run("should fail: hobby list", func() {
 		s.Run("when hobby list is empty", func() {
-			person := s.defaultPersonExtended
+			person := testdata.NewDefaultPersonExtended()
 			person.HobbyList = []testdata.Hobby{}
 			s.Error(s.validator.Validate(&person))
 		})
 
 		s.Run("when hobby name is 'Everything'", func() {
-			person := s.defaultPersonExtended
+			person := testdata.NewDefaultPersonExtended()
 			person.HobbyList[0].Name = "Everything"
 			s.EqualError(s.validator.Validate(&person), "hobby name cannot be 'Everything'")
 		})
@@ -135,15 +134,24 @@ func (s *ValidatorTestSuite) TestValidateExtended() {
 
 	s.Run("should fail: hobby list of list", func() {
 		s.Run("when hobby list of list is empty", func() {
-			person := s.defaultPersonExtended
+			person := testdata.NewDefaultPersonExtended()
 			person.HobbyListOfList = [][]testdata.Hobby{}
 			s.Error(s.validator.Validate(&person))
 		})
 
 		s.Run("when hobby name is 'Everything'", func() {
-			person := s.defaultPersonExtended
+			person := testdata.NewDefaultPersonExtended()
 			person.HobbyListOfList[0][0].Name = "Everything"
 			s.EqualError(s.validator.Validate(&person), "hobby name cannot be 'Everything'")
+		})
+	})
+
+	s.Run("should fail: nick name list", func() {
+		person := testdata.NewDefaultPersonExtended()
+
+		s.Run("when nick name list is empty", func() {
+			person.NickNameList = []string{}
+			s.Error(s.validator.Validate(&person))
 		})
 	})
 }
