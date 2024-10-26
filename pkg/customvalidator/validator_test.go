@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -29,19 +30,26 @@ func (s *ValidatorTestSuite) TestValidateSimple() {
 	})
 
 	s.Run("should fail: functionality", func() {
-		s.Run("when value is nil", func() {
-			err := s.validator.Validate(nil)
-			s.EqualError(err, "value cannot be nil")
-		})
-
 		s.Run("when value is empty struct", func() {
 			person := testdata.PersonSimple{}
 			s.Error(s.validator.Validate(&person))
 		})
 
+		s.Run("when value is nil", func() {
+			err := s.validator.Validate(nil)
+			s.Error(err)
+
+			_, ok := err.(*validator.InvalidValidationError)
+			s.True(ok)
+		})
+
 		s.Run("when value is not a struct pointer", func() {
 			value := 1
-			s.EqualError(s.validator.Validate(&value), "value must be a struct or a pointer to a struct")
+			err := s.validator.Validate(&value)
+			s.Error(err)
+
+			_, ok := err.(*validator.InvalidValidationError)
+			s.True(ok)
 		})
 	})
 

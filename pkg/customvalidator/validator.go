@@ -29,15 +29,6 @@ func New() *Validator {
 // validation error message with a custom one made by
 // you using `CustomValidationMessage` interface.
 func (v *Validator) Validate(value any) (err error) {
-	if value == nil {
-		return errors.New("value cannot be nil")
-	}
-
-	if !v.helper.isStruct(value) {
-		err = errors.New("value must be a struct or a pointer to a struct")
-		return
-	}
-
 	// When there's no error we'll use the custom validation
 	// made by the developer.
 	if err = v.ActualValidator.Struct(value); err != nil {
@@ -56,9 +47,6 @@ func (v *Validator) Validate(value any) (err error) {
 		errWithCustomMessage := v.changeValidationMessage(value, firstFieldError)
 		if errWithCustomMessage != nil {
 			err = errWithCustomMessage
-		}
-		if err != nil {
-			return
 		}
 		return
 	}
@@ -101,10 +89,7 @@ func (v *Validator) handleRecursiveValidationForFieldOrIndex(valueRef reflect.Va
 	var valueToPass any
 	if valueRef.Kind() == reflect.Ptr || v.helper.isSliceOrArray(valueRef.Interface()) {
 		valueToPass = valueRef.Interface()
-	} else {
-		if !valueRef.CanAddr() {
-			return
-		}
+	} else if valueRef.Kind() == reflect.Struct {
 		valueToPass = valueRef.Addr().Interface()
 	}
 
