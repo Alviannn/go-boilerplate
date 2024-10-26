@@ -78,7 +78,7 @@ start-rest-prod: ## Starts REST API app from 'build' directory for production.
 start-rest-dev: ## Starts REST API app with 'air' to allow live/hot reloading as you edit the code.
 	ENVIRONMENT=development air -c ./.air.rest.toml
 
-# ---------------------------------------------------------------------------------------- #
+# --------------------------------------v DB MIGRATIONS v-------------------------------------- #
 
 .PHONY: migration-new
 migration-new: ## Create a new migration file (ex, migration-new name=create_accounts_table).
@@ -95,3 +95,15 @@ migration-up: ## Execute all migration files.
 .PHONY: migration-down
 migration-down: ## Rollback 1 migration.
 	$(DBMATE_CMD_WITH_URL_PREFIX) down
+
+# --------------------------------------v TEST v-------------------------------------- #
+
+.PHONY: test
+test: ## Run unit tests.
+	go test $(args) $(TEST_PATH_LIST)
+
+.PHONY: test-coverage
+test-coverage: ## Run unit tests with coverage.
+	go test $(args) -coverprofile=$(TEST_COVERAGE_OUTPUT_FILE) $(TEST_PATH_LIST)
+	go tool cover -html=$(TEST_COVERAGE_OUTPUT_FILE)
+	rm $(TEST_COVERAGE_OUTPUT_FILE)
