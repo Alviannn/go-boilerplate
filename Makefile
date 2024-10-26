@@ -15,6 +15,9 @@ DBMATE_URL                 := mysql://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT
 DBMATE_CMD_PREFIX          := dbmate --migrations-dir './migrations' --no-dump-schema
 DBMATE_CMD_WITH_URL_PREFIX := $(DBMATE_CMD_PREFIX) --url $(DBMATE_URL)
 
+TEST_PATH_LIST            := ./pkg/...
+TEST_COVERAGE_OUTPUT_FILE := test-coverage.out
+
 GOOS_VAR := linux
 BIN_EXT  :=
 
