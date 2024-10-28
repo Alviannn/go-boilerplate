@@ -48,7 +48,7 @@ func (ctl *accounts) GetByID(c echo.Context) (err error) {
 		ctx = c.Request().Context()
 	)
 
-	if err = helpers.Echo.DefaultBind(c, &params); err != nil {
+	if err = helpers.EchoDefaultBind(c, &params); err != nil {
 		res = response.NewBuilder().WithError(err).Build()
 		return c.JSON(res.StatusCode, res.Data)
 	}
@@ -87,7 +87,7 @@ func (ctl *accounts) GetAll(c echo.Context) (err error) {
 		ctx = c.Request().Context()
 	)
 
-	if err = helpers.Echo.DefaultBind(c, &params); err != nil {
+	if err = helpers.EchoDefaultBind(c, &params); err != nil {
 		res = response.NewBuilder().WithError(err).Build()
 		return c.JSON(res.StatusCode, res.Data)
 	}
@@ -122,7 +122,7 @@ func (ctl *accounts) Register(c echo.Context) (err error) {
 		ctx = c.Request().Context()
 	)
 
-	if err = helpers.Echo.DefaultBind(c, &params); err != nil {
+	if err = helpers.EchoDefaultBind(c, &params); err != nil {
 		res = response.NewBuilder().WithError(err).Build()
 		return c.JSON(res.StatusCode, res.Data)
 	}

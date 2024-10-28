@@ -109,7 +109,7 @@ func maskJSONBody(body any) any {
 		return typedBody
 	case map[string]any:
 		for key, value := range typedBody {
-			isShouldMask := helpers.Slice[string]().IsIn(fieldsToMask, key)
+			isShouldMask := helpers.SliceIsIn(fieldsToMask, key)
 			if _, ok := value.(string); ok && isShouldMask {
 				typedBody[key] = constants.MaskedValue
 				continue
