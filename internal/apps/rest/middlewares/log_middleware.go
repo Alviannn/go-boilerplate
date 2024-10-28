@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"go-boilerplate/internal/constants"
 	"go-boilerplate/pkg/customerror"
-	"go-boilerplate/pkg/helpers"
 	"net/http"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -16,70 +16,79 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Log(next echo.HandlerFunc) echo.HandlerFunc {
+var (
+	MaskedValue = strings.Repeat("*", 10)
+)
+
+type Log struct{}
+
+func NewLog() *Log {
+	return &Log{}
+}
+
+func (m *Log) Handle(next echo.HandlerFunc) echo.HandlerFunc {
 	startTime := time.Now()
 
-	bodyDumpMiddleware := echo_middleware.BodyDumpWithConfig(echo_middleware.BodyDumpConfig{
+	bodyDumpConfig := echo_middleware.BodyDumpConfig{
 		Handler: func(c echo.Context, reqRawBody, resRawBody []byte) {
 			uri := c.Request().RequestURI
 			if strings.Contains(uri, "swagger") {
 				return
 			}
 
-			reqBody := unmarshalAnyOrNil(reqRawBody)
-			writeLogRequest(c, reqBody)
+			reqBody := m.unmarshalAnyOrNil(reqRawBody)
+			m.writeLogRequest(c, reqBody)
 
 			elapsedTime := time.Since(startTime)
 
-			resBody := unmarshalAnyOrNil(resRawBody)
-			if errorRespBody := getTraceableErrorAsAny(c); errorRespBody != nil {
+			resBody := m.unmarshalAnyOrNil(resRawBody)
+			if errorRespBody := m.getTraceableErrorAsAnyOrNil(c); errorRespBody != nil {
 				resBody = errorRespBody
 			}
 
-			writeLogResponse(c, resBody, elapsedTime)
+			m.writeLogResponse(c, resBody, elapsedTime)
 		},
-	})
+	}
 
-	return bodyDumpMiddleware(next)
+	return echo_middleware.BodyDumpWithConfig(bodyDumpConfig)(next)
 }
 
-func writeLogRequest(c echo.Context, body any) {
+func (m *Log) writeLogRequest(c echo.Context, body any) {
 	var (
-		req = c.Request()
-		ctx = req.Context()
-
-		requestID = fmt.Sprint(ctx.Value(constants.CtxKeyRequestID)) // Use `Sprint` just incase the request ID is `nil`.
+		req       = c.Request()
 		header    = req.Header.Clone()
+		ctx       = req.Context()
+		requestID = fmt.Sprint(ctx.Value(constants.CtxKeyRequestID)) // Use `Sprint` just incase the request ID is `nil`.
 	)
 
-	maskHeaders(header)
+	m.maskHeaders(header)
 
 	log.Info().
 		Str("request_id", requestID).
 		Str("method", req.Method).
 		Str("uri", req.RequestURI).
-		Any("body", maskJSONBody(body)).
+		Any("body", m.maskJSONBody(body)).
 		Any("headers", header).
 		Msg("HTTP Request")
 }
 
-func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
+func (m *Log) writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 	var (
-		req = c.Request()
-		ctx = req.Context()
-		res = c.Response()
+		req    = c.Request()
+		res    = c.Response()
+		header = res.Header().Clone()
+		ctx    = req.Context()
 
-		logEvent        = log.Info()
 		isErrorResponse = (res.Status >= 400)
-		header          = res.Header().Clone()
 		requestID       = fmt.Sprint(ctx.Value(constants.CtxKeyRequestID)) // Use `Sprint` just incase the request ID is `nil`.
 	)
 
+	logEvent := log.Info()
 	if isErrorResponse {
 		logEvent = log.Error()
 	}
 
-	maskHeaders(header)
+	m.maskHeaders(header)
 
 	logEvent.
 		Str("request_id", requestID).
@@ -87,13 +96,13 @@ func writeLogResponse(c echo.Context, body any, elapsedTime time.Duration) {
 		Str("uri", req.RequestURI).
 		Str("elapsed_time", fmt.Sprintf("%dms", elapsedTime.Milliseconds())).
 		Int("status_code", res.Status).
-		Any("body", maskJSONBody(body)).
+		Any("body", m.maskJSONBody(body)).
 		Any("headers", header).
 		Msg("HTTP Response")
 }
 
-func maskJSONBody(body any) any {
-	fieldsToMask := []string{
+func (m *Log) maskJSONBody(body any) any {
+	fieldToMaskList := []string{
 		"password",
 		"token",
 		"access_token",
@@ -103,19 +112,19 @@ func maskJSONBody(body any) any {
 	switch typedBody := body.(type) {
 	case []any:
 		for i, item := range typedBody {
-			typedBody[i] = maskJSONBody(item)
+			typedBody[i] = m.maskJSONBody(item)
 		}
 
 		return typedBody
 	case map[string]any:
 		for key, value := range typedBody {
-			isShouldMask := helpers.SliceIsIn(fieldsToMask, key)
+			isShouldMask := slices.Contains(fieldToMaskList, key)
 			if _, ok := value.(string); ok && isShouldMask {
-				typedBody[key] = constants.MaskedValue
+				typedBody[key] = MaskedValue
 				continue
 			}
 
-			typedBody[key] = maskJSONBody(value)
+			typedBody[key] = m.maskJSONBody(value)
 		}
 
 		return typedBody
@@ -124,47 +133,61 @@ func maskJSONBody(body any) any {
 	}
 }
 
-func maskHeaders(header http.Header) {
-	maskCookies(header)
-	maskAuthorization(header)
+func (m *Log) maskHeaders(header http.Header) {
+	m.maskCookies(header)
+	m.maskAuthorization(header)
 }
 
-func maskCookies(header http.Header) {
-	cookieFields := []string{
-		"refresh_token",
-	}
+func (m *Log) maskCookies(header http.Header) {
+	var (
+		matchRegexFmt = `%s=[a-zA-Z0-9._-]+`
+		headerKeyList = []string{
+			echo.HeaderSetCookie,
+			echo.HeaderCookie,
+		}
+		fieldList = []string{
+			"refresh_token",
+		}
+	)
 
-	for mapKey, mapValue := range header {
-		for arrayIndex, arrayValue := range mapValue {
-			for _, field := range cookieFields {
-				regex, err := regexp.Compile(fmt.Sprintf(`%s=[a-zA-Z0-9._-]+`, field))
+	for _, key := range headerKeyList {
+		for idx, value := range header[key] {
+			for _, field := range fieldList {
+				regex, err := regexp.Compile(fmt.Sprintf(matchRegexFmt, field))
 				if err != nil {
 					continue
 				}
 
-				header[mapKey][arrayIndex] = regex.ReplaceAllString(arrayValue, fmt.Sprintf("%s=%s", field, constants.MaskedValue))
+				header[key][idx] = regex.ReplaceAllString(
+					value,
+					fmt.Sprintf(
+						"%s=%s",
+						field,
+						MaskedValue,
+					),
+				)
 			}
 		}
 	}
 }
 
-func maskAuthorization(header http.Header) {
-	authorization := header.Get("Authorization")
+func (m *Log) maskAuthorization(header http.Header) {
+	authorization := header.Get(echo.HeaderAuthorization)
 	if !strings.HasPrefix(authorization, "Bearer ") {
 		return
 	}
 
-	header.Set("Authorization", fmt.Sprintf("Bearer %s", constants.MaskedValue))
+	header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %s", MaskedValue))
 }
 
-func unmarshalAnyOrNil(jsonValue []byte) (value any) {
+func (m *Log) unmarshalAnyOrNil(jsonValue []byte) (value any) {
 	if err := json.Unmarshal(jsonValue, &value); err != nil {
 		value = nil
 	}
 	return
 }
 
-func getTraceableErrorAsAny(c echo.Context) any {
+func (m *Log) getTraceableErrorAsAnyOrNil(c echo.Context) any {
 	ctx := c.Request().Context()
 	value := ctx.Value(constants.CtxKeyHTTPTraceableError)
 	if value == nil {
@@ -181,5 +204,5 @@ func getTraceableErrorAsAny(c echo.Context) any {
 		return nil
 	}
 
-	return unmarshalAnyOrNil(marshaledError)
+	return m.unmarshalAnyOrNil(marshaledError)
 }

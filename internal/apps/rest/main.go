@@ -57,7 +57,10 @@ func StartServer(container *di.Container) (err error) {
 			helpers.EchoAddContextValue(c, constants.CtxKeyRequestID, rid)
 		},
 	}))
-	app.Use(middlewares.Log)
+	app.Use(middlewares.NewLog().Handle)
+
+	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
+	app.JSONSerializer = middlewares.NewErrorGuardJSONSerializer(app)
 
 	// Override error handler middleware
 	if err = registerRouters(app, container); err != nil {
@@ -67,9 +70,6 @@ func StartServer(container *di.Container) (err error) {
 	if config.Environment != constants.EnvProduction {
 		app.GET("/rest-swagger/*", echo_swagger.WrapHandler)
 	}
-
-	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
-	app.JSONSerializer = middlewares.NewErrorGuardJSONSerializer(app)
 
 	err = app.Start(fmt.Sprintf(":%d", config.Port))
 	return
