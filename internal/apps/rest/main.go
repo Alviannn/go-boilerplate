@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	controllers_rest "go-boilerplate/internal/apps/rest/controllers"
 	"go-boilerplate/internal/apps/rest/middlewares"
@@ -11,6 +10,7 @@ import (
 	"go-boilerplate/internal/services"
 	"go-boilerplate/pkg/databases"
 	"go-boilerplate/pkg/dependencies"
+	"go-boilerplate/pkg/helpers"
 
 	"github.com/defval/di"
 	"github.com/labstack/echo/v4"
@@ -54,13 +54,7 @@ func StartServer(container *di.Container) (err error) {
 	app.Pre(echo_middlewares.RemoveTrailingSlash())
 	app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
 		RequestIDHandler: func(c echo.Context, rid string) {
-			req := c.Request()
-			ctx := req.Context()
-
-			newCtx := context.WithValue(ctx, constants.CtxKeyRequestID, rid)
-			newReq := req.WithContext(newCtx)
-
-			c.SetRequest(newReq)
+			helpers.EchoAddContextValue(c, constants.CtxKeyRequestID, rid)
 		},
 	}))
 	app.Use(middlewares.Log)

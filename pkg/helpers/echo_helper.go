@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"context"
+	"go-boilerplate/internal/constants"
 	"go-boilerplate/pkg/customerror"
 	"net/http"
 
@@ -15,4 +17,14 @@ func EchoDefaultBind(c echo.Context, param any) (err error) {
 			WithMessage("Failed to bind parameters")
 	}
 	return
+}
+
+func EchoAddContextValue(c echo.Context, key constants.ContextKey, value any) {
+	req := c.Request()
+	ctx := req.Context()
+
+	newCtx := context.WithValue(ctx, key, value)
+	newReq := req.WithContext(newCtx)
+
+	c.SetRequest(newReq)
 }

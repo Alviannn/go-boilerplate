@@ -1,10 +1,10 @@
 package middlewares
 
 import (
-	"context"
 	"go-boilerplate/internal/configs"
 	"go-boilerplate/internal/constants"
 	"go-boilerplate/pkg/customerror"
+	"go-boilerplate/pkg/helpers"
 
 	"github.com/labstack/echo/v4"
 )
@@ -28,15 +28,9 @@ func NewErrorGuardJSONSerializer(app *echo.Echo) echo.JSONSerializer {
 
 func (t *ErrorGuardJSONSerializer) Serialize(c echo.Context, i interface{}, indent string) error {
 	if customErrorJSON, ok := i.(customerror.ErrorJSON); ok {
-		req := c.Request()
-		ctx := req.Context()
-
 		// Store original error in `context` so it can log
 		// with stack trace in the logger middleware.
-		newCtx := context.WithValue(ctx, constants.CtxKeyHTTPTraceableError, customErrorJSON)
-		newReq := req.WithContext(newCtx)
-
-		c.SetRequest(newReq)
+		helpers.EchoAddContextValue(c, constants.CtxKeyHTTPTraceableError, customErrorJSON)
 
 		// Prevent the error stack trace from being shown in HTTP response.
 		if configs.Default().Environment == constants.EnvProduction {
