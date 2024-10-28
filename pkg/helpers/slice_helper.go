@@ -1,16 +1,19 @@
 package helpers
 
-func SliceIsInWithFunc[T comparable](slice []T, itemToFind T, matchFunc func(expected T, actual T) bool) bool {
-	for _, item := range slice {
-		if matchFunc(itemToFind, item) {
-			return true
-		}
+import "slices"
+
+type SliceMatchFunc[T comparable] func(current T) bool
+
+func SliceFindFunc[T comparable](slice []T, matchFunc SliceMatchFunc[T]) *T {
+	idx := slices.IndexFunc(slice, matchFunc)
+	if idx == -1 {
+		return nil
 	}
-	return false
+	return &slice[idx]
 }
 
-func SliceIsIn[T comparable](slice []T, itemToFind T) bool {
-	return SliceIsInWithFunc(slice, itemToFind, func(expected T, actual T) bool {
-		return expected == actual
+func SliceFind[T comparable](slice []T, itemToFind T) *T {
+	return SliceFindFunc(slice, func(actual T) bool {
+		return itemToFind == actual
 	})
 }

@@ -10,28 +10,34 @@ type SliceHelperTestSuite struct {
 	suite.Suite
 }
 
-func (s *SliceHelperTestSuite) TestSliceIsIn() {
+func (s *SliceHelperTestSuite) TestSliceFind() {
 	var (
 		intList = []int{1, 2, 3}
 		strList = []string{"a", "b", "c"}
 	)
 
-	s.Run("int (pass): slice contains item", func() {
-		s.True(SliceIsIn(intList, 1))
+	s.Run("int (pass): found item in slice", func() {
+		ptr := SliceFind(intList, 1)
+		s.NotNil(ptr)
+		s.Equal(1, *ptr)
 	})
 	s.Run("int (fail): slice does not contain item", func() {
-		s.False(SliceIsIn(intList, 4))
+		ptr := SliceFind(intList, 4)
+		s.Nil(ptr)
 	})
 
 	s.Run("string (pass): slice contains item", func() {
-		s.True(SliceIsIn(strList, "a"))
+		ptr := SliceFind(strList, "b")
+		s.NotNil(ptr)
+		s.Equal("b", *ptr)
 	})
 	s.Run("string (fail): slice does not contain item", func() {
-		s.False(SliceIsIn(strList, "d"))
+		ptr := SliceFind(strList, "d")
+		s.Nil(ptr)
 	})
 }
 
-func (s *SliceHelperTestSuite) TestSliceIsInWithFunc() {
+func (s *SliceHelperTestSuite) TestSliceFindFunc() {
 	type person struct {
 		Name string
 		Age  int
@@ -53,23 +59,20 @@ func (s *SliceHelperTestSuite) TestSliceIsInWithFunc() {
 	}
 
 	s.Run("person (pass): when finding by name", func() {
-		toFind := person{
-			Name: "John",
-			Age:  30,
-		}
-		s.True(SliceIsInWithFunc(personList, toFind, func(expected person, actual person) bool {
-			return expected.Name == actual.Name
-		}))
+		nameToFind := "John"
+		ptr := SliceFindFunc(personList, func(current person) bool {
+			return current.Name == nameToFind
+		})
+		s.NotNil(ptr)
+		s.Equal(nameToFind, ptr.Name)
 	})
 
 	s.Run("person (fail): when finding by name", func() {
-		toFind := person{
-			Name: "Dave",
-			Age:  25,
-		}
-		s.False(SliceIsInWithFunc(personList, toFind, func(expected person, actual person) bool {
-			return expected.Name == actual.Name
-		}))
+		nameToFind := "Dave"
+		ptr := SliceFindFunc(personList, func(current person) bool {
+			return current.Name == nameToFind
+		})
+		s.Nil(ptr)
 	})
 }
 
