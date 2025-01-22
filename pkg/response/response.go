@@ -14,7 +14,7 @@ var (
 type (
 	Builder struct {
 		Data        any
-		Error       error
+		Error       *customerror.Error
 		SuccessCode int
 	}
 
@@ -43,19 +43,15 @@ func (b *Builder) WithSuccessCode(statusCode int) *Builder {
 	return b
 }
 
-func (b *Builder) sanitizeError(err error) *customerror.Error {
-	if err == nil {
-		return nil
-	}
-	if customError, ok := err.(*customerror.Error); ok {
-		return customError
-	}
-
-	return customerror.New().WithSourceError(err)
-}
-
 func (b *Builder) WithError(err error) *Builder {
-	b.Error = b.sanitizeError(err)
+	if err == nil {
+		return b
+	}
+	if customErr, ok := err.(*customerror.Error); ok {
+		b.Error = customErr
+	} else {
+		b.Error = customerror.New().WithSourceError(err)
+	}
 	return b
 }
 
@@ -68,44 +64,32 @@ func (b *Builder) WithError(err error) *Builder {
 // Anything that's not a slice or struct or `nil` value
 // will become the default zero value of the type,
 // ex: empty string stays as "".
-func (b *Builder) sanitizeData(data any) (newData any) {
+func (b *Builder) sanitizeData(data any) any {
 	if data == nil {
-		newData = emptyMap
-		return
+		return emptyMap
 	}
 
-	var (
-		dataReflect         = reflect.ValueOf(data)
-		dataKind            = dataReflect.Kind()
-		isDataStructOrSlice = (dataKind == reflect.Struct || dataKind == reflect.Slice)
-	)
-
-	if !isDataStructOrSlice {
-		newData = data
-		return
+	dataRef := reflect.ValueOf(data)
+	if !dataRef.IsZero() {
+		return data
 	}
 
-	if dataReflect.IsZero() {
-		if dataKind == reflect.Struct {
-			newData = emptyMap
-		} else {
-			newData = emptySlice
-		}
-		return
+	switch dataRef.Kind() {
+	case reflect.Struct:
+		return emptyMap
+	case reflect.Slice, reflect.Array:
+		return emptySlice
 	}
-
-	newData = data
-	return
+	return data
 }
 
 func (b *Builder) Build() (res Response) {
 	res.Data = b.sanitizeData(b.Data)
 	res.StatusCode = b.SuccessCode
 
-	if customErr := b.sanitizeError(b.Error); customErr != nil {
-		res.Data = customErr.ToJSON()
-		res.StatusCode = customErr.Code
+	if err := b.Error; err != nil {
+		res.Data = err.ToJSON()
+		res.StatusCode = err.Code
 	}
-
 	return
 }
