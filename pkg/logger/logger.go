@@ -1,26 +1,34 @@
 package logger
 
 import (
+	"errors"
+	"fmt"
 	"go-boilerplate/internal/configs"
 	"go-boilerplate/internal/constants"
 	"go-boilerplate/pkg/customerror"
 	"io"
 	"os"
+	"path"
+	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-func SetupLogger() error {
-	os.Mkdir("logs", os.ModePerm)
+func Setup() error {
+	var (
+		logsDir       = "./logs"
+		config        = configs.Default()
+		consoleWriter = io.Writer(os.Stdout)
+	)
+
+	mkdirErr := os.Mkdir(logsDir, os.ModePerm).(*os.PathError)
+	if mkdirErr != nil && !errors.Is(mkdirErr.Err, os.ErrExist) {
+		return mkdirErr
+	}
 
 	zerolog.ErrorMarshalFunc = errorMarshaller
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-
-	var (
-		consoleWriter io.Writer = os.Stdout
-		config                  = configs.Default()
-	)
 
 	// When running in local environment (or basically not in production)
 	// we'll enable debugging and pretty print logging.
@@ -32,7 +40,10 @@ func SetupLogger() error {
 		}
 	}
 
-	rotateFileWriter, err := NewRotateFileWriter("./logs/{date}.log")
+	rotateFileWriter, err := NewRotateFileWriter(func() string {
+		fileName := fmt.Sprintf("%s.log", time.Now().Format("2006-01-02"))
+		return path.Join(logsDir, fileName)
+	})
 	if err != nil {
 		return err
 	}
@@ -47,6 +58,5 @@ func errorMarshaller(err error) any {
 	if !ok {
 		return err
 	}
-
 	return customError.ToJSON()
 }

@@ -2,65 +2,57 @@ package logger
 
 import (
 	"os"
-	"strings"
-	"time"
 )
 
-type RotateFileWriter struct {
-	filenameWithFormat string
-	currentFilePath    string
-
-	fileWriter *os.File
-}
-
-func NewRotateFileWriter(filenameWithFormat string) (writer *RotateFileWriter, err error) {
-	writer = &RotateFileWriter{
-		filenameWithFormat: filenameWithFormat,
+type (
+	RotateFileWriter struct {
+		currentFilePath  string
+		nextFilePathFunc NextFilePathFunc
+		writer           *os.File
 	}
 
-	err = writer.rotateFile()
+	NextFilePathFunc func() string
+)
+
+func NewRotateFileWriter(nextFunc NextFilePathFunc) (writer *RotateFileWriter, err error) {
+	writer = &RotateFileWriter{}
+	err = writer.rotateFile(writer.nextFilePathFunc())
 	return
 }
 
-func (w *RotateFileWriter) getExpectedFilePath() string {
-	currentDate := time.Now().Format(time.DateOnly)
-	return strings.ReplaceAll(w.filenameWithFormat, "{date}", currentDate)
-}
-
-func (w *RotateFileWriter) rotateFile() (err error) {
-	// Close the old (or previous) file writer if there were any.
+func (w *RotateFileWriter) rotateFile(nextFilePath string) (err error) {
+	// Closes previous file writer if there were any.
 	if err = w.Close(); err != nil {
 		return
 	}
 
-	expectedFilePath := w.getExpectedFilePath()
-	fileWriter, err := os.OpenFile(expectedFilePath, os.O_WRONLY|os.O_APPEND|os.O_CREATE, os.ModePerm)
+	fileWriter, err := os.OpenFile(nextFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
 	if err != nil {
 		return
 	}
 
-	w.fileWriter = fileWriter
+	w.writer = fileWriter
+	w.currentFilePath = nextFilePath
 	return
 }
 
 func (w *RotateFileWriter) Write(p []byte) (n int, err error) {
-	if w.currentFilePath != w.getExpectedFilePath() {
-		if err = w.rotateFile(); err != nil {
+	if nextFilePath := w.nextFilePathFunc(); w.currentFilePath != nextFilePath {
+		if err = w.rotateFile(nextFilePath); err != nil {
 			return
 		}
 	}
-
-	return w.fileWriter.Write(p)
+	return w.writer.Write(p)
 }
 
 func (w *RotateFileWriter) Close() (err error) {
-	if w.fileWriter == nil {
+	if w.writer == nil {
 		return
 	}
 
-	if err = w.fileWriter.Close(); err != nil {
-		w.fileWriter = nil
+	err = w.writer.Close()
+	if err == nil {
+		w.writer = nil
 	}
-
-	return err
+	return
 }

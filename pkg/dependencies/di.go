@@ -10,7 +10,7 @@ import (
 
 // New creates a new DI (dependency injection) container.
 func New(extraDeps ...di.Option) (container *di.Container, err error) {
-	if err = logger.SetupLogger(); err != nil {
+	if err = logger.Setup(); err != nil {
 		return
 	}
 
