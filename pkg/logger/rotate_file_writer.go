@@ -15,7 +15,9 @@ type (
 )
 
 func NewRotateFileWriter(nextFunc NextFilePathFunc) (writer *RotateFileWriter, err error) {
-	writer = &RotateFileWriter{}
+	writer = &RotateFileWriter{
+		nextFilePathFunc: nextFunc,
+	}
 	err = writer.rotateFile(writer.nextFilePathFunc())
 	return
 }
