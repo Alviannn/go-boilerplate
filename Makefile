@@ -45,17 +45,18 @@ clean: ## Cleans the build directory by removing all binary files.
 
 .PHONY: docs-fmt
 docs-fmt: ## Format the swagger annotations within the codebase.
+	command -v swag >/dev/null 2>&1 || go install github.com/swaggo/swag/cmd/swag@latest
 	swag fmt -d $(SOURCE_REST_PATH)
 
 .PHONY: docs-gen
 docs-gen: docs-fmt ## Generate swagger API documentation for this app.
 	mkdir -p $(SOURCE_REST_PATH)/docs
 	swag init -d\
-	 $(SOURCE_REST_PATH),\
+		$(SOURCE_REST_PATH),\
 	$(shell find $(SOURCE_MODELS_PATH)/* -type d | tr '\n' ',' | sed 's/,$$//'),\
 	$(SOURCE_DTOS_PATH),\
 	$(PKG_CUSTOM_ERROR_PATH)\
-	 -o $(SOURCE_REST_PATH)/docs
+		-o $(SOURCE_REST_PATH)/docs
 
 # --------------------------------------v REST API v-------------------------------------- #
 
@@ -79,6 +80,7 @@ start-rest-prod: ## Starts REST API app from 'build' directory for production.
 
 .PHONY: start-rest-dev
 start-rest-dev: ## Starts REST API app with 'air' to allow live/hot reloading as you edit the code.
+	command -v air >/dev/null 2>&1 || go install github.com/air-verse/air@latest
 	ENVIRONMENT=development air -c ./.air.rest.toml
 
 # --------------------------------------v DB MIGRATIONS v-------------------------------------- #
