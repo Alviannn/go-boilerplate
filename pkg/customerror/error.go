@@ -45,6 +45,9 @@ type Error struct {
 	//
 	// It defaults to `http.StatusInternalServerError` or 500.
 	Code int
+
+	// IsPanic is a flag that indicates whether the error is a panic.
+	IsPanic bool
 }
 
 type ErrorJSON struct {
@@ -58,6 +61,7 @@ func New() *Error {
 	customError := &Error{
 		Message: "Unhandled error",
 		Code:    http.StatusInternalServerError,
+		IsPanic: false,
 	}
 	customError.thisError = tracerr.Wrap(customError)
 
@@ -92,6 +96,11 @@ func (e *Error) WithSourceError(err error) *Error {
 	}
 
 	e.SourceError = err
+	return e
+}
+
+func (e *Error) WithPanic(isPanic bool) *Error {
+	e.IsPanic = isPanic
 	return e
 }
 

@@ -14,7 +14,13 @@ func CustomErrorHandler() echo.HTTPErrorHandler {
 			return
 		}
 
-		customErr := customerror.New().WithSourceError(err)
+		var customErr *customerror.Error
+		if tmpErr, ok := err.(*customerror.Error); ok && tmpErr.IsPanic {
+			customErr = tmpErr
+		} else {
+			customErr = customerror.New().WithSourceError(err)
+		}
+
 		log.Error().Err(customErr).Msg(customErr.Message)
 
 		res := response.NewBuilder().

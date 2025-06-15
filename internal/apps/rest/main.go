@@ -8,6 +8,7 @@ import (
 	"go-boilerplate/internal/constants"
 	"go-boilerplate/internal/repositories"
 	"go-boilerplate/internal/services"
+	"go-boilerplate/pkg/customerror"
 	"go-boilerplate/pkg/databases"
 	"go-boilerplate/pkg/dependencies"
 	"go-boilerplate/pkg/helpers"
@@ -46,6 +47,16 @@ func StartServer(container *di.Container) (err error) {
 
 	app := echo.New()
 	config := configs.Default()
+
+	app.Use(echo_middlewares.RecoverWithConfig(echo_middlewares.RecoverConfig{
+		LogErrorFunc: func(c echo.Context, err error, stack []byte) error {
+			err = customerror.New().
+				WithPanic(true).
+				WithSourceError(err).
+				WithMessage("PANIC: Unhandled error")
+			return err
+		},
+	}))
 
 	app.Use(echo_middlewares.Secure())
 	app.Use(echo_middlewares.CORSWithConfig(echo_middlewares.CORSConfig{
