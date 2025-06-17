@@ -41,7 +41,7 @@ func Setup() error {
 	}
 
 	rotateFileWriter, err := NewRotateFileWriter(func() string {
-		fileName := fmt.Sprintf("%s.log", time.Now().Format("2006-01-02"))
+		fileName := fmt.Sprintf("%s.log", time.Now().Format(time.DateOnly))
 		return path.Join(logsDir, fileName)
 	})
 	if err != nil {
