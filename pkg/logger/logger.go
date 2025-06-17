@@ -22,9 +22,8 @@ func Setup() error {
 		consoleWriter = io.Writer(os.Stdout)
 	)
 
-	mkdirErr := os.Mkdir(logsDir, os.ModePerm).(*os.PathError)
-	if mkdirErr != nil && !errors.Is(mkdirErr.Err, os.ErrExist) {
-		return mkdirErr
+	if err := os.Mkdir(logsDir, os.ModePerm); err != nil && !errors.Is(err, os.ErrExist) {
+		return err
 	}
 
 	zerolog.ErrorMarshalFunc = errorMarshaller
