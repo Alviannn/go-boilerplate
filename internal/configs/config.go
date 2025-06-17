@@ -9,11 +9,11 @@ import (
 )
 
 type Config struct {
-	Port               int                `env:"PORT"`
+	Port               int                `env:"PORT" validate:"required"`
 	Environment        constants.EnvValue `env:"ENVIRONMENT" validate:"oneof=production development"`
 	CORSAllowedOrigins []string           `env:"CORS_ALLOWED_ORIGINS" envSeparator:","`
 
-	MySQL MySQLConfig
+	MySQL MySQLConfig `validate:"required"`
 }
 
 var defaultConfig Config
