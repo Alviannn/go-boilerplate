@@ -12,9 +12,15 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+const (
+	GormMySQLURLFmt    = "%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=UTC"
+	DbmateMySQLURLFmt  = "mysql://%s:%s@%s:%s/%s"
+	DbmateMigrationDir = "./migrations"
+)
+
 func NewMySQLDB() (db *gorm.DB, err error) {
 	mysqlConfig := configs.Default().MySQL
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=UTC",
+	dsn := fmt.Sprintf(GormMySQLURLFmt,
 		mysqlConfig.Username,
 		mysqlConfig.Password,
 		mysqlConfig.Host,
@@ -29,7 +35,7 @@ func NewMySQLDB() (db *gorm.DB, err error) {
 
 func MigrateMySQL() (err error) {
 	mysqlConfig := configs.Default().MySQL
-	rawDBUrl := fmt.Sprintf("mysql://%s:%s@%s:%s/%s",
+	rawDBUrl := fmt.Sprintf(DbmateMySQLURLFmt,
 		mysqlConfig.Username,
 		url.QueryEscape(mysqlConfig.Password),
 		mysqlConfig.Host,
@@ -43,7 +49,7 @@ func MigrateMySQL() (err error) {
 	}
 
 	db := dbmate.New(dbUrl)
-	db.MigrationsDir = []string{"./migrations"}
+	db.MigrationsDir = []string{DbmateMigrationDir}
 	db.AutoDumpSchema = false
 	db.Verbose = false
 

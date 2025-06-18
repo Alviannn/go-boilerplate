@@ -1,5 +1,3 @@
-include .env
-
 APP_NAME := go-boilerplate
 
 SOURCE_PATH           := ./internal
@@ -8,12 +6,7 @@ SOURCE_MODELS_PATH    := $(SOURCE_PATH)/models
 SOURCE_REST_PATH      := $(SOURCE_PATH)/apps/rest
 PKG_CUSTOM_ERROR_PATH := ./pkg/customerror
 
-CREATE_DOMAIN_CMD := go run ./cmd/create-domain/internal/main.go
-MIGRATION_CMD     := go run ./cmd/migrations/internal/main.go
-
-DBMATE_URL                 := mysql://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)
-DBMATE_CMD_PREFIX          := dbmate --migrations-dir './migrations' --no-dump-schema
-DBMATE_CMD_WITH_URL_PREFIX := $(DBMATE_CMD_PREFIX) --url $(DBMATE_URL)
+MIGRATION_CMD := go run ./cmd/migration/main.go
 
 TEST_PATH_LIST            := ./pkg/...
 TEST_COVERAGE_OUTPUT_FILE := test-coverage.out
@@ -87,19 +80,19 @@ start-rest-dev: ## Starts REST API app with 'air' to allow live/hot reloading as
 
 .PHONY: migration-new
 migration-new: ## Create a new migration file (ex, migration-new name=create_accounts_table).
-	$(DBMATE_CMD_PREFIX) new $(name)
+	$(MIGRATION_CMD) -action=new -name=$(name)
 
 .PHONY: migration-status
 migration-status: ## Show the migration status.
-	$(DBMATE_CMD_WITH_URL_PREFIX) status
+	$(MIGRATION_CMD) -action=status
 
 .PHONY: migration-up
 migration-up: ## Execute all migration files.
-	$(DBMATE_CMD_WITH_URL_PREFIX) up
+	$(MIGRATION_CMD) -action=up
 
 .PHONY: migration-down
 migration-down: ## Rollback 1 migration.
-	$(DBMATE_CMD_WITH_URL_PREFIX) down
+	$(MIGRATION_CMD) -action=down
 
 # --------------------------------------v TEST v-------------------------------------- #
 
