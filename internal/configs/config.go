@@ -1,7 +1,10 @@
 package configs
 
 import (
+	"encoding/json"
+	"errors"
 	"go-boilerplate/internal/constants"
+	"go-boilerplate/pkg/customerror"
 	"go-boilerplate/pkg/customvalidator"
 
 	"github.com/caarlos0/env/v11"
@@ -26,8 +29,16 @@ func Load() (err error) {
 		return
 	}
 
-	validator := customvalidator.New()
-	err = validator.Validate(&defaultConfig)
+	if err = customvalidator.New().Validate(&defaultConfig); err != nil {
+		customErr := customerror.New().
+			WithSourceError(err).
+			WithMessage("Failed to validate config")
+
+		errJson, _ := json.Marshal(customErr.ToJSON())
+		err = errors.New(string(errJson))
+		return
+	}
+
 	return
 }
 
