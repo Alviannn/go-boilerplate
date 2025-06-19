@@ -21,9 +21,14 @@ func NewAccounts(db *gorm.DB) Accounts {
 	}
 }
 
+func (r *accounts) TableName() string {
+	return "accounts"
+}
+
 func (r *accounts) GetByID(ctx context.Context, accountID int64) (account models_mysql.Account, err error) {
 	query := getDB(ctx, r.DB).
 		WithContext(ctx).
+		Table(r.TableName()).
 		Limit(1).
 		Where("id = ?", accountID)
 
@@ -44,7 +49,9 @@ func (r *accounts) GetByID(ctx context.Context, accountID int64) (account models
 }
 
 func (r *accounts) GetAll(ctx context.Context, params dtos.AccountGetAllReq) (accounts []models_mysql.Account, err error) {
-	query := getDB(ctx, r.DB).WithContext(ctx)
+	query := getDB(ctx, r.DB).
+		WithContext(ctx).
+		Table(r.TableName())
 
 	if params.Email != "" {
 		query = query.Where("email = ?", params.Email)
@@ -98,6 +105,7 @@ func (r *accounts) ExistByEmail(ctx context.Context, email string) (exist bool, 
 
 	query := getDB(ctx, r.DB).
 		WithContext(ctx).
+		Table(r.TableName()).
 		Select("id").
 		Where("email = ?", email).
 		Limit(1)
