@@ -33,7 +33,7 @@ func (s *accounts) GetByID(ctx context.Context, param dtos.AccountGetReq) (accou
 		err = customerror.New().
 			WithSourceError(err).
 			WithCode(http.StatusBadRequest).
-			WithMessage("Failed to validate request")
+			WithMessage(constants.ErrFailedValidation)
 		return
 	}
 
@@ -51,7 +51,7 @@ func (s *accounts) Register(ctx context.Context, param dtos.AccountRegisterReq) 
 		err = customerror.New().
 			WithSourceError(err).
 			WithCode(http.StatusBadRequest).
-			WithMessage("Failed to validate request")
+			WithMessage(constants.ErrFailedValidation)
 		return
 	}
 

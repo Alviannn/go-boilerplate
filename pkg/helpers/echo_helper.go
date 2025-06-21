@@ -14,7 +14,7 @@ func EchoDefaultBind(c echo.Context, param any) (err error) {
 		err = customerror.New().
 			WithCode(http.StatusBadRequest).
 			WithSourceError(err).
-			WithMessage("Failed to bind parameters")
+			WithMessage(constants.ErrFailedBind)
 	}
 	return
 }
