@@ -17,3 +17,11 @@ func SliceFind[T comparable](slice []T, itemToFind T) *T {
 		return itemToFind == actual
 	})
 }
+
+func SliceMap[A comparable, B any](slice []A, mapFunc func(A) B) (newList []B) {
+	newList = make([]B, len(slice))
+	for i, v := range slice {
+		newList[i] = mapFunc(v)
+	}
+	return
+}
