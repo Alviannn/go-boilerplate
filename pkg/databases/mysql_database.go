@@ -3,6 +3,7 @@ package databases
 import (
 	"fmt"
 	"go-boilerplate/internal/configs"
+	"go-boilerplate/internal/constants"
 	"net/url"
 
 	"github.com/amacneil/dbmate/v2/pkg/dbmate"
@@ -19,18 +20,30 @@ const (
 )
 
 func NewMySQLDB() (db *gorm.DB, err error) {
-	mysqlConfig := configs.Default().MySQL
-	dsn := fmt.Sprintf(GormMySQLURLFmt,
-		mysqlConfig.Username,
-		mysqlConfig.Password,
-		mysqlConfig.Host,
-		mysqlConfig.Port,
-		mysqlConfig.Name,
+	var (
+		cfg      = configs.Default()
+		mysqlCfg = cfg.MySQL
+
+		logLevel = logger.Warn
+		dsn      = fmt.Sprintf(GormMySQLURLFmt,
+			mysqlCfg.Username,
+			mysqlCfg.Password,
+			mysqlCfg.Host,
+			mysqlCfg.Port,
+			mysqlCfg.Name,
+		)
 	)
 
-	return gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Warn),
-	})
+	if cfg.Environment != constants.EnvProduction {
+		logLevel = logger.Info
+	}
+
+	return gorm.Open(
+		mysql.Open(dsn),
+		&gorm.Config{
+			Logger: logger.Default.LogMode(logLevel),
+		},
+	)
 }
 
 func MigrateMySQL() (err error) {
