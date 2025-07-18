@@ -58,11 +58,12 @@ func StartServer(container *di.Container) (err error) {
 		},
 	}))
 
+	app.Pre(echo_middlewares.RemoveTrailingSlash())
+
 	app.Use(echo_middlewares.Secure())
 	app.Use(echo_middlewares.CORSWithConfig(echo_middlewares.CORSConfig{
 		AllowOrigins: config.CORSAllowedOrigins,
 	}))
-	app.Pre(echo_middlewares.RemoveTrailingSlash())
 	app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
 		RequestIDHandler: func(c echo.Context, rid string) {
 			helpers.EchoAddContextValue(c, constants.CtxKeyRequestID, rid)

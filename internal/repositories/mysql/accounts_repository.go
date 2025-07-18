@@ -8,6 +8,7 @@ import (
 	"go-boilerplate/pkg/customerror"
 	"net/http"
 
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -37,6 +38,8 @@ func (r *accounts) GetByID(ctx context.Context, accountID int64) (account models
 			WithSourceError(err).
 			WithCode(http.StatusInternalServerError).
 			WithMessage("Failed to get account.")
+
+		log.Error().Ctx(ctx).Err(err).Send()
 		return
 	}
 	if !account.IsExist() {
@@ -75,6 +78,9 @@ func (r *accounts) GetAll(ctx context.Context, params dtos.AccountGetAllReq) (ac
 			WithSourceError(err).
 			WithCode(http.StatusInternalServerError).
 			WithMessage("Failed to get all accounts.")
+
+		log.Error().Ctx(ctx).Err(err).Send()
+		return
 	}
 	return
 }
@@ -96,6 +102,9 @@ func (r *accounts) Register(ctx context.Context, params dtos.AccountRegisterReq)
 			WithSourceError(err).
 			WithCode(http.StatusInternalServerError).
 			WithMessage("Failed to register new account.")
+
+		log.Error().Ctx(ctx).Err(err).Send()
+		return
 	}
 	return
 }
@@ -115,6 +124,8 @@ func (r *accounts) ExistByEmail(ctx context.Context, email string) (exist bool, 
 			WithSourceError(err).
 			WithCode(http.StatusInternalServerError).
 			WithMessage("Failed to check account existence.")
+
+		log.Error().Ctx(ctx).Err(err).Send()
 		return
 	}
 

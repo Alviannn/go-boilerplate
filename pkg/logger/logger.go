@@ -46,6 +46,7 @@ func Setup() error {
 		return err
 	}
 
+	log.Logger = log.Hook(&requestIDHook{})
 	log.Logger = log.Output(zerolog.MultiLevelWriter(
 		consoleWriter,
 		rotateFileWriter,

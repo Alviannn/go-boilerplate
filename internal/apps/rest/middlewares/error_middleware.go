@@ -21,7 +21,10 @@ func CustomErrorHandler() echo.HTTPErrorHandler {
 			customErr = customerror.New().WithSourceError(err)
 		}
 
-		log.Error().Err(customErr).Msg(customErr.Message)
+		log.Error().
+			Ctx(c.Request().Context()).
+			Err(customErr).
+			Msg(customErr.Message)
 
 		res := response.NewBuilder().
 			WithError(customErr).

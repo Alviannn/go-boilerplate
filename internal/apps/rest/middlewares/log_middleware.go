@@ -55,16 +55,14 @@ func (m *Log) Handle(next echo.HandlerFunc) echo.HandlerFunc {
 
 func (m *Log) writeLogRequest(c echo.Context, body any) {
 	var (
-		req       = c.Request()
-		header    = req.Header.Clone()
-		ctx       = req.Context()
-		requestID = fmt.Sprint(ctx.Value(constants.CtxKeyRequestID)) // Use `Sprint` just incase the request ID is `nil`.
+		req    = c.Request()
+		header = req.Header.Clone()
 	)
 
 	m.maskHeaders(header)
 
 	log.Info().
-		Str("request_id", requestID).
+		Ctx(req.Context()).
 		Str("method", req.Method).
 		Str("uri", req.RequestURI).
 		Any("body", m.maskJSONBody(body)).
@@ -77,10 +75,8 @@ func (m *Log) writeLogResponse(c echo.Context, body any, elapsedTime time.Durati
 		req    = c.Request()
 		res    = c.Response()
 		header = res.Header().Clone()
-		ctx    = req.Context()
 
-		isErrorResponse = (res.Status >= 400)
-		requestID       = fmt.Sprint(ctx.Value(constants.CtxKeyRequestID)) // Use `Sprint` just incase the request ID is `nil`.
+		isErrorResponse = (res.Status >= http.StatusBadRequest)
 	)
 
 	logEvent := log.Info()
@@ -91,7 +87,7 @@ func (m *Log) writeLogResponse(c echo.Context, body any, elapsedTime time.Durati
 	m.maskHeaders(header)
 
 	logEvent.
-		Str("request_id", requestID).
+		Ctx(req.Context()).
 		Str("method", req.Method).
 		Str("uri", req.RequestURI).
 		Str("elapsed_time", fmt.Sprintf("%dms", elapsedTime.Milliseconds())).

@@ -10,6 +10,7 @@ import (
 	"go-boilerplate/pkg/customvalidator"
 	"net/http"
 
+	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -38,11 +39,17 @@ func (s *accounts) GetByID(ctx context.Context, param dtos.AccountGetReq) (accou
 	}
 
 	account, err = s.MySQLRepo.GetByID(ctx, param.ID)
+	if err != nil {
+		return
+	}
 	return
 }
 
 func (s *accounts) GetAll(ctx context.Context, param dtos.AccountGetAllReq) (accounts []models_mysql.Account, err error) {
 	accounts, err = s.MySQLRepo.GetAll(ctx, param)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -66,22 +73,27 @@ func (s *accounts) Register(ctx context.Context, param dtos.AccountRegisterReq) 
 		return
 	}
 
-	param.Password, err = s.hashPassword(param.Password)
+	param.Password, err = s.hashPassword(ctx, param.Password)
 	if err != nil {
 		return
 	}
 
 	err = s.MySQLRepo.Register(ctx, param)
+	if err != nil {
+		return
+	}
 	return
 }
 
-func (s *accounts) hashPassword(password string) (hashed string, err error) {
+func (s *accounts) hashPassword(ctx context.Context, password string) (hashed string, err error) {
 	rawHashed, err := bcrypt.GenerateFromPassword([]byte(password), constants.DefaultHashCost)
 	if err != nil {
 		err = customerror.New().
 			WithSourceError(err).
-			WithMessage("Failed to hash password.").
-			WithCode(http.StatusBadRequest)
+			WithCode(http.StatusBadRequest).
+			WithMessage("Failed to hash password.")
+
+		log.Error().Ctx(ctx).Err(err).Send()
 		return
 	}
 
