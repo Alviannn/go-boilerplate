@@ -12,6 +12,7 @@ import (
 	"go-boilerplate/pkg/databases"
 	"go-boilerplate/pkg/dependencies"
 	"go-boilerplate/pkg/helpers"
+	"time"
 
 	"github.com/defval/di"
 	"github.com/labstack/echo/v4"
@@ -70,6 +71,7 @@ func StartServer(container *di.Container) (err error) {
 		},
 	}))
 	app.Use(middlewares.NewLog().Handle)
+	app.Use(middlewares.NewTimeout(30 * time.Second))
 
 	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
 	app.JSONSerializer = middlewares.NewErrorGuardJSONSerializer(app)

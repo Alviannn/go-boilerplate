@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"context"
+	"errors"
 	"go-boilerplate/pkg/customerror"
 	"go-boilerplate/pkg/response"
 
@@ -14,11 +16,13 @@ func CustomErrorHandler() echo.HTTPErrorHandler {
 			return
 		}
 
-		var customErr *customerror.Error
-		if tmpErr, ok := err.(*customerror.Error); ok && tmpErr.IsPanic {
-			customErr = tmpErr
-		} else {
-			customErr = customerror.New().WithSourceError(err)
+		customErr := customerror.New().WithSourceError(err)
+
+		if currentCustomErr, ok := err.(*customerror.Error); ok {
+			isOverrideError := currentCustomErr.IsPanic || errors.Is(currentCustomErr.GetWorkingError(), context.DeadlineExceeded)
+			if isOverrideError {
+				customErr = currentCustomErr
+			}
 		}
 
 		log.Error().
