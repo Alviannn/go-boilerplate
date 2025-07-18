@@ -17,12 +17,11 @@ import (
 
 func Setup() error {
 	var (
-		logsDir       = "./logs"
 		config        = configs.Default()
 		consoleWriter = io.Writer(os.Stdout)
 	)
 
-	if err := os.Mkdir(logsDir, os.ModePerm); err != nil && !errors.Is(err, os.ErrExist) {
+	if err := os.Mkdir(config.LogsDir, os.ModePerm); err != nil && !errors.Is(err, os.ErrExist) {
 		return err
 	}
 
@@ -41,14 +40,16 @@ func Setup() error {
 
 	rotateFileWriter, err := NewRotateFileWriter(func() string {
 		fileName := fmt.Sprintf("%s.log", time.Now().Format(time.DateOnly))
-		return path.Join(logsDir, fileName)
+		return path.Join(config.LogsDir, fileName)
 	})
 	if err != nil {
 		return err
 	}
 
-	multi := zerolog.MultiLevelWriter(consoleWriter, rotateFileWriter)
-	log.Logger = log.Output(multi)
+	log.Logger = log.Output(zerolog.MultiLevelWriter(
+		consoleWriter,
+		rotateFileWriter,
+	))
 	return nil
 }
 
