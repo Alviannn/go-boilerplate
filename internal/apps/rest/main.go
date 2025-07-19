@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	controllers_rest "go-boilerplate/internal/apps/rest/controllers"
+	"go-boilerplate/internal/apps/rest/docs"
 	"go-boilerplate/internal/apps/rest/middlewares"
 	"go-boilerplate/internal/configs"
 	"go-boilerplate/internal/constants"
@@ -18,7 +19,6 @@ import (
 	"github.com/labstack/echo/v4"
 	echo_middlewares "github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog/log"
-	echo_swagger "github.com/swaggo/echo-swagger"
 	"gorm.io/gorm"
 
 	_ "go-boilerplate/internal/apps/rest/docs"
@@ -81,9 +81,7 @@ func StartServer(container *di.Container) (err error) {
 		return
 	}
 
-	if config.Environment != constants.EnvProduction {
-		app.GET("/rest-swagger/*", echo_swagger.WrapHandler)
-	}
+	docs.RegisterSwagger(app)
 
 	err = app.Start(fmt.Sprintf(":%d", config.Port))
 	return
