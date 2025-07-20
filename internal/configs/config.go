@@ -31,8 +31,12 @@ func (c *Config) Validate() (err error) {
 var defaultConfig Config
 
 func Load() (err error) {
-	if err = godotenv.Load(); err != nil {
-		return
+	envFilePath := ".env"
+
+	if _, err = os.Stat(envFilePath); err == nil {
+		if err = godotenv.Load(envFilePath); err != nil {
+			return
+		}
 	}
 	if err = env.Parse(&defaultConfig); err != nil {
 		return
