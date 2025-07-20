@@ -1,0 +1,27 @@
+FROM golang:1.24.5-alpine3.22 AS builder
+
+RUN apk add make
+
+WORKDIR /app
+
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=bind,source=go.mod,target=go.mod \
+    --mount=type=bind,source=go.sum,target=go.sum \
+    go mod download -x
+
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=bind,source=.,target=. \
+    make build-rest-prod target=/bin/go-app
+
+FROM alpine:3.22
+
+WORKDIR /app
+
+COPY ./migrations ./migrations
+
+COPY --from=builder /bin/go-app .
+
+EXPOSE 5000
+
+CMD ["./go-app"]
