@@ -11,8 +11,7 @@ type Tx interface {
 }
 
 type Accounts interface {
-	GetByID(ctx context.Context, accountID int64) (account models_mysql.Account, err error)
+	Get(ctx context.Context, params models_mysql.AccountGetParam) (account models_mysql.Account, err error)
 	GetAll(ctx context.Context, params dtos.AccountGetAllReq) (accounts []models_mysql.Account, err error)
-	Register(ctx context.Context, params dtos.AccountRegisterReq) error
-	ExistByEmail(ctx context.Context, email string) (exist bool, err error)
+	Create(ctx context.Context, account *models_mysql.Account) (err error)
 }

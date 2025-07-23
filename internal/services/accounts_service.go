@@ -38,7 +38,9 @@ func (s *accounts) GetByID(ctx context.Context, param dtos.AccountGetReq) (accou
 		return
 	}
 
-	account, err = s.MySQLRepo.GetByID(ctx, param.ID)
+	account, err = s.MySQLRepo.Get(ctx, models_mysql.AccountGetParam{
+		ID: param.ID,
+	})
 	if err != nil {
 		return
 	}
@@ -62,23 +64,36 @@ func (s *accounts) Register(ctx context.Context, param dtos.AccountRegisterReq) 
 		return
 	}
 
-	isExist, err := s.MySQLRepo.ExistByEmail(ctx, param.Email)
-	if err != nil {
-		return
-	}
-	if isExist {
+	_, err = s.MySQLRepo.Get(ctx, models_mysql.AccountGetParam{
+		Email: param.Email,
+	})
+	if err == nil {
 		err = customerror.New().
+			WithSourceError(err).
 			WithCode(http.StatusConflict).
-			WithMessage("Account with this email already exists.")
+			WithMessage("Account with this email already exists")
 		return
 	}
-
-	param.Password, err = s.hashPassword(ctx, param.Password)
+	if customerror.EqualCode(err, http.StatusNotFound) {
+		err = nil
+	}
 	if err != nil {
 		return
 	}
 
-	err = s.MySQLRepo.Register(ctx, param)
+	hashedPassword, err := s.hashPassword(ctx, param.Password)
+	if err != nil {
+		return
+	}
+
+	account := models_mysql.Account{
+		Username: param.Username,
+		FullName: param.FullName,
+		Email:    param.Email,
+		Password: hashedPassword,
+	}
+
+	err = s.MySQLRepo.Create(ctx, &account)
 	if err != nil {
 		return
 	}
@@ -91,7 +106,7 @@ func (s *accounts) hashPassword(ctx context.Context, password string) (hashed st
 		err = customerror.New().
 			WithSourceError(err).
 			WithCode(http.StatusBadRequest).
-			WithMessage("Failed to hash password.")
+			WithMessage("Failed to hash password")
 
 		log.Error().Ctx(ctx).Err(err).Send()
 		return

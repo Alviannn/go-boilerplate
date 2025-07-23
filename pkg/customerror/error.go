@@ -57,6 +57,16 @@ type ErrorJSON struct {
 	Stack              []string `json:"stack,omitempty"`
 }
 
+func EqualCode(err error, code int) bool {
+	if err == nil {
+		return false
+	}
+	if customError, ok := err.(*Error); ok {
+		return customError.Code == code
+	}
+	return false
+}
+
 func New() *Error {
 	customError := &Error{
 		Message: "Unhandled error",
