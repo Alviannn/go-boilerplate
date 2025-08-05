@@ -18,7 +18,6 @@ func NewRotateFileWriter(nextFunc NextFilePathFunc) (writer *RotateFileWriter, e
 	writer = &RotateFileWriter{
 		nextFilePathFunc: nextFunc,
 	}
-	err = writer.rotateFile(writer.nextFilePathFunc())
 	return
 }
 
