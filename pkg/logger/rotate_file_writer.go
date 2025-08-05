@@ -14,11 +14,10 @@ type (
 	NextFilePathFunc func() string
 )
 
-func NewRotateFileWriter(nextFunc NextFilePathFunc) (writer *RotateFileWriter, err error) {
-	writer = &RotateFileWriter{
+func NewRotateFileWriter(nextFunc NextFilePathFunc) *RotateFileWriter {
+	return &RotateFileWriter{
 		nextFilePathFunc: nextFunc,
 	}
-	return
 }
 
 func (w *RotateFileWriter) rotateFile(nextFilePath string) (err error) {
