@@ -15,18 +15,5 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-  app:
-    container_name: go-boilerplate-app
-    build:
-      context: .
-      dockerfile: Dockerfile.rest
-    restart: on-failure
-    ports:
-      - 5000:5000
-    depends_on:
-      mariadb:
-        condition: service_healthy
-    env_file:
-      - .env
     volumes:
-      - ./logs:/app/logs
+      - ./db/mariadb:/var/lib/mysql

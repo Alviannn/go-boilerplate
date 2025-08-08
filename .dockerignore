@@ -1,2 +1,6 @@
+# env files
 .env
 .env.*
+
+# database storages
+db/

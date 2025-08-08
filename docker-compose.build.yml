@@ -1,0 +1,13 @@
+services:
+  app:
+    container_name: go-boilerplate-app
+    build:
+      context: .
+      dockerfile: Dockerfile.rest
+    restart: on-failure
+    ports:
+      - 5000:5000
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs

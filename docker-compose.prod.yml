@@ -1,0 +1,10 @@
+include:
+  - docker-compose.yml
+services:
+  app:
+    extends:
+      file: docker-compose.build.yml
+      service: app
+    depends_on:
+      mariadb:
+        condition: service_healthy
