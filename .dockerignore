@@ -3,4 +3,4 @@
 .env.*
 
 # database storages
-db/
+.db/

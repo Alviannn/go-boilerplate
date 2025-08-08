@@ -16,4 +16,4 @@ services:
       timeout: 5s
       retries: 3
     volumes:
-      - ./db/mariadb:/var/lib/mysql
+      - ./.db/mariadb:/var/lib/mysql
