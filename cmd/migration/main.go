@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"go-boilerplate/internal/configs"
 	"go-boilerplate/pkg/databases"
 	"net/url"
@@ -72,15 +71,11 @@ func getDB(isNeedConnection bool) (db *dbmate.DB, err error) {
 			return
 		}
 
-		rawMysqlUrl := fmt.Sprintf(databases.DbmateMySQLURLFmt,
-			configs.Default().MySQL.Username,
-			url.QueryEscape(configs.Default().MySQL.Password),
-			configs.Default().MySQL.Host,
-			configs.Default().MySQL.Port,
-			configs.Default().MySQL.Name,
+		var (
+			rawMysqlUrl = configs.Default().MySQL.ToDbmateURL()
+			mysqlUrl    *url.URL
 		)
 
-		var mysqlUrl *url.URL
 		mysqlUrl, err = url.Parse(rawMysqlUrl)
 		if err != nil {
 			return

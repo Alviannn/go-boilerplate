@@ -1,7 +1,6 @@
 package databases
 
 import (
-	"fmt"
 	"go-boilerplate/internal/configs"
 	"go-boilerplate/internal/constants"
 	"net/url"
@@ -10,52 +9,33 @@ import (
 	_ "github.com/amacneil/dbmate/v2/pkg/driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	gormLogger "gorm.io/gorm/logger"
 )
 
 const (
-	GormMySQLURLFmt    = "%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=UTC"
-	DbmateMySQLURLFmt  = "mysql://%s:%s@%s:%s/%s"
 	DbmateMigrationDir = "./migrations"
 )
 
 func NewMySQLDB() (db *gorm.DB, err error) {
 	var (
 		cfg      = configs.Default()
-		mysqlCfg = cfg.MySQL
-
-		logLevel = logger.Warn
-		dsn      = fmt.Sprintf(GormMySQLURLFmt,
-			mysqlCfg.Username,
-			mysqlCfg.Password,
-			mysqlCfg.Host,
-			mysqlCfg.Port,
-			mysqlCfg.Name,
-		)
+		logLevel = gormLogger.Warn
 	)
 
 	if cfg.Environment != constants.EnvProduction {
-		logLevel = logger.Info
+		logLevel = gormLogger.Info
 	}
 
 	return gorm.Open(
-		mysql.Open(dsn),
+		mysql.Open(cfg.MySQL.ToGormURL()),
 		&gorm.Config{
-			Logger: logger.Default.LogMode(logLevel),
+			Logger: gormLogger.Default.LogMode(logLevel),
 		},
 	)
 }
 
 func MigrateMySQL() (err error) {
-	mysqlConfig := configs.Default().MySQL
-	rawDBUrl := fmt.Sprintf(DbmateMySQLURLFmt,
-		mysqlConfig.Username,
-		url.QueryEscape(mysqlConfig.Password),
-		mysqlConfig.Host,
-		mysqlConfig.Port,
-		mysqlConfig.Name,
-	)
-
+	rawDBUrl := configs.Default().MySQL.ToDbmateURL()
 	dbUrl, err := url.Parse(rawDBUrl)
 	if err != nil {
 		return
