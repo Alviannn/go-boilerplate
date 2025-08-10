@@ -12,14 +12,20 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Config struct {
-	Port               int                `env:"PORT"`
-	Environment        constants.EnvValue `env:"ENVIRONMENT" validate:"oneof=production development"`
-	CORSAllowedOrigins []string           `env:"CORS_ALLOWED_ORIGINS" envSeparator:","`
-	LogsDir            string             `env:"LOGS_DIR" validate:"required"`
+type (
+	Config struct {
+		Port               int                `env:"PORT"`
+		Environment        constants.EnvValue `env:"ENVIRONMENT" validate:"oneof=production development"`
+		CORSAllowedOrigins []string           `env:"CORS_ALLOWED_ORIGINS" envSeparator:","`
+		LogsDir            string             `env:"LOGS_DIR" validate:"required"`
 
-	MySQL MySQLConfig `validate:"required"`
-}
+		MySQL MySQLConfig `validate:"required"`
+	}
+
+	LoadParam struct {
+		IsMock bool
+	}
+)
 
 func (c *Config) Validate() (err error) {
 	if c.Port == 0 {
@@ -28,9 +34,19 @@ func (c *Config) Validate() (err error) {
 	return
 }
 
-var defaultConfig Config
+var (
+	defaultConfig Config
+	mockConfig    *Config
+	isMock        bool
+)
 
-func Load() (err error) {
+func LoadWithConfig(param LoadParam) (err error) {
+	if param.IsMock {
+		isMock = true
+		mockConfig = &Config{}
+		return
+	}
+
 	envFilePath := ".env"
 
 	if _, err = os.Stat(envFilePath); err == nil {
@@ -55,6 +71,17 @@ func Load() (err error) {
 	return
 }
 
+func Load() (err error) {
+	return LoadWithConfig(LoadParam{})
+}
+
 func Default() Config {
+	if isMock {
+		return *mockConfig
+	}
 	return defaultConfig
+}
+
+func GetMocked() *Config {
+	return mockConfig
 }
