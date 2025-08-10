@@ -2,6 +2,7 @@ package logger
 
 import (
 	"os"
+	"sync"
 )
 
 type (
@@ -9,6 +10,7 @@ type (
 		currentFilePath  string
 		nextFilePathFunc NextFilePathFunc
 		writer           *os.File
+		mutex            sync.Mutex
 	}
 
 	NextFilePathFunc func() string
@@ -26,6 +28,9 @@ func (w *RotateFileWriter) rotateFile(nextFilePath string) (err error) {
 		return
 	}
 
+	w.mutex.Lock()
+	defer w.mutex.Unlock()
+
 	fileWriter, err := os.OpenFile(nextFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
 	if err != nil {
 		return
@@ -42,10 +47,17 @@ func (w *RotateFileWriter) Write(p []byte) (n int, err error) {
 			return
 		}
 	}
+
+	w.mutex.Lock()
+	defer w.mutex.Unlock()
+
 	return w.writer.Write(p)
 }
 
 func (w *RotateFileWriter) Close() (err error) {
+	w.mutex.Lock()
+	defer w.mutex.Unlock()
+
 	if w.writer == nil {
 		return
 	}
