@@ -1,6 +1,16 @@
+FROM golang:1.24.5-alpine3.22 AS dev
+
+WORKDIR /app
+
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk add --no-cache make
+
+ENTRYPOINT [ "make", "start-rest-dev" ]
+
 FROM golang:1.24.5-alpine3.22 AS builder
 
-RUN apk add make
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk add --update-cache make
 
 WORKDIR /app
 
@@ -14,7 +24,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=bind,source=.,target=. \
     make build-rest-prod target=/bin/go-app
 
-FROM alpine:3.22
+FROM alpine:3.22 AS prod
 
 WORKDIR /app
 
@@ -24,4 +34,4 @@ COPY --from=builder /bin/go-app .
 
 EXPOSE 5000
 
-CMD ["./go-app"]
+ENTRYPOINT [ "./go-app" ]

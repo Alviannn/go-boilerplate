@@ -1,0 +1,24 @@
+services:
+  mariadb:
+    extends:
+      file: docker-compose.db.yml
+      service: mariadb
+  app:
+    extends:
+      file: docker-compose.prod.yml
+      service: app
+    build:
+      target: dev
+    environment:
+      - ENVIRONMENT=development
+    volumes:
+      # Mount your local source code for live-reloading
+      - .:/app
+      # Mount a named volume for the Go module cache
+      - go-mod-cache:/go/pkg/mod
+      # Mount a named volume for the Go build cache
+      - go-build-cache:/root/.cache/go-build
+
+volumes:
+  go-mod-cache:
+  go-build-cache:

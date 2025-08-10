@@ -2,35 +2,30 @@ root = "."
 tmp_dir = "build"
 
 [build]
-  args_bin = []
-  bin = "./build/go-boilerplate-rest"
-  cmd = "make build-rest"
-  delay = 1000
-  rerun_delay = 800
-  kill_delay = 500
-  exclude_dir = ["tmp", "vendor", "cmd", "docs", "internal/apps/rest/docs"]
-  exclude_regex = ["_test\\.go"]
-  exclude_unchanged = true
-  include_dir = []
-  include_ext = ["go", "env"]
-  include_file = []
-  log = "build-errors.log"
-  send_interrupt = false
-  stop_on_error = true
+bin = "./build/go-boilerplate-rest"
+cmd = "make build-rest"
+delay = 1000
+rerun = true
+rerun_delay = 80000
+kill_delay = 500
+exclude_dir = ["tmp", "vendor", "cmd", "docs", "internal/apps/rest/docs"]
+exclude_regex = ["_test\\.go"]
+exclude_unchanged = true
+include_ext = ["go", "env"]
+log = "build-errors.log"
+stop_on_error = true
 
 [color]
-  build = "yellow"
-  main = "magenta"
-  runner = "green"
-  watcher = "cyan"
+build = "yellow"
+main = "magenta"
+runner = "green"
+watcher = "cyan"
 
 [log]
-  main_only = false
-  time = false
+time = true
 
 [misc]
-  clean_on_exit = true
+clean_on_exit = true
 
 [screen]
-  clear_on_rebuild = false
-  keep_scroll = true
+keep_scroll = true

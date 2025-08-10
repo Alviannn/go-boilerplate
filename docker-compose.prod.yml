@@ -1,6 +1,8 @@
-include:
-  - docker-compose.yml
 services:
+  mariadb:
+    extends:
+      file: docker-compose.db.yml
+      service: mariadb
   app:
     extends:
       file: docker-compose.build.yml
@@ -8,3 +10,6 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
+    environment:
+      - ENVIRONMENT=production
+      - MYSQL_HOST=mariadb
