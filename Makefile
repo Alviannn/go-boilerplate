@@ -72,8 +72,8 @@ start-rest-prod: ## Starts REST API app from 'build' directory for production.
 
 .PHONY: start-rest-dev
 start-rest-dev: ## Starts REST API app with 'air' to allow live/hot reloading as you edit the code.
-	command -v air >/dev/null 2>&1 || go install github.com/air-verse/air@latest
-	ENVIRONMENT=development air -c ./.air.rest.toml
+	command -v air >/dev/null 2>&1 || go install -v github.com/air-verse/air@latest
+	air -c ./.air.rest.toml
 
 # --------------------------------------v DB MIGRATIONS v-------------------------------------- #
 
