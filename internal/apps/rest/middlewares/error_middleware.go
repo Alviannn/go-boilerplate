@@ -16,7 +16,9 @@ func CustomErrorHandler() echo.HTTPErrorHandler {
 			return
 		}
 
-		customErr := customerror.New().WithSourceError(err)
+		customErr := customerror.New().
+			WithContext(c.Request().Context()).
+			WithSourceError(err)
 
 		if currentCustomErr, ok := err.(*customerror.Error); ok {
 			isOverrideError := currentCustomErr.IsPanic || errors.Is(currentCustomErr.GetWorkingError(), context.DeadlineExceeded)

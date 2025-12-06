@@ -52,6 +52,7 @@ func StartServer(container *di.Container) (err error) {
 	app.Use(echo_middlewares.RecoverWithConfig(echo_middlewares.RecoverConfig{
 		LogErrorFunc: func(c echo.Context, err error, stack []byte) error {
 			err = customerror.New().
+				WithContext(c.Request().Context()).
 				WithPanic(true).
 				WithSourceError(err).
 				WithMessage("PANIC: Unhandled error")

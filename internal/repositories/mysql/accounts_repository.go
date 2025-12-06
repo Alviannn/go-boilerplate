@@ -40,6 +40,7 @@ func (r *accounts) Get(ctx context.Context, params models_mysql.AccountGetParam)
 	err = query.First(&account).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		err = customerror.New().
+			WithContext(ctx).
 			WithSourceError(err).
 			WithCode(http.StatusNotFound).
 			WithMessage("Account not found")
@@ -47,6 +48,7 @@ func (r *accounts) Get(ctx context.Context, params models_mysql.AccountGetParam)
 	}
 	if err != nil {
 		err = customerror.New().
+			WithContext(ctx).
 			WithSourceError(err).
 			WithCode(http.StatusInternalServerError).
 			WithMessage("Failed to get account")
@@ -81,6 +83,7 @@ func (r *accounts) GetAll(ctx context.Context, params dtos.AccountGetAllReq) (ac
 
 	if err = query.Find(&accounts).Error; err != nil {
 		err = customerror.New().
+			WithContext(ctx).
 			WithSourceError(err).
 			WithCode(http.StatusInternalServerError).
 			WithMessage("Failed to get all accounts")
@@ -99,6 +102,7 @@ func (r *accounts) Create(ctx context.Context, account *models_mysql.Account) (e
 
 	if err = query.Error; err != nil {
 		err = customerror.New().
+			WithContext(ctx).
 			WithSourceError(err).
 			WithCode(http.StatusInternalServerError).
 			WithMessage("Failed to create new account")

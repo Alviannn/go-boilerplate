@@ -1,9 +1,12 @@
 package customerror
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/rs/zerolog"
 	"github.com/ztrue/tracerr"
 )
 
@@ -18,6 +21,9 @@ import (
 // This struct is using builder pattern, you can see the code example
 // in `responses.NewError()` function.
 type Error struct {
+	// Context is the context of the error.
+	Context context.Context
+
 	// SourceError is the real source of error.
 	//
 	// It acts as a detail that shows where the error really came from,
@@ -51,10 +57,29 @@ type Error struct {
 }
 
 type ErrorJSON struct {
+	src                *Error
 	Message            string   `json:"message"`
 	SourceErrorMessage string   `json:"sourceErrorMessage"`
 	StackLine          string   `json:"stackLine,omitempty"`
 	Stack              []string `json:"stack,omitempty"`
+}
+
+func (ej ErrorJSON) MarshalZerologObject(e *zerolog.Event) {
+	var (
+		ctx    = ej.src.Context
+		rawMap = make(map[string]any)
+	)
+
+	if ctx != nil {
+		e.Ctx(ctx)
+	}
+
+	jsonBuf, _ := json.Marshal(ej)
+	_ = json.Unmarshal(jsonBuf, &rawMap)
+
+	for key, value := range rawMap {
+		e.Interface(key, value)
+	}
 }
 
 func EqualCode(err error, code int) bool {
@@ -91,6 +116,11 @@ func (e *Error) WithCode(statusCode int) *Error {
 	}
 
 	e.Code = statusCode
+	return e
+}
+
+func (e *Error) WithContext(ctx context.Context) *Error {
+	e.Context = ctx
 	return e
 }
 
@@ -156,6 +186,7 @@ func (e *Error) Error() string {
 
 func (e *Error) ToJSON() ErrorJSON {
 	return ErrorJSON{
+		src:                e,
 		Message:            e.Message,
 		SourceErrorMessage: e.GetWorkingError().Error(),
 		StackLine:          e.GetStackLine(),

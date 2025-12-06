@@ -32,6 +32,7 @@ func NewTimeout(timeout time.Duration) echo.MiddlewareFunc {
 				c.Error(err)
 			case <-ctx.Done():
 				err := customerror.New().
+					WithContext(ctx).
 					WithSourceError(ctx.Err()).
 					WithCode(http.StatusServiceUnavailable).
 					WithMessage("Request Timeout")
