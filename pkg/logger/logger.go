@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go-boilerplate/internal/configs"
 	"go-boilerplate/internal/constants"
-	"go-boilerplate/pkg/customerror"
+	"go-boilerplate/pkg/logger/hooks"
 	"io"
 	"os"
 	"path"
@@ -17,6 +17,7 @@ import (
 
 type SetupWithConfigParam struct {
 	ConsoleWriter io.Writer
+	IsDisableFile bool
 }
 
 func SetupWithConfig(param SetupWithConfigParam) error {
@@ -25,12 +26,6 @@ func SetupWithConfig(param SetupWithConfigParam) error {
 		cfg        = configs.Default()
 	)
 
-	err := os.Mkdir(cfg.LogsDir, os.ModePerm)
-	if err != nil && !errors.Is(err, os.ErrExist) {
-		return err
-	}
-
-	zerolog.ErrorMarshalFunc = errorMarshaller
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	// When running in local environment (or basically not in production)
@@ -50,26 +45,36 @@ func SetupWithConfig(param SetupWithConfigParam) error {
 		writerList = append(writerList, param.ConsoleWriter)
 	}
 
-	writerList = append(writerList, NewRotateFileWriter(func() string {
-		fileName := fmt.Sprintf("%s.log", time.Now().Format(time.DateOnly))
-		return path.Join(cfg.LogsDir, fileName)
-	}))
+	if !param.IsDisableFile {
+		err := os.Mkdir(cfg.LogsDir, os.ModePerm)
+		if errors.Is(err, os.ErrExist) {
+			err = nil
+		}
+		if err != nil {
+			return err
+		}
 
-	log.Logger = log.Hook(&requestIDHook{})
+		writerList = append(writerList, NewRotateFileWriter(func() string {
+			fileName := fmt.Sprintf("%s.log", time.Now().Format(time.DateOnly))
+			return path.Join(cfg.LogsDir, fileName)
+		}))
+	}
+
+	applyHooksToLogger()
+
 	log.Logger = log.Output(zerolog.MultiLevelWriter(writerList...))
 	return nil
+}
+
+func applyHooksToLogger() {
+	zerolog.ErrorMarshalFunc = hooks.ErrorMarshallerHook
+
+	log.Logger = log.Hook(&hooks.RequestIDHook{})
 }
 
 func Setup() error {
 	return SetupWithConfig(SetupWithConfigParam{
 		ConsoleWriter: os.Stdout,
+		IsDisableFile: false,
 	})
-}
-
-func errorMarshaller(err error) any {
-	customError, ok := err.(*customerror.Error)
-	if !ok {
-		return err
-	}
-	return customError.ToJSON()
 }
