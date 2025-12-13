@@ -8,17 +8,17 @@ import (
 )
 
 type tx struct {
-	DB *gorm.DB
+	RepositoryMysql
 }
 
-func NewTx(db *gorm.DB) Tx {
+func NewTx(repository RepositoryMysql) Tx {
 	return &tx{
-		DB: db,
+		RepositoryMysql: repository,
 	}
 }
 
 func (r *tx) Transaction(ctx context.Context, fc func(newCtx context.Context) error) error {
-	db := getDB(ctx, r.DB)
+	db := r.GetDB(ctx)
 
 	return db.Transaction(func(gormTx *gorm.DB) error {
 		newCtx := context.WithValue(ctx, constants.CtxKeyGormTransaction, gormTx)

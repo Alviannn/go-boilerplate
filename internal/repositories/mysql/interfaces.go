@@ -4,7 +4,13 @@ import (
 	"context"
 	"go-boilerplate/internal/dtos"
 	models_mysql "go-boilerplate/internal/models/mysql"
+
+	"gorm.io/gorm"
 )
+
+type RepositoryMysql interface {
+	GetDB(ctx context.Context) (mysqlDB *gorm.DB)
+}
 
 type Tx interface {
 	Transaction(ctx context.Context, fc func(newCtx context.Context) error) (err error)

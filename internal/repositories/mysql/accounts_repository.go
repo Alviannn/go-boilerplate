@@ -13,17 +13,17 @@ import (
 )
 
 type accounts struct {
-	DB *gorm.DB
+	RepositoryMysql
 }
 
-func NewAccounts(db *gorm.DB) Accounts {
+func NewAccounts(repository RepositoryMysql) Accounts {
 	return &accounts{
-		DB: db,
+		RepositoryMysql: repository,
 	}
 }
 
 func (r *accounts) Get(ctx context.Context, params models_mysql.AccountGetParam) (account models_mysql.Account, err error) {
-	query := getDB(ctx, r.DB).
+	query := r.GetDB(ctx).
 		WithContext(ctx).
 		Model(&models_mysql.Account{})
 
@@ -60,7 +60,7 @@ func (r *accounts) Get(ctx context.Context, params models_mysql.AccountGetParam)
 }
 
 func (r *accounts) GetAll(ctx context.Context, params dtos.AccountGetAllReq) (accounts []models_mysql.Account, err error) {
-	query := getDB(ctx, r.DB).
+	query := r.GetDB(ctx).
 		WithContext(ctx).
 		Model(&models_mysql.Account{})
 
@@ -95,7 +95,7 @@ func (r *accounts) GetAll(ctx context.Context, params dtos.AccountGetAllReq) (ac
 }
 
 func (r *accounts) Create(ctx context.Context, account *models_mysql.Account) (err error) {
-	query := getDB(ctx, r.DB).
+	query := r.GetDB(ctx).
 		WithContext(ctx).
 		Model(&models_mysql.Account{}).
 		Create(account)

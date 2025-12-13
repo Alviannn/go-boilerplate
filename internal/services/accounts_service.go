@@ -15,16 +15,16 @@ import (
 )
 
 type accounts struct {
-	MySQLRepo repositories_mysql.Accounts
+	RepoMysql repositories_mysql.Accounts
 	Validator *customvalidator.Validator
 }
 
 func NewAccounts(
-	mysqlRepo repositories_mysql.Accounts,
+	repoMysql repositories_mysql.Accounts,
 	validator *customvalidator.Validator,
 ) Accounts {
 	return &accounts{
-		MySQLRepo: mysqlRepo,
+		RepoMysql: repoMysql,
 		Validator: validator,
 	}
 }
@@ -39,7 +39,7 @@ func (s *accounts) GetByID(ctx context.Context, param dtos.AccountGetReq) (accou
 		return
 	}
 
-	account, err = s.MySQLRepo.Get(ctx, models_mysql.AccountGetParam{
+	account, err = s.RepoMysql.Get(ctx, models_mysql.AccountGetParam{
 		ID: param.ID,
 	})
 	if err != nil {
@@ -49,7 +49,7 @@ func (s *accounts) GetByID(ctx context.Context, param dtos.AccountGetReq) (accou
 }
 
 func (s *accounts) GetAll(ctx context.Context, param dtos.AccountGetAllReq) (accounts []models_mysql.Account, err error) {
-	accounts, err = s.MySQLRepo.GetAll(ctx, param)
+	accounts, err = s.RepoMysql.GetAll(ctx, param)
 	if err != nil {
 		return
 	}
@@ -66,7 +66,7 @@ func (s *accounts) Register(ctx context.Context, param dtos.AccountRegisterReq) 
 		return
 	}
 
-	_, err = s.MySQLRepo.Get(ctx, models_mysql.AccountGetParam{
+	_, err = s.RepoMysql.Get(ctx, models_mysql.AccountGetParam{
 		Email: param.Email,
 	})
 	if err == nil {
@@ -96,7 +96,7 @@ func (s *accounts) Register(ctx context.Context, param dtos.AccountRegisterReq) 
 		Password: hashedPassword,
 	}
 
-	err = s.MySQLRepo.Create(ctx, &account)
+	err = s.RepoMysql.Create(ctx, &account)
 	if err != nil {
 		return
 	}
