@@ -36,7 +36,7 @@ func registerRouters(echo *echo.Echo, container *di.Container) (err error) {
 	return
 }
 
-func StartServer(container *di.Container) (err error) {
+func start(container *di.Container) (err error) {
 	// Force DB to load and test the connection.
 	var gormDB *gorm.DB
 	if err = container.Resolve(&gormDB); err != nil {
@@ -72,7 +72,7 @@ func StartServer(container *di.Container) (err error) {
 		},
 	}))
 	app.Use(middlewares.NewLog().Handle)
-	app.Use(middlewares.NewTimeout(30 * time.Second))
+	app.Use(echo_middlewares.ContextTimeout(30 * time.Second))
 
 	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
 	app.JSONSerializer = middlewares.NewErrorGuardJSONSerializer(app)
@@ -108,7 +108,7 @@ func main() {
 		return
 	}
 
-	if err := container.Invoke(StartServer); err != nil {
+	if err := container.Invoke(start); err != nil {
 		log.Fatal().Err(err).Send()
 	}
 }
