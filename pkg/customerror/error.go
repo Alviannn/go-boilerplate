@@ -2,11 +2,9 @@ package customerror
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
-	"github.com/rs/zerolog"
 	"github.com/ztrue/tracerr"
 )
 
@@ -54,32 +52,6 @@ type Error struct {
 
 	// IsPanic is a flag that indicates whether the error is a panic.
 	IsPanic bool
-}
-
-type ErrorJSON struct {
-	src                *Error
-	Message            string   `json:"message"`
-	SourceErrorMessage string   `json:"sourceErrorMessage"`
-	StackLine          string   `json:"stackLine,omitempty"`
-	Stack              []string `json:"stack,omitempty"`
-}
-
-func (ej ErrorJSON) MarshalZerologObject(e *zerolog.Event) {
-	var (
-		ctx    = ej.src.Context
-		rawMap = make(map[string]any)
-	)
-
-	if ctx != nil {
-		e.Ctx(ctx)
-	}
-
-	jsonBuf, _ := json.Marshal(ej)
-	_ = json.Unmarshal(jsonBuf, &rawMap)
-
-	for key, value := range rawMap {
-		e.Interface(key, value)
-	}
 }
 
 func EqualCode(err error, code int) bool {
@@ -149,7 +121,7 @@ func (e *Error) WithPanic(isPanic bool) *Error {
 //
 // The first priority is `SourceError`, although when the value
 // is `nil` it will be replaced with `ThisError`.
-func (e *Error) GetWorkingError() (err error) {
+func (e Error) GetWorkingError() (err error) {
 	err = e.SourceError
 	if err == nil {
 		err = e.thisError
@@ -158,7 +130,7 @@ func (e *Error) GetWorkingError() (err error) {
 	return err
 }
 
-func (e *Error) GetStackTrace() []string {
+func (e Error) GetStackTrace() []string {
 	// Use `make` to avoid returning `nil` value
 	stackList := make([]string, 0)
 	rawStackList := tracerr.StackTrace(e.GetWorkingError())
@@ -170,7 +142,7 @@ func (e *Error) GetStackTrace() []string {
 	return stackList
 }
 
-func (e *Error) GetStackLine() string {
+func (e Error) GetStackLine() string {
 	rawStackList := tracerr.StackTrace(e.GetWorkingError())
 	if len(rawStackList) < 2 {
 		return ""
@@ -180,7 +152,7 @@ func (e *Error) GetStackLine() string {
 	return fmt.Sprintf("%s at line %d", rawStack.Func, rawStack.Line)
 }
 
-func (e *Error) Error() string {
+func (e Error) Error() string {
 	return e.Message
 }
 
