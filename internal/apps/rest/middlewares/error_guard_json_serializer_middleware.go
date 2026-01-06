@@ -26,22 +26,22 @@ func NewErrorGuardJSONSerializer(app *echo.Echo) echo.JSONSerializer {
 	}
 }
 
-func (t *ErrorGuardJSONSerializer) Serialize(c echo.Context, i interface{}, indent string) error {
-	if customErrorJSON, ok := i.(customerror.ErrorJSON); ok {
+func (t *ErrorGuardJSONSerializer) Serialize(c echo.Context, v any, indent string) error {
+	if errResp, ok := v.(customerror.ErrorJSON); ok {
 		// Store original error in `context` so it can log
 		// with stack trace in the logger middleware.
-		helpers.EchoAddContextValue(c, constants.CtxKeyHTTPTraceableError, customErrorJSON)
+		helpers.EchoAddContextValue(c, constants.CtxKeyHTTPTraceableError, errResp)
 
 		// Prevent the error stack trace from being shown in HTTP response.
 		if configs.Default().Environment == constants.EnvProduction {
-			customErrorJSON.Stack = nil
-			i = customErrorJSON
+			errResp.Stack = nil
+			v = errResp
 		}
 	}
 
-	return t.Parent.Serialize(c, i, indent)
+	return t.Parent.Serialize(c, v, indent)
 }
 
-func (t *ErrorGuardJSONSerializer) Deserialize(c echo.Context, i interface{}) error {
-	return t.Parent.Deserialize(c, i)
+func (t *ErrorGuardJSONSerializer) Deserialize(c echo.Context, v any) error {
+	return t.Parent.Deserialize(c, v)
 }

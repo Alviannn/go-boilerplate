@@ -36,19 +36,7 @@ func registerRouters(echo *echo.Echo, container *di.Container) (err error) {
 	return
 }
 
-func start(container *di.Container) (err error) {
-	// Force DB to load and test the connection.
-	var gormDB *gorm.DB
-	if err = container.Resolve(&gormDB); err != nil {
-		return
-	}
-	if err = databases.MigrateMySQL(); err != nil {
-		return
-	}
-
-	app := echo.New()
-	config := configs.Default()
-
+func setupMiddlewares(app *echo.Echo) {
 	app.Use(echo_middlewares.RecoverWithConfig(echo_middlewares.RecoverConfig{
 		LogErrorFunc: func(c echo.Context, err error, stack []byte) error {
 			err = customerror.New().
@@ -64,18 +52,33 @@ func start(container *di.Container) (err error) {
 
 	app.Use(echo_middlewares.Secure())
 	app.Use(echo_middlewares.CORSWithConfig(echo_middlewares.CORSConfig{
-		AllowOrigins: config.CORSAllowedOrigins,
+		AllowOrigins: configs.Default().CORSAllowedOrigins,
 	}))
 	app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
 		RequestIDHandler: func(c echo.Context, rid string) {
 			helpers.EchoAddContextValue(c, constants.CtxKeyRequestID, rid)
 		},
 	}))
-	app.Use(middlewares.NewLog().Handle)
+	app.Use(middlewares.Log())
 	app.Use(echo_middlewares.ContextTimeout(30 * time.Second))
 
 	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
 	app.JSONSerializer = middlewares.NewErrorGuardJSONSerializer(app)
+}
+
+func start(container *di.Container) (err error) {
+	var mysqlDB *gorm.DB
+
+	// Force DB to load and test the connection.
+	if err = container.Resolve(&mysqlDB); err != nil {
+		return
+	}
+	if err = databases.MigrateMySQL(); err != nil {
+		return
+	}
+
+	app := echo.New()
+	setupMiddlewares(app)
 
 	// Override error handler middleware
 	if err = registerRouters(app, container); err != nil {
@@ -84,7 +87,7 @@ func start(container *di.Container) (err error) {
 
 	docs.RegisterSwagger(app)
 
-	err = app.Start(fmt.Sprintf(":%d", config.Port))
+	err = app.Start(fmt.Sprintf(":%d", configs.Default().Port))
 	return
 }
 

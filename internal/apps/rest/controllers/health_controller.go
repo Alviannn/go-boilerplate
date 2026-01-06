@@ -14,13 +14,13 @@ func NewHealth() *health {
 	return &health{}
 }
 
-func (ctl *health) SetupRouter(app *echo.Echo) {
+func (ctl health) SetupRouter(app *echo.Echo) {
 	group := app.Group("/health")
 
 	group.GET("", ctl.Get)
 }
 
-func (ctl *health) Get(c echo.Context) (err error) {
+func (ctl health) Get(c echo.Context) (err error) {
 	currentTime := time.Now().Format(time.DateTime)
 	res := response.NewBuilder().
 		WithData(currentTime).
