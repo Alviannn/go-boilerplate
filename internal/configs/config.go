@@ -34,6 +34,10 @@ func (c *Config) Validate() (err error) {
 	return
 }
 
+func (c Config) IsEnvProd() bool {
+	return c.Environment == constants.EnvProduction
+}
+
 var (
 	defaultConfig Config
 	mockConfig    *Config

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"go-boilerplate/internal/configs"
-	"go-boilerplate/internal/constants"
 	"go-boilerplate/pkg/logger/hooks"
 	"io"
 	"os"
@@ -30,7 +29,7 @@ func SetupWithConfig(param SetupWithConfigParam) error {
 
 	// When running in local environment (or basically not in production)
 	// we'll enable debugging and pretty print logging.
-	if cfg.Environment != constants.EnvProduction {
+	if !cfg.IsEnvProd() {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 		if param.ConsoleWriter != nil {

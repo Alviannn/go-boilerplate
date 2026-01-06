@@ -33,7 +33,7 @@ func (t *ErrorGuardJSONSerializer) Serialize(c echo.Context, v any, indent strin
 		helpers.EchoAddContextValue(c, constants.CtxKeyHTTPTraceableError, errResp)
 
 		// Prevent the error stack trace from being shown in HTTP response.
-		if configs.Default().Environment == constants.EnvProduction {
+		if configs.Default().IsEnvProd() {
 			errResp.Stack = nil
 			v = errResp
 		}

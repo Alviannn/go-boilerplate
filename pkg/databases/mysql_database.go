@@ -2,7 +2,6 @@ package databases
 
 import (
 	"go-boilerplate/internal/configs"
-	"go-boilerplate/internal/constants"
 	"net/url"
 
 	"github.com/amacneil/dbmate/v2/pkg/dbmate"
@@ -22,7 +21,7 @@ func NewMySQLDB() (db *gorm.DB, err error) {
 		logLevel = gormLogger.Warn
 	)
 
-	if cfg.Environment != constants.EnvProduction {
+	if !cfg.IsEnvProd() {
 		logLevel = gormLogger.Info
 	}
 
