@@ -14,6 +14,15 @@ type (
 	}
 
 	NextFilePathFunc func() string
+
+	PerformRotateFileParam struct {
+		NextFilePath string
+		IsUseLock    bool
+	}
+)
+
+const (
+	DefaultFilePerm = os.FileMode(0644)
 )
 
 func NewRotateFileWriter(nextFunc NextFilePathFunc) *RotateFileWriter {
@@ -22,41 +31,44 @@ func NewRotateFileWriter(nextFunc NextFilePathFunc) *RotateFileWriter {
 	}
 }
 
-func (w *RotateFileWriter) rotateFile(nextFilePath string) (err error) {
-	// Closes previous file writer if there were any.
-	if err = w.Close(); err != nil {
-		return
-	}
-
+func (w *RotateFileWriter) Write(p []byte) (n int, err error) {
 	w.mutex.Lock()
 	defer w.mutex.Unlock()
 
-	fileWriter, err := os.OpenFile(nextFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
+	if nextFilePath := w.nextFilePathFunc(); w.currentFilePath != nextFilePath {
+		err = w.performRotateFile(PerformRotateFileParam{
+			NextFilePath: nextFilePath,
+			IsUseLock:    false, // already locked
+		})
+		if err != nil {
+			return
+		}
+	}
+
+	return w.writer.Write(p)
+}
+
+func (w *RotateFileWriter) performRotateFile(param PerformRotateFileParam) (err error) {
+	// Closes previous file writer if there were any.
+	if err = w.performClose(param.IsUseLock); err != nil {
+		return
+	}
+
+	fileWriter, err := os.OpenFile(param.NextFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, DefaultFilePerm)
 	if err != nil {
 		return
 	}
 
 	w.writer = fileWriter
-	w.currentFilePath = nextFilePath
+	w.currentFilePath = param.NextFilePath
 	return
 }
 
-func (w *RotateFileWriter) Write(p []byte) (n int, err error) {
-	if nextFilePath := w.nextFilePathFunc(); w.currentFilePath != nextFilePath {
-		if err = w.rotateFile(nextFilePath); err != nil {
-			return
-		}
+func (w *RotateFileWriter) performClose(isUseLock bool) (err error) {
+	if isUseLock {
+		w.mutex.Lock()
+		defer w.mutex.Unlock()
 	}
-
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
-
-	return w.writer.Write(p)
-}
-
-func (w *RotateFileWriter) Close() (err error) {
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
 
 	if w.writer == nil {
 		return
@@ -67,4 +79,8 @@ func (w *RotateFileWriter) Close() (err error) {
 		w.writer = nil
 	}
 	return
+}
+
+func (w *RotateFileWriter) Close() (err error) {
+	return w.performClose(true)
 }
