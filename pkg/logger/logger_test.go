@@ -1,13 +1,12 @@
 package logger_test
 
 import (
-	"fmt"
 	"go-boilerplate/internal/configs"
 	"go-boilerplate/pkg/logger"
+	"io"
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/suite"
@@ -37,15 +36,38 @@ func (s *loggerTest) setupTest() (finishFunc func()) {
 	}
 }
 
+func (s *loggerTest) prepareLogFile(t *testing.T, fileName string) (writer *logger.RotateFileWriter, err error) {
+	t.Helper()
+
+	err = os.MkdirAll(filepath.Dir(fileName), os.ModePerm)
+	if err != nil {
+		return
+	}
+
+	writer = logger.NewRotateFileWriter(func() string {
+		return fileName
+	})
+	return
+}
+
 func (s *loggerTest) TestSetup() {
 	finishFunc := s.setupTest()
 	defer finishFunc()
 
-	var (
-		logsDir     = configs.Default().LogsDir
-		logFilePath = path.Join(logsDir, fmt.Sprintf("%s.log", time.Now().Format(time.DateOnly)))
-		err         = logger.Setup()
-	)
+	logFilePath := filepath.Join(configs.Default().LogsDir, "test.log")
+	logFileWriter, err := s.prepareLogFile(s.T(), logFilePath)
+
+	if logFileWriter != nil {
+		defer logFileWriter.Close()
+
+		logger.Setup(logger.SetupParam{
+			ConsoleWriter: nil,
+			ExtraWriters:  []io.Writer{logFileWriter},
+		})
+	}
+
+	s.NoError(err)
+	s.NotNil(logFileWriter)
 
 	log.Info().Msg("hello world")
 
@@ -57,13 +79,18 @@ func (s *loggerTest) TestWriteLog() {
 	finishFunc := s.setupTest()
 	defer finishFunc()
 
-	var (
-		logsDir     = configs.Default().LogsDir
-		fileName    = fmt.Sprintf("%s.log", time.Now().Format(time.DateOnly))
-		logFilePath = path.Join(logsDir, fileName)
-	)
+	logFilePath := filepath.Join(configs.Default().LogsDir, "test.log")
+	logFileWriter, err := s.prepareLogFile(s.T(), logFilePath)
 
-	err := logger.Setup()
+	if logFileWriter != nil {
+		defer logFileWriter.Close()
+
+		logger.Setup(logger.SetupParam{
+			ConsoleWriter: nil,
+			ExtraWriters:  []io.Writer{logFileWriter},
+		})
+	}
+
 	s.Require().NoError(err)
 
 	log.Info().Msg("test info")

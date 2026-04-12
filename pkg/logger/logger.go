@@ -1,36 +1,29 @@
 package logger
 
 import (
-	"errors"
-	"fmt"
 	"go-boilerplate/internal/configs"
 	"go-boilerplate/pkg/logger/hooks"
 	"io"
-	"os"
-	"path"
-	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-type SetupWithConfigParam struct {
+type SetupParam struct {
 	ConsoleWriter io.Writer
-	IsDisableFile bool
+	ExtraWriters  []io.Writer
 }
 
-func SetupWithConfig(param SetupWithConfigParam) error {
+func Setup(param SetupParam) {
 	var (
-		writerList = []io.Writer{}
-		cfg        = configs.Default()
+		writerList  = []io.Writer{}
+		globalLevel = zerolog.InfoLevel // defaults to info level
 	)
-
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	// When running in local environment (or basically not in production)
 	// we'll enable debugging and pretty print logging.
-	if !cfg.IsEnvProd() {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	if !configs.Default().IsEnvProd() {
+		globalLevel = zerolog.DebugLevel
 
 		if param.ConsoleWriter != nil {
 			param.ConsoleWriter = zerolog.ConsoleWriter{
@@ -43,37 +36,17 @@ func SetupWithConfig(param SetupWithConfigParam) error {
 	if param.ConsoleWriter != nil {
 		writerList = append(writerList, param.ConsoleWriter)
 	}
-
-	if !param.IsDisableFile {
-		err := os.Mkdir(cfg.LogsDir, os.ModePerm)
-		if errors.Is(err, os.ErrExist) {
-			err = nil
-		}
-		if err != nil {
-			return err
-		}
-
-		writerList = append(writerList, NewRotateFileWriter(func() string {
-			fileName := fmt.Sprintf("%s.log", time.Now().Format(time.DateOnly))
-			return path.Join(cfg.LogsDir, fileName)
-		}))
+	if len(param.ExtraWriters) > 0 {
+		writerList = append(writerList, param.ExtraWriters...)
 	}
 
-	applyHooksToLogger()
-
-	log.Logger = log.Output(zerolog.MultiLevelWriter(writerList...))
-	return nil
-}
-
-func applyHooksToLogger() {
+	zerolog.SetGlobalLevel(globalLevel)
 	zerolog.ErrorMarshalFunc = hooks.ErrorMarshallerHook
 
-	log.Logger = log.Hook(&hooks.RequestIDHook{})
-}
+	logWriter := zerolog.MultiLevelWriter(writerList...)
 
-func Setup() error {
-	return SetupWithConfig(SetupWithConfigParam{
-		ConsoleWriter: os.Stdout,
-		IsDisableFile: false,
-	})
+	newLogger := zerolog.New(logWriter).With().Timestamp().Logger()
+	newLogger = newLogger.Hook(&hooks.RequestIDHook{})
+
+	log.Logger = newLogger
 }
