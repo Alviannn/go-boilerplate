@@ -1,4 +1,4 @@
-package hooks
+package logger_hooks
 
 import "go-boilerplate/pkg/customerror"
 
@@ -9,4 +9,3 @@ func ErrorMarshallerHook(err error) any {
 	}
 	return customError.ToJSON()
 }
-

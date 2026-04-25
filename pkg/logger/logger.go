@@ -2,7 +2,7 @@ package logger
 
 import (
 	"go-boilerplate/internal/configs"
-	"go-boilerplate/pkg/logger/hooks"
+	logger_hooks "go-boilerplate/pkg/logger/hooks"
 	"io"
 
 	"github.com/rs/zerolog"
@@ -41,12 +41,13 @@ func Setup(param SetupParam) {
 	}
 
 	zerolog.SetGlobalLevel(globalLevel)
-	zerolog.ErrorMarshalFunc = hooks.ErrorMarshallerHook
+	zerolog.ErrorMarshalFunc = logger_hooks.ErrorMarshallerHook
 
 	logWriter := zerolog.MultiLevelWriter(writerList...)
 
 	newLogger := zerolog.New(logWriter).With().Timestamp().Logger()
-	newLogger = newLogger.Hook(&hooks.RequestIDHook{})
+	newLogger = newLogger.Hook(&logger_hooks.RequestIDHook{})
+	newLogger = newLogger.Hook(&logger_hooks.LogMapHook{})
 
 	log.Logger = newLogger
 }

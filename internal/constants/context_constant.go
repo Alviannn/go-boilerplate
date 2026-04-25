@@ -6,4 +6,5 @@ const (
 	CtxKeyRequestID          = ContextKey("requestid")
 	CtxKeyGormTransaction    = ContextKey("gorm_transaction")
 	CtxKeyHTTPTraceableError = ContextKey("http_traceable_error")
+	CtxKeyLogMap             = ContextKey("log_map")
 )

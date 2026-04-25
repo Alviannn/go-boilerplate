@@ -1,4 +1,4 @@
-package hooks
+package logger_hooks
 
 import (
 	"fmt"
