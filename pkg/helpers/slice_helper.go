@@ -8,7 +8,7 @@ func SliceMap[Before any, After any](slice []Before, mapFunc func(Before) After)
 	return
 }
 
-func SliceDeduplicateFunc[T any, K comparable](oldList []T, keyFunc func(T) K) []T {
+func SliceDedupFunc[T any, K comparable](oldList []T, keyFunc func(T) K) []T {
 	var (
 		seen   = make(map[K]struct{}, len(oldList))
 		result = make([]T, 0)
@@ -28,8 +28,8 @@ func SliceDeduplicateFunc[T any, K comparable](oldList []T, keyFunc func(T) K) [
 	return result
 }
 
-func SliceDeduplicate[T comparable](oldList []T) []T {
-	return SliceDeduplicateFunc(oldList, func(key T) T {
+func SliceDedup[T comparable](oldList []T) []T {
+	return SliceDedupFunc(oldList, func(key T) T {
 		return key
 	})
 }
