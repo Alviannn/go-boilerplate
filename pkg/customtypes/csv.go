@@ -1,11 +1,8 @@
 package customtypes
 
 import (
-	"encoding"
 	"encoding/json"
 	"strings"
-
-	"github.com/labstack/echo/v4"
 )
 
 const (
@@ -13,41 +10,61 @@ const (
 )
 
 type CSV struct {
-	json.Unmarshaler
-	encoding.TextUnmarshaler
-	echo.BindUnmarshaler
-
 	Source string
 	Comma  string
 }
 
-func (ct *CSV) ToSlice() []string {
-	currentComma := ct.Comma
-	if currentComma == "" {
-		currentComma = DefaultComma
+func NewCSV(source string) *CSV {
+	v := &CSV{}
+	v.fillDefaults().WithSource(source)
+	return v
+}
+
+func (ct *CSV) fillDefaults() *CSV {
+	if ct.Comma == "" {
+		ct.Comma = DefaultComma
+	}
+	return ct
+}
+
+func (ct *CSV) WithComma(comma string) *CSV {
+	ct.Comma = comma
+	return ct
+}
+
+func (ct *CSV) WithSource(source string) *CSV {
+	ct.Source = source
+	return ct
+}
+
+func (ct CSV) ToSlice() (strList []string) {
+	if ct.Source == "" {
+		return
 	}
 
-	splitList := strings.Split(ct.Source, currentComma)
-	if len(splitList) == 1 && splitList[0] == "" {
-		return []string{}
-	}
-	return splitList
+	strList = strings.Split(ct.Source, ct.Comma)
+	return
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (ct *CSV) UnmarshalJSON(buf []byte) error {
-	ct.Source = string(buf)
+	var strVal string
+	if err := json.Unmarshal(buf, &strVal); err != nil {
+		return err
+	}
+
+	ct.fillDefaults().WithSource(strVal)
 	return nil
 }
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 func (ct *CSV) UnmarshalText(text []byte) error {
-	ct.Source = string(text)
+	ct.fillDefaults().WithSource(string(text))
 	return nil
 }
 
 // UnmarshalParam implements the echo.BindUnmarshaler interface.
 func (ct *CSV) UnmarshalParam(param string) error {
-	ct.Source = param
+	ct.fillDefaults().WithSource(param)
 	return nil
 }
