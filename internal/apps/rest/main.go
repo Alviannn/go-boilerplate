@@ -92,10 +92,10 @@ func start(container *di.Container) (err error) {
 
 // main starts the REST API server
 //
-//	@title		API documentation
-//	@version	1.0
-//	@schemes	http https
-//	@host		localhost:5000
+// @title    API documentation
+// @version  1.0
+// @schemes  http https
+// @host     localhost:5000
 func main() {
 	if err := configs.Load(); err != nil {
 		panic(err)
