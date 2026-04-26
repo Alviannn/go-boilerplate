@@ -1,86 +1,66 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	controllers_rest "go-boilerplate/internal/apps/rest/controllers"
 	"go-boilerplate/internal/apps/rest/docs"
 	"go-boilerplate/internal/apps/rest/middlewares"
 	"go-boilerplate/internal/configs"
-	"go-boilerplate/internal/constants"
-	"go-boilerplate/internal/repositories"
-	"go-boilerplate/internal/services"
-	"go-boilerplate/pkg/customerror"
 	"go-boilerplate/pkg/databases"
-	"go-boilerplate/pkg/dependencies"
-	"go-boilerplate/pkg/helpers"
+	"go-boilerplate/pkg/logger"
+	"io"
+	"os"
+	"path"
 	"time"
 
-	"github.com/defval/di"
 	"github.com/labstack/echo/v4"
-	echo_middlewares "github.com/labstack/echo/v4/middleware"
-	"github.com/rs/zerolog/log"
+	"github.com/samber/do/v2"
 	"gorm.io/gorm"
 
 	_ "go-boilerplate/internal/apps/rest/docs"
 )
 
-func registerRouters(echo *echo.Echo, container *di.Container) (err error) {
-	var restDeliveries []controllers_rest.Controller
-	if err = container.Resolve(&restDeliveries); err != nil {
+func setupLogger() (err error) {
+	cfg := configs.Default()
+
+	err = os.MkdirAll(cfg.LogsDir, os.ModePerm)
+	if errors.Is(err, os.ErrExist) {
+		err = nil
+	}
+	if err != nil {
 		return
 	}
 
-	for _, rest := range restDeliveries {
-		rest.SetupRouter(echo)
-	}
+	fileWriter := logger.NewRotateFileWriter(func() string {
+		fileName := fmt.Sprintf("%s.log", time.Now().Format(time.DateOnly))
+		return path.Join(cfg.LogsDir, fileName)
+	})
+
+	logger.Setup(logger.SetupParam{
+		ConsoleWriter: os.Stdout,
+		ExtraWriters:  []io.Writer{fileWriter},
+	})
 	return
 }
 
-func setupMiddlewares(app *echo.Echo) {
-	app.Use(echo_middlewares.RecoverWithConfig(echo_middlewares.RecoverConfig{
-		LogErrorFunc: func(c echo.Context, err error, stack []byte) error {
-			err = customerror.New().
-				WithPanic(true).
-				WithSourceError(err).
-				WithMessage("PANIC: Unhandled error")
-			return err
-		},
-	}))
-
-	app.Pre(echo_middlewares.RemoveTrailingSlash())
-
-	app.Use(echo_middlewares.Secure())
-	app.Use(echo_middlewares.CORSWithConfig(echo_middlewares.CORSConfig{
-		AllowOrigins: configs.Default().CORSAllowedOrigins,
-	}))
-	app.Use(echo_middlewares.RequestIDWithConfig(echo_middlewares.RequestIDConfig{
-		RequestIDHandler: func(c echo.Context, rid string) {
-			helpers.EchoAddContextValue(c, constants.CtxKeyRequestID, rid)
-		},
-	}))
-	app.Use(middlewares.Log())
-	app.Use(echo_middlewares.ContextTimeout(30 * time.Second))
-
-	app.HTTPErrorHandler = middlewares.CustomErrorHandler()
-	app.JSONSerializer = middlewares.NewErrorGuardJSONSerializer(app)
-}
-
-func start(container *di.Container) (err error) {
-	var mysqlDB *gorm.DB
-
+func startServer(injector *do.RootScope) (err error) {
 	// Force DB to load and test the connection.
-	if err = container.Resolve(&mysqlDB); err != nil {
+	_, err = do.Invoke[*gorm.DB](injector)
+	if err != nil {
 		return
 	}
+
 	if err = databases.MigrateMySQL(); err != nil {
 		return
 	}
 
 	app := echo.New()
-	setupMiddlewares(app)
 
-	// Override error handler middleware
-	if err = registerRouters(app, container); err != nil {
+	middlewares.Use(app)
+
+	// Register all controllers
+	if err = controllers_rest.Register(injector, app); err != nil {
 		return
 	}
 
@@ -101,16 +81,13 @@ func main() {
 		panic(err)
 	}
 
-	container, err := dependencies.New(
-		repositories.Module(),
-		services.Module(),
-		controllers_rest.Module(),
-	)
-	if err != nil {
-		return
+	if err := setupLogger(); err != nil {
+		panic(err)
 	}
 
-	if err := container.Invoke(start); err != nil {
-		log.Fatal().Err(err).Send()
+	injector := NewDI()
+
+	if err := startServer(injector); err != nil {
+		panic(err)
 	}
 }

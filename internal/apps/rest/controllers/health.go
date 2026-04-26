@@ -6,15 +6,16 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/samber/do/v2"
 )
 
 type health struct{}
 
-func NewHealth() *health {
-	return &health{}
+func NewHealth(i do.Injector) (Controller, error) {
+	return do.InvokeStruct[*health](i)
 }
 
-func (ctl health) SetupRouter(app *echo.Echo) {
+func (ctl *health) SetupRouter(app *echo.Echo) {
 	group := app.Group("/health")
 
 	group.GET("", ctl.Get)

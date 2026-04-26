@@ -65,7 +65,7 @@ func (m logMiddleware) writeLogRequest(c echo.Context, buf []byte) {
 		header = req.Header.Clone()
 	)
 
-	if buf != nil {
+	if len(buf) > 0 {
 		if err := json.Unmarshal(buf, &body); err != nil {
 			log.Error().Ctx(ctx).Err(err).Msg("failed to unmarshal request body")
 		}

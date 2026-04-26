@@ -11,3 +11,7 @@ type Accounts interface {
 	GetAll(ctx context.Context, param dtos.AccountGetAllReq) (accounts []models_mysql.Account, err error)
 	Register(ctx context.Context, param dtos.AccountRegisterReq) (err error)
 }
+
+type Helper interface {
+	GetBase() *Base
+}

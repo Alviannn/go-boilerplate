@@ -11,22 +11,17 @@ import (
 	"net/http"
 
 	"github.com/rs/zerolog/log"
+	"github.com/samber/do/v2"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type accounts struct {
-	RepoMysql repositories_mysql.Accounts
-	Validator *customvalidator.Validator
+	Validator *customvalidator.Validator `do:""`
+	RepoMysql *repositories_mysql.Base   `do:""`
 }
 
-func NewAccounts(
-	repoMysql repositories_mysql.Accounts,
-	validator *customvalidator.Validator,
-) Accounts {
-	return &accounts{
-		RepoMysql: repoMysql,
-		Validator: validator,
-	}
+func NewAccounts(i do.Injector) (Accounts, error) {
+	return do.InvokeStruct[*accounts](i)
 }
 
 func (s *accounts) GetByID(ctx context.Context, param dtos.AccountGetReq) (account models_mysql.Account, err error) {
@@ -38,7 +33,7 @@ func (s *accounts) GetByID(ctx context.Context, param dtos.AccountGetReq) (accou
 		return
 	}
 
-	account, err = s.RepoMysql.Get(ctx, models_mysql.AccountGetParam{
+	account, err = s.RepoMysql.Accounts.Get(ctx, models_mysql.AccountGetParam{
 		ID: param.ID,
 	})
 	if err != nil {
@@ -48,7 +43,7 @@ func (s *accounts) GetByID(ctx context.Context, param dtos.AccountGetReq) (accou
 }
 
 func (s *accounts) GetAll(ctx context.Context, param dtos.AccountGetAllReq) (accounts []models_mysql.Account, err error) {
-	accounts, err = s.RepoMysql.GetAll(ctx, param)
+	accounts, err = s.RepoMysql.Accounts.GetAll(ctx, param)
 	if err != nil {
 		return
 	}
@@ -64,7 +59,7 @@ func (s *accounts) Register(ctx context.Context, param dtos.AccountRegisterReq) 
 		return
 	}
 
-	_, err = s.RepoMysql.Get(ctx, models_mysql.AccountGetParam{
+	_, err = s.RepoMysql.Accounts.Get(ctx, models_mysql.AccountGetParam{
 		Email: param.Email,
 	})
 	if err == nil {
@@ -93,7 +88,7 @@ func (s *accounts) Register(ctx context.Context, param dtos.AccountRegisterReq) 
 		Password: hashedPassword,
 	}
 
-	err = s.RepoMysql.Create(ctx, &account)
+	err = s.RepoMysql.Accounts.Create(ctx, &account)
 	if err != nil {
 		return
 	}

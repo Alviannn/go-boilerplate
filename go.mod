@@ -5,11 +5,11 @@ go 1.26.2
 require (
 	github.com/amacneil/dbmate/v2 v2.32.0
 	github.com/caarlos0/env/v11 v11.4.0
-	github.com/defval/di v1.12.0
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.15.1
 	github.com/rs/zerolog v1.35.1
+	github.com/samber/do/v2 v2.0.0
 	github.com/stretchr/testify v1.11.1
 	github.com/swaggo/echo-swagger v1.5.2
 	github.com/swaggo/swag v1.16.6
@@ -49,6 +49,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.42 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
+	github.com/samber/go-type-to-string v1.8.0 // indirect
 	github.com/sv-tools/openapi v0.4.0 // indirect
 	github.com/swaggo/files/v2 v2.0.2 // indirect
 	github.com/swaggo/swag/v2 v2.0.0-rc5 // indirect

@@ -8,16 +8,15 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/samber/do/v2"
 )
 
 type accounts struct {
-	Service services.Accounts
+	Service *services.Base `do:""`
 }
 
-func NewAccounts(service services.Accounts) *accounts {
-	return &accounts{
-		Service: service,
-	}
+func NewAccounts(i do.Injector) (Controller, error) {
+	return do.InvokeStruct[*accounts](i)
 }
 
 func (ctl *accounts) SetupRouter(echo *echo.Echo) {
@@ -53,7 +52,7 @@ func (ctl *accounts) GetByID(c echo.Context) (err error) {
 		return c.JSON(res.StatusCode, res.Data)
 	}
 
-	account, err := ctl.Service.GetByID(ctx, params)
+	account, err := ctl.Service.Accounts.GetByID(ctx, params)
 	res = response.NewBuilder().
 		WithSuccessCode(http.StatusOK).
 		WithData(account).
@@ -92,7 +91,7 @@ func (ctl *accounts) GetAll(c echo.Context) (err error) {
 		return c.JSON(res.StatusCode, res.Data)
 	}
 
-	data, err := ctl.Service.GetAll(ctx, params)
+	data, err := ctl.Service.Accounts.GetAll(ctx, params)
 	res = response.NewBuilder().
 		WithSuccessCode(http.StatusOK).
 		WithData(data).
@@ -127,7 +126,7 @@ func (ctl *accounts) Register(c echo.Context) (err error) {
 		return c.JSON(res.StatusCode, res.Data)
 	}
 
-	err = ctl.Service.Register(ctx, params)
+	err = ctl.Service.Accounts.Register(ctx, params)
 	res = response.NewBuilder().
 		WithSuccessCode(http.StatusOK).
 		WithError(err).

@@ -9,17 +9,16 @@ import (
 	"net/http"
 
 	"github.com/rs/zerolog/log"
+	"github.com/samber/do/v2"
 	"gorm.io/gorm"
 )
 
 type accounts struct {
-	RepositoryMysql
+	Helper `do:""`
 }
 
-func NewAccounts(repository RepositoryMysql) Accounts {
-	return &accounts{
-		RepositoryMysql: repository,
-	}
+func NewAccounts(i do.Injector) (Accounts, error) {
+	return do.InvokeStruct[*accounts](i)
 }
 
 func (r *accounts) Get(ctx context.Context, params models_mysql.AccountGetParam) (account models_mysql.Account, err error) {
