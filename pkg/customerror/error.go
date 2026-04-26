@@ -1,7 +1,6 @@
 package customerror
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
@@ -19,9 +18,6 @@ import (
 // This struct is using builder pattern, you can see the code example
 // in `responses.NewError()` function.
 type Error struct {
-	// Context is the context of the error.
-	Context context.Context
-
 	// SourceError is the real source of error.
 	//
 	// It acts as a detail that shows where the error really came from,
@@ -88,11 +84,6 @@ func (e *Error) WithCode(statusCode int) *Error {
 	}
 
 	e.Code = statusCode
-	return e
-}
-
-func (e *Error) WithContext(ctx context.Context) *Error {
-	e.Context = ctx
 	return e
 }
 

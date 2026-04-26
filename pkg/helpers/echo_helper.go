@@ -12,7 +12,6 @@ import (
 func EchoDefaultBind(c echo.Context, param any) (err error) {
 	if err := c.Bind(param); err != nil {
 		err = customerror.New().
-			WithContext(c.Request().Context()).
 			WithCode(http.StatusBadRequest).
 			WithSourceError(err).
 			WithMessage(constants.ErrFailedBind)
