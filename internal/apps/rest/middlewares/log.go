@@ -112,7 +112,7 @@ func (m logMiddleware) writeLogResponse(c echo.Context, buf []byte, elapsedTime 
 		}
 	}
 
-	if buf != nil {
+	if len(buf) > 0 {
 		if err := json.Unmarshal(buf, &body); err != nil {
 			log.Error().Ctx(ctx).Err(err).Msg("failed to unmarshal response body")
 			body = nil
