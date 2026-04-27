@@ -29,16 +29,16 @@ func (ctl *accounts) SetupRouter(echo *echo.Echo) {
 
 // GetByID gets account detail by the account ID
 //
-// @Summary      Gets account details
-// @Description  Gets account details by the account ID
-// @Tags         accounts
-// @Accept       json
-// @Produce      json
-// @Param        id   path      int  true  "Account's ID"
-// @Success      200  {object}  models_mysql.Account
-// @Failure      400  {object}  customerror.ErrorJSON
-// @Failure      500  {object}  customerror.ErrorJSON
-// @Router       /accounts/{id} [get]
+//	@Summary		Gets account details
+//	@Description	Gets account details by the account ID
+//	@Tags			accounts
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"Account's ID"
+//	@Success		200	{object}	models_mysql.Account
+//	@Failure		400	{object}	customerror.ErrorJSON
+//	@Failure		500	{object}	customerror.ErrorJSON
+//	@Router			/accounts/{id} [get]
 func (ctl *accounts) GetByID(c echo.Context) (err error) {
 	var (
 		params dtos.AccountGetReq
@@ -64,20 +64,20 @@ func (ctl *accounts) GetByID(c echo.Context) (err error) {
 
 // GetAll gets all accounts along with its details
 //
-// @Summary      Gets all accounts along with its details
-// @Description  Gets all accounts along with its details
-// @Tags         accounts
-// @Accept       json
-// @Produce      json
-// @Param        username  query     string  false  "Account's username"
-// @Param        email     query     string  false  "Account's email address"
-// @Param        fullName  query     string  false  "Account's full name"
-// @Param        limit     query     int     false  "Limit the amount data to show"
-// @Param        offset    query     int     false  "The data offset, or where it should start"
-// @Success      200       {object}  []models_mysql.Account
-// @Failure      400       {object}  customerror.ErrorJSON
-// @Failure      500       {object}  customerror.ErrorJSON
-// @Router       /accounts [get]
+//	@Summary		Gets all accounts along with its details
+//	@Description	Gets all accounts along with its details
+//	@Tags			accounts
+//	@Accept			json
+//	@Produce		json
+//	@Param			username	query		string	false	"Account's username"
+//	@Param			email		query		string	false	"Account's email address"
+//	@Param			fullName	query		string	false	"Account's full name"
+//	@Param			limit		query		int		false	"Limit the amount data to show"
+//	@Param			offset		query		int		false	"The data offset, or where it should start"
+//	@Success		200			{object}	[]models_mysql.Account
+//	@Failure		400			{object}	customerror.ErrorJSON
+//	@Failure		500			{object}	customerror.ErrorJSON
+//	@Router			/accounts [get]
 func (ctl *accounts) GetAll(c echo.Context) (err error) {
 	var (
 		params dtos.AccountGetAllReq
@@ -103,16 +103,16 @@ func (ctl *accounts) GetAll(c echo.Context) (err error) {
 
 // Register creates or registers a new account
 //
-// @Summary      Register a new account
-// @Description  Creates or registers a new account
-// @Tags         accounts
-// @Accept       json
-// @Produce      json
-// @Param        newAccount  body      dtos.AccountRegisterReq  true  "New account details"
-// @Success      200         {object}  any
-// @Failure      400         {object}  customerror.ErrorJSON
-// @Failure      500         {object}  customerror.ErrorJSON
-// @Router       /accounts [post]
+//	@Summary		Register a new account
+//	@Description	Creates or registers a new account
+//	@Tags			accounts
+//	@Accept			json
+//	@Produce		json
+//	@Param			newAccount	body		dtos.AccountRegisterReq	true	"New account details"
+//	@Success		200			{object}	any
+//	@Failure		400			{object}	customerror.ErrorJSON
+//	@Failure		500			{object}	customerror.ErrorJSON
+//	@Router			/accounts [post]
 func (ctl *accounts) Register(c echo.Context) (err error) {
 	var (
 		params dtos.AccountRegisterReq

@@ -33,6 +33,7 @@ func NewMySQLDB() (db *gorm.DB, err error) {
 	)
 }
 
+// TODO: create own package to migrate db or use goose
 func MigrateMySQL() (err error) {
 	rawDBUrl := configs.Default().MySQL.ToDbmateURL()
 	dbUrl, err := url.Parse(rawDBUrl)

@@ -113,8 +113,7 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            type: object
+          schema: {}
         "400":
           description: Bad Request
           schema:
