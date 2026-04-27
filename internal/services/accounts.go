@@ -88,7 +88,13 @@ func (s *accounts) Register(ctx context.Context, param dtos.AccountRegisterReq) 
 		Password: hashedPassword,
 	}
 
-	err = s.RepoMysql.Accounts.Create(ctx, &account)
+	err = s.RepoMysql.Helper.Transaction(ctx, func(newCtx context.Context) error {
+		txErr := s.RepoMysql.Accounts.Create(newCtx, &account)
+		if txErr != nil {
+			return txErr
+		}
+		return nil
+	})
 	if err != nil {
 		return
 	}
