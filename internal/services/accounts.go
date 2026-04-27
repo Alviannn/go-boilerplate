@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"crypto/sha256"
 	"go-boilerplate/internal/constants"
 	"go-boilerplate/internal/dtos"
 	models_mysql "go-boilerplate/internal/models/mysql"
@@ -102,7 +103,11 @@ func (s *accounts) Register(ctx context.Context, param dtos.AccountRegisterReq) 
 }
 
 func (s *accounts) hashPassword(ctx context.Context, password string) (hashed string, err error) {
-	rawHashed, err := bcrypt.GenerateFromPassword([]byte(password), constants.DefaultHashCost)
+	// pre-hash with sha256 before bcrypt for better security and allow longer passwords
+	sha256Hash := sha256.New()
+	sha256Hash.Write([]byte(password))
+
+	rawHashed, err := bcrypt.GenerateFromPassword(sha256Hash.Sum(nil), constants.DefaultHashCost)
 	if err != nil {
 		err = customerror.New().
 			WithSourceError(err).
