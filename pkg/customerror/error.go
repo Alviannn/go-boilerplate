@@ -149,7 +149,6 @@ func (e Error) Error() string {
 
 func (e *Error) ToJSON() ErrorJSON {
 	return ErrorJSON{
-		src:                e,
 		Message:            e.Message,
 		SourceErrorMessage: e.GetWorkingError().Error(),
 		StackLine:          e.GetStackLine(),
