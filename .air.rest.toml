@@ -3,7 +3,7 @@ tmp_dir = "build"
 
 [build]
 bin = "./build/go-boilerplate-rest"
-cmd = "make build-rest"
+cmd = "just build-rest"
 delay = 1000
 rerun = true
 rerun_delay = 80000
