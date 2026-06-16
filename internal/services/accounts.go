@@ -65,7 +65,6 @@ func (s *accounts) Register(ctx context.Context, param dtos.AccountRegisterReq) 
 	})
 	if err == nil {
 		err = customerror.New().
-			WithSourceError(err).
 			WithCode(http.StatusConflict).
 			WithMessage("Account with this email already exists")
 		return
