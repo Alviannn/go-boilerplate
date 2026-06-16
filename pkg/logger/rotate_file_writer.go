@@ -21,10 +21,6 @@ type (
 	}
 )
 
-const (
-	DefaultFilePerm = os.FileMode(0644)
-)
-
 func NewRotateFileWriter(nextFunc NextFilePathFunc) *RotateFileWriter {
 	return &RotateFileWriter{
 		nextFilePathFunc: nextFunc,
@@ -35,7 +31,9 @@ func (w *RotateFileWriter) Write(p []byte) (n int, err error) {
 	w.mutex.Lock()
 	defer w.mutex.Unlock()
 
-	if nextFilePath := w.nextFilePathFunc(); w.currentFilePath != nextFilePath {
+	nextFilePath := w.nextFilePathFunc()
+
+	if w.writer == nil || w.currentFilePath != nextFilePath {
 		err = w.performRotateFile(PerformRotateFileParam{
 			NextFilePath: nextFilePath,
 			IsUseLock:    false, // already locked
@@ -54,7 +52,12 @@ func (w *RotateFileWriter) performRotateFile(param PerformRotateFileParam) (err 
 		return
 	}
 
-	fileWriter, err := os.OpenFile(param.NextFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, DefaultFilePerm)
+	var (
+		defaultFilePerm = os.FileMode(0644)
+		defaultFileFlag = os.O_CREATE | os.O_WRONLY | os.O_APPEND
+	)
+
+	fileWriter, err := os.OpenFile(param.NextFilePath, defaultFileFlag, defaultFilePerm)
 	if err != nil {
 		return
 	}
@@ -77,6 +80,7 @@ func (w *RotateFileWriter) performClose(isUseLock bool) (err error) {
 	err = w.writer.Close()
 	if err == nil {
 		w.writer = nil
+		w.currentFilePath = ""
 	}
 	return
 }
