@@ -6,6 +6,8 @@ src_models := "./internal/models/mysql"
 src_dtos   := "./internal/dtos"
 pkg_err    := "./pkg/customerror"
 
+swag_cmd := "go run github.com/swaggo/swag/cmd/swag@latest"
+
 # OS Detection
 os_var := if os() == "windows" {
     "windows"
@@ -33,10 +35,9 @@ clean:
 
 # Format and generate swagger docs
 docs:
-    go install github.com/swaggo/swag/cmd/swag@latest
-    swag fmt -d {{src_rest}}
+    {{swag_cmd}} fmt -d {{src_rest}}
     mkdir -p {{src_rest}}/docs
-    swag init -g main.go -d {{src_rest}},{{src_models}},{{src_dtos}},{{pkg_err}} -o {{src_rest}}/docs
+    {{swag_cmd}} init -g main.go -d {{src_rest}},{{src_models}},{{src_dtos}},{{pkg_err}} -o {{src_rest}}/docs
 
 # Build REST API (usage: just build-rest target=./my-bin)
 build-rest target=('./build/' + app_name + '-rest' + bin_ext): docs
